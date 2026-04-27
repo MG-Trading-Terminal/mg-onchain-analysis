@@ -1,0 +1,129 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthPumpD052bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "symbol": "PUMP052",
+    "label": "positive",
+    "category": "pump_dump",
+    "source_url": "synthetic/pump_dump/signal_b_burst_fallback",
+    "fetched_at": "2026-04-21T20:01:00Z",
+    "synthetic": true,
+    "notes": "D04 Signal B (burst fallback): no 7d baseline (new token, 1 day old). vol_1h/vol_24h = 1.0 (RAVE-style zero-baseline burst). vol_1h=$31k > $5k dust filter. Confidence=(0.50 + (1.0-0.90)/0.10*0.25)=0.75."
+  },
+  "token_meta": {
+    "mint": "SynthPumpD052bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "BurstToken052",
+    "symbol": "PUMP052",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevBurst052111111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 3100,
+    "rugcheck_score_normalised": 62,
+    "risks": [],
+    "markets": [
+      {
+        "pool_address": "BurstPool05211111111111111111111111111111111",
+        "dex": "raydium",
+        "lp_burned_pct": "0.00",
+        "liquidity_usd": "8200.00",
+        "lp_provider_count": 1
+      }
+    ],
+    "lockers": {},
+    "creator": "DevBurst052111111111111111111111111111111111",
+    "creator_balance_raw": "450000000000000",
+    "total_market_liquidity_usd": "8200.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 38,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "DevBurst052111111111111111111111111111111111": 450000000000000,
+      "BurstHolder052_0111111111111111111111111111": 180000000000000,
+      "BurstHolder052_0211111111111111111111111111": 120000000000000,
+      "BurstHolder052_0311111111111111111111111111": 70000000000000,
+      "BurstHolder052_0411111111111111111111111111": 45000000000000,
+      "BurstHolder052_0511111111111111111111111111": 30000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": null,
+  "holder_classifications": [
+    { "address": "DevBurst052111111111111111111111111111111111", "kind": "deployer" }
+  ],
+  "pool_rows": [
+    {
+      "pool_address": "BurstPool05211111111111111111111111111111111",
+      "dex": "raydium",
+      "lp_burned_pct": "0.00",
+      "lp_locked_pct": "0.0",
+      "effective_safe_pct": "0.0",
+      "lp_provider_count": 1,
+      "liquidity_usd": "8200.00"
+    }
+  ],
+  "swaps_1h": {
+    "volume_usd": "31000.00",
+    "trade_count": 48,
+    "unique_buyers": 36,
+    "price_start": "0.0000082",
+    "price_end": "0.0000247",
+    "price_change_pct": "2.012"
+  },
+  "swaps_24h": {
+    "volume_usd": "31000.00",
+    "trade_count": 48
+  },
+  "swaps_7d_daily_baseline": {
+    "day_count_nonzero": 0,
+    "mean_daily_volume_usd": "0.00",
+    "std_daily_volume_usd": "0.00",
+    "volume_multiplier_observed": null,
+    "volume_z_score": null
+  },
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.15],
+      "severity": "Info",
+      "reason": "No honeypot signals. No freeze, fee, delegate, hook."
+    },
+    "d02_rug_pull": {
+      "verdict": "FIRES",
+      "confidence_band": [0.70, 0.75],
+      "severity": "High",
+      "reason": "effective_safe_pct=0.0%, lp_provider_count=1. Signal B fires at 0.75."
+    },
+    "d03_concentration": {
+      "verdict": "FIRES",
+      "confidence_band": [0.65, 0.85],
+      "severity": "High",
+      "reason": "Signal 3: top-10 liquid pct computed from balances: deployer holds 45% alone; top6 = 89.5% >> 80% threshold. Signal 3 fires. conf=min(0.85, 0.65+(0.895-0.80)/0.20*0.20)=0.745."
+    },
+    "d04_pump_dump": {
+      "verdict": "FIRES",
+      "confidence_band": [0.68, 0.78],
+      "severity": "High",
+      "reason": "Signal B (burst fallback): baseline_days=0 < 3. vol_1h=31k > min_burst_volume_usd=5k. burst_ratio=31k/31k=1.0 >= threshold=0.90. confidence=min(0.75, 0.50+(1.0-0.90)/0.10*0.25)=0.75. No Signal C (deployer_clusters empty; top_holders proxy detects deployer but no sell data in 24h window yet). confidence band [0.68,0.78] accounting for Signal C absence."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.10],
+      "severity": "Info",
+      "reason": "36 unique buyers in 1h, no self-dealing patterns detectable from snapshot. Pool thin ($8.2k) but above min_pool_usd_for_h1. Insufficient swap-level data to confirm round-trips — predicted BELOW."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.05],
+      "severity": "Info",
+      "reason": "mint_authority=null. No supply change events. Signals A, B, C all inactive."
+    }
+  }
+}

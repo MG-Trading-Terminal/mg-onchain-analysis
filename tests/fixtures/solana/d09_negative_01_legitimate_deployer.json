@@ -1,0 +1,111 @@
+{
+  "_label": "NEG_D09_01",
+  "_description": "Synthetic fixture: deployer with 10 consistent well-behaved launches. No regime shift. BOCPD should NOT fire — P(r_t=0) stays near H=0.003 throughout.",
+  "_chain": "solana",
+  "_deployer": "LegitimateDeployer1111111111111111111111111",
+  "_source": "Synthetic — design 0016 §13.2 (no-changepoint scenario). Adams & MacKay 2007 §4 null case.",
+  "_note": "A legitimate deployer who consistently provides good LP protection, large initial liquidity, and many holders. Composite scores remain in the 0.05-0.10 range. BOCPD stays in the stable regime.",
+
+  "observations": [
+    {
+      "_obs": 1, "_token": "LegitToken001111111111111111111111111111111",
+      "log_gap_seconds": 14.7,
+      "lp_locked_pct": 0.95,
+      "log_initial_liquidity_usd": 9.5,
+      "holder_count_at_1h": 250.0,
+      "prior_rug_rate": 0.0,
+      "_composite_score_approx": 0.04,
+      "_gap_days": 30
+    },
+    {
+      "_obs": 2, "_token": "LegitToken002222222222222222222222222222222",
+      "log_gap_seconds": 14.5,
+      "lp_locked_pct": 0.92,
+      "log_initial_liquidity_usd": 9.2,
+      "holder_count_at_1h": 200.0,
+      "prior_rug_rate": 0.0,
+      "_composite_score_approx": 0.05
+    },
+    {
+      "_obs": 3, "_token": "LegitToken003333333333333333333333333333333",
+      "log_gap_seconds": 14.8,
+      "lp_locked_pct": 0.97,
+      "log_initial_liquidity_usd": 9.8,
+      "holder_count_at_1h": 300.0,
+      "prior_rug_rate": 0.0,
+      "_composite_score_approx": 0.03
+    },
+    {
+      "_obs": 4, "_token": "LegitToken004444444444444444444444444444444",
+      "log_gap_seconds": 14.3,
+      "lp_locked_pct": 0.90,
+      "log_initial_liquidity_usd": 9.0,
+      "holder_count_at_1h": 180.0,
+      "prior_rug_rate": 0.0,
+      "_composite_score_approx": 0.06
+    },
+    {
+      "_obs": 5, "_token": "LegitToken005555555555555555555555555555555",
+      "log_gap_seconds": 15.0,
+      "lp_locked_pct": 0.98,
+      "log_initial_liquidity_usd": 10.0,
+      "holder_count_at_1h": 350.0,
+      "prior_rug_rate": 0.0,
+      "_composite_score_approx": 0.02
+    },
+    {
+      "_obs": 6, "_token": "LegitToken006666666666666666666666666666666",
+      "log_gap_seconds": 14.6,
+      "lp_locked_pct": 0.91,
+      "log_initial_liquidity_usd": 9.3,
+      "holder_count_at_1h": 210.0,
+      "prior_rug_rate": 0.0,
+      "_composite_score_approx": 0.05
+    },
+    {
+      "_obs": 7, "_token": "LegitToken007777777777777777777777777777777",
+      "log_gap_seconds": 14.4,
+      "lp_locked_pct": 0.93,
+      "log_initial_liquidity_usd": 9.4,
+      "holder_count_at_1h": 220.0,
+      "prior_rug_rate": 0.0,
+      "_composite_score_approx": 0.04
+    },
+    {
+      "_obs": 8, "_token": "LegitToken008888888888888888888888888888888",
+      "log_gap_seconds": 14.9,
+      "lp_locked_pct": 0.96,
+      "log_initial_liquidity_usd": 9.6,
+      "holder_count_at_1h": 280.0,
+      "prior_rug_rate": 0.0,
+      "_composite_score_approx": 0.03
+    },
+    {
+      "_obs": 9, "_token": "LegitToken009999999999999999999999999999999",
+      "log_gap_seconds": 14.2,
+      "lp_locked_pct": 0.89,
+      "log_initial_liquidity_usd": 8.9,
+      "holder_count_at_1h": 170.0,
+      "prior_rug_rate": 0.0,
+      "_composite_score_approx": 0.07
+    },
+    {
+      "_obs": 10, "_token": "LegitTokenAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "log_gap_seconds": 14.7,
+      "lp_locked_pct": 0.94,
+      "log_initial_liquidity_usd": 9.1,
+      "holder_count_at_1h": 230.0,
+      "prior_rug_rate": 0.0,
+      "_composite_score_approx": 0.04,
+      "_gap_days": 30
+    }
+  ],
+
+  "_expected": {
+    "detector_id": "deployer_changepoint",
+    "fires": false,
+    "_note": "After 10 stable low-risk observations, P(r_t=0) should remain near H=0.003 (the hazard rate). The BOCPD posterior concentrates at r=10 — a long stable run. No anomaly event should be emitted.",
+    "max_composite_score": 0.10,
+    "max_changepoint_prob_approx": 0.01
+  }
+}

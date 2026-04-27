@@ -1,0 +1,39 @@
+{
+  "_fixture_meta": {
+    "label": "negative",
+    "detector": "honeypot_sim",
+    "expected_confidence_max": 0.05,
+    "expected_severity": "Info",
+    "capture_date": "2026-04-21",
+    "notes": "Wrapped SOL (wSOL). Gold-standard negative fixture: mintAuthority null, freezeAuthority null, standard SPL program, jup_verified=true, jup_strict=true, score=1. All honeypot signals structurally absent. Used as canonical negative for all static signals.",
+    "signals_expected": {
+      "freeze_authority_active": false,
+      "transfer_fee_bps": 0,
+      "permanent_delegate_active": false,
+      "transfer_hook_present": false,
+      "buy_sell_ratio_above_sentinel": false,
+      "simulation_fail": false
+    }
+  },
+  "mint": "So11111111111111111111111111111111111111112",
+  "mintAuthority": null,
+  "freezeAuthority": null,
+  "transferFee": {
+    "pct": 0,
+    "maxAmount": 0,
+    "authority": "11111111111111111111111111111111"
+  },
+  "permanentDelegate": null,
+  "transferHook": null,
+  "rugged": false,
+  "risks": [],
+  "score": 1,
+  "tokenProgram": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  "verification": {
+    "mint": "So11111111111111111111111111111111111111112",
+    "name": "Wrapped SOL",
+    "symbol": "sol",
+    "jup_verified": true,
+    "jup_strict": true
+  }
+}

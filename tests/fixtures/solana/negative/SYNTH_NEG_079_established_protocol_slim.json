@@ -1,0 +1,159 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthNeg079SLIMGovGGGGGGGGGGGGGGGGGGGG",
+    "symbol": "SLIM79",
+    "label": "negative",
+    "category": "established_protocol_governance",
+    "source_url": "synthetic/established_protocol/slim_governance",
+    "fetched_at": "2026-04-21T21:45:00Z",
+    "synthetic": true,
+    "notes": "Solime (SLIM) monitoring protocol token. jup_verified=true. Utility for protocol subscriptions. mint_authority=null. Edge case: low volume but established protocol. vol_multiplier=1.2 \u2014 slightly above 1.0 but far below 5.0 threshold."
+  },
+  "token_meta": {
+    "mint": "SynthNeg079SLIMGovGGGGGGGGGGGGGGGGGGGG",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "SolimeMonitor079",
+    "symbol": "SLIM79",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": false,
+    "update_authority": null,
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": {
+      "jup_verified": true,
+      "jup_strict": false
+    },
+    "rugcheck_score": 250,
+    "rugcheck_score_normalised": 11,
+    "risks": [],
+    "markets": [
+      {
+        "pool_address": "GovPool079111111111111111111111111111111",
+        "dex": "raydium",
+        "lp_burned_pct": "0.00",
+        "liquidity_usd": "920000.00",
+        "lp_provider_count": 45
+      }
+    ],
+    "lockers": {},
+    "creator": "DevSLIM79111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "920000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 12000,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "GovTreasury0791111111111111111111111111": 350000000000000,
+      "GovVesting07911111111111111111111111111": 200000000000000,
+      "GovHolder079_011111111111111111111111111": 22000000000000,
+      "GovHolder079_021111111111111111111111111": 17000000000000,
+      "GovHolder079_031111111111111111111111111": 13000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 11900,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.18",
+    "gini_liquid_after_exclusion": "0.59"
+  },
+  "holder_classifications": [
+    {
+      "address": "GovTreasury0791111111111111111111111111",
+      "type": "dao_treasury"
+    },
+    {
+      "address": "GovVesting07911111111111111111111111111",
+      "type": "vesting_contract"
+    }
+  ],
+  "pool_rows": [
+    {
+      "pool_address": "GovPool079111111111111111111111111111111",
+      "dex": "raydium",
+      "lp_burned_pct": "0.00",
+      "lp_locked_pct": "0.00",
+      "effective_safe_pct": "0.00",
+      "lp_provider_count": 45,
+      "liquidity_usd": "920000.00"
+    }
+  ],
+  "swaps_1h": {
+    "volume_usd": "380000.00",
+    "trade_count": 1200,
+    "unique_buyers": 600,
+    "price_start": "0.00100",
+    "price_end": "0.00101",
+    "price_change_pct": "0.010"
+  },
+  "swaps_7d_daily_baseline": {
+    "day_count_nonzero": 7,
+    "mean_daily_volume_usd": "360000.00",
+    "std_daily_volume_usd": "65000.00",
+    "volume_multiplier_observed": "1.06",
+    "volume_z_score": "0.3"
+  },
+  "signal_a_round_trips": [],
+  "pool_total_volume_1h_usd": "380000.00",
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "No static honeypot signals."
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "is_established_protocol=true (jup_verified=true). D02 suppressed."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.08
+      ],
+      "severity": "Info",
+      "reason": "After DAO/vesting exclusion: top10_pct_liquid=0.18. gini_delta~0."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "vol_multiplier=1.06. price_change=+1.0%."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "No round-trip events."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "mint_authority=null."
+    }
+  }
+}

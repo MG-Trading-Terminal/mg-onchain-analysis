@@ -1,0 +1,76 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthRug081EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE",
+    "symbol": "RUG081",
+    "label": "positive",
+    "category": "rug_latent",
+    "source_url": "synthetic/rug_pull/0pct_lp_plus_mint_authority",
+    "fetched_at": "2026-04-21T20:30:00Z",
+    "synthetic": true,
+    "notes": "D02 Signal B (0% LP) + D06 Signal A (mint_authority active). Dual latent risk: LP rug + dilution. Cross-detector: D02+D06 co-fire."
+  },
+  "token_meta": {
+    "mint": "SynthRug081EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "DualRisk081",
+    "symbol": "RUG081",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": "DevDual081111111111111111111111111111111111",
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevDual081111111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 5800,
+    "rugcheck_score_normalised": 82,
+    "risks": [
+      { "name": "LP Vault unlocked", "level": "danger" },
+      { "name": "Mint Authority still enabled", "level": "danger" }
+    ],
+    "markets": [
+      { "pool_address": "DualPool081111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "liquidity_usd": "28000.00", "lp_provider_count": 1 }
+    ],
+    "lockers": {},
+    "creator": "DevDual081111111111111111111111111111111111",
+    "creator_balance_raw": "50000000000000",
+    "total_market_liquidity_usd": "28000.00",
+    "detected_at": "2026-04-01T10:00:00Z"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 180,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "DevDual081111111111111111111111111111111111": 50000000000000,
+      "DualHolder081_011111111111111111111111111": 78000000000000,
+      "DualHolder081_021111111111111111111111111": 55000000000000,
+      "DualHolder081_031111111111111111111111111": 38000000000000,
+      "DualHolder081_041111111111111111111111111": 25000000000000,
+      "DualHolder081_051111111111111111111111111": 16000000000000,
+      "DualHolder081_061111111111111111111111111": 10500000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 175,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.273",
+    "gini_liquid_after_exclusion": "0.62"
+  },
+  "holder_classifications": [{ "address": "DevDual081111111111111111111111111111111111", "kind": "deployer" }],
+  "pool_rows": [
+    { "pool_address": "DualPool081111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "lp_locked_pct": "0.0", "effective_safe_pct": "0.0", "lp_provider_count": 1, "liquidity_usd": "28000.00" }
+  ],
+  "mint_events_30d": [],
+  "signal_c_data": { "cumulative_supply_change_30d_pct": "0.00", "mint_event_count_30d": 0, "token_age_days": 20, "mint_authority": "DevDual081111111111111111111111111111111111", "supply_base": "circulating" },
+  "expected": {
+    "d01_honeypot": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.15], "severity": "Info", "reason": "No freeze, no transfer_fee, no permanent_delegate, no hook." },
+    "d02_rug_pull": { "verdict": "FIRES", "confidence_band": [0.70, 0.75], "severity": "High", "reason": "Signal B: effective_safe=0%, single provider. conf=0.75." },
+    "d03_concentration": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.15], "severity": "Info", "reason": "top10=0.273; stable." },
+    "d04_pump_dump": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No spike." },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No self-dealing." },
+    "d06_mint_burn_anomaly": { "verdict": "FIRES", "confidence_band": [0.17, 0.23], "severity": "Info", "reason": "Signal A: mint_authority active, token_age=20d > 7d. No mint events -> Signal B/C inactive. conf=0.20. D02+D06 dual fire demonstrates cross-detector coverage of dual-risk token." }
+  }
+}

@@ -1,0 +1,227 @@
+{
+  "_fixture_meta": {
+    "mint": "CzLSujWBLFsSjncfkh59rUFqvafWcY5tzedWJSuypump",
+    "symbol": "GOAT",
+    "label": "negative",
+    "category": "meme_distributed",
+    "source_url": "https://api.rugcheck.xyz/v1/tokens/CzLSujWBLFsSjncfkh59rUFqvafWcY5tzedWJSuypump/report",
+    "fetched_at": "2026-04-21T19:37:00Z",
+    "synthetic": false,
+    "notes": "Goatseus Maximus (GOAT) \u2014 notable pump.fun-launched AI meme token that reached top-100 by market cap. Score=1023. No mint/freeze authorities. 99.72% LP locked via Raydium. Top holder 15.6% is a Raydium pool account (DexPool). Negative across all three detectors."
+  },
+  "token_meta": {
+    "mint": "CzLSujWBLFsSjncfkh59rUFqvafWcY5tzedWJSuypump",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "Goatseus Maximus",
+    "symbol": "GOAT",
+    "decimals": 6,
+    "supply_raw": "999981124629964",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": false,
+    "update_authority": "TSLvdd1pWpHVjahSpsvCXUbgwsL3JAcvokwaKt1eokM",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": {
+      "jup_verified": false,
+      "jup_strict": false
+    },
+    "rugcheck_score": 1023,
+    "rugcheck_score_normalised": 22,
+    "risks": [
+      {
+        "name": "High holder concentration",
+        "level": "warn",
+        "score": 1022
+      }
+    ],
+    "markets": [
+      {
+        "pool_address": "9Tb2ohu5P16BpBarqd3N27WnkF51Ukfs8Z1GzzLDxVZW",
+        "dex": "raydium",
+        "lp_burned_pct": "0.00",
+        "liquidity_usd": "1338266.00",
+        "lp_provider_count": 2
+      }
+    ],
+    "lockers": {
+      "8FsRCL1oJxzgFUyan5PdjiXpS1b39u6ZJDcFyUfnmJVM": {
+        "type": "raydium_locker",
+        "usdcLocked": 1338266.15
+      }
+    },
+    "creator": "TSLvdd1pWpHVjahSpsvCXUbgwsL3JAcvokwaKt1eokM",
+    "creator_balance_raw": "0",
+    "top_holders": [
+      {
+        "address": "3GVQfer41tLQfpkkDh5vZPKnDKNiXLN5bUXAZxTszxFK",
+        "amount_raw": "155799483321778",
+        "pct": "15.58",
+        "owner": "Am8MAEorCMAKxphqjAz3Ff59NEwPm4W2eS3DQLi2B4hg",
+        "insider": false
+      },
+      {
+        "address": "9nRMdyQFskxGZkFookdZQ37YkJoqwcPodeCRSAk6XcAP",
+        "amount_raw": "107369204430119",
+        "pct": "10.74",
+        "owner": "EZ41WcMH3FmyWGV9WQaDLo5uo4ysVNdeAm1ZoTybxjsJ",
+        "insider": false
+      },
+      {
+        "address": "DpRgWo3GpZVeuxwoLS5p995b7fBWavozDDVZcSxLSf3m",
+        "amount_raw": "71663525742678",
+        "pct": "7.17",
+        "owner": "Gem2VAypSg7Ai7vjDKPTtqFahpoQWkfgVkyzx3rPoTka",
+        "insider": false
+      },
+      {
+        "address": "7UsurwMkw3sc3mevm3k2kDBEYRP4urCei1dKpKk2WifM",
+        "amount_raw": "47970925109119",
+        "pct": "4.80",
+        "owner": "C68a6RCGLiPskbPYtAcsCjhG8tfTWYcoB4JjCrXFdqyo",
+        "insider": false
+      },
+      {
+        "address": "FhMHm2TVY9ULmZJvjjRx849Jn2ZRirVhJbTncHULTSvH",
+        "amount_raw": "40912177813188",
+        "pct": "4.09",
+        "owner": "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
+        "insider": false
+      },
+      {
+        "address": "CN8acZ57Bs7m9wAN4sgZNxm3pHTWuTDm9neH5acG4c3Z",
+        "amount_raw": "32829674182674",
+        "pct": "3.28",
+        "owner": "JBQ1suc4GJBbVYP6y2poGjoDCFrfjtGSEJRt4deasyNe",
+        "insider": false
+      },
+      {
+        "address": "ByEf2hRa4fuNGGxAMnVcqGBCSZ1fgoJ8SNU2TCBjtxrX",
+        "amount_raw": "29012410642330",
+        "pct": "2.90",
+        "owner": "4vmjUC6AtFK4JyF9CrcBM8Wtq9fFvUSa31pLWJumGMZ",
+        "insider": false
+      },
+      {
+        "address": "3iLJPmDfqNFZSEkguu7hRW3jZwVwFTjqGu7gzdejwcRU",
+        "amount_raw": "28180410533226",
+        "pct": "2.82",
+        "owner": "u6PJ8DtQuPFnfmwHbGFULQ4u4EgjDiyYKjVEsynXq2w",
+        "insider": false
+      },
+      {
+        "address": "7eYePC7gmthuP6Xi64sfAnciSXAcNbvHRT6TG48i9DGh",
+        "amount_raw": "26893315195722",
+        "pct": "2.69",
+        "owner": "81BgcfZuZf9bESLvw3zDkh7cZmMtDwTPgkCvYu7zx26o",
+        "insider": false
+      },
+      {
+        "address": "d8aGAnZkr3pLZcDtTxRSZRDVbHcuC3Bi99qu6BygZpH",
+        "amount_raw": "22716983632499",
+        "pct": "2.27",
+        "owner": "A77HErqtfN1hLLpvZ9pCtu66FEtM8BveoaKbbMoZ4RiR",
+        "insider": false
+      }
+    ]
+  },
+  "holder_snapshot_now": {
+    "total_holders": 62000,
+    "balances": {
+      "3GVQfer41tLQfpkkDh5vZPKnDKNiXLN5bUXAZxTszxFK": 155799483321778,
+      "9nRMdyQFskxGZkFookdZQ37YkJoqwcPodeCRSAk6XcAP": 107369204430119,
+      "DpRgWo3GpZVeuxwoLS5p995b7fBWavozDDVZcSxLSf3m": 71663525742678,
+      "7UsurwMkw3sc3mevm3k2kDBEYRP4urCei1dKpKk2WifM": 47970925109119,
+      "FhMHm2TVY9ULmZJvjjRx849Jn2ZRirVhJbTncHULTSvH": 40912177813188,
+      "CN8acZ57Bs7m9wAN4sgZNxm3pHTWuTDm9neH5acG4c3Z": 32829674182674,
+      "ByEf2hRa4fuNGGxAMnVcqGBCSZ1fgoJ8SNU2TCBjtxrX": 29012410642330,
+      "3iLJPmDfqNFZSEkguu7hRW3jZwVwFTjqGu7gzdejwcRU": 28180410533226,
+      "7eYePC7gmthuP6Xi64sfAnciSXAcNbvHRT6TG48i9DGh": 26893315195722,
+      "d8aGAnZkr3pLZcDtTxRSZRDVbHcuC3Bi99qu6BygZpH": 22716983632499
+    },
+    "total_supply_raw": 999981124629964
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 61500,
+    "total_supply_raw": 999981124629964,
+    "top10_pct_liquid_after_exclusion": "0.5535",
+    "gini_liquid_after_exclusion": "0.8300"
+  },
+  "holder_classifications": [
+    {
+      "address": "3GVQfer41tLQfpkkDh5vZPKnDKNiXLN5bUXAZxTszxFK",
+      "kind": "DexPool",
+      "subkind": "raydium_amm",
+      "confidence": 0.8
+    }
+  ],
+  "pool_rows": [
+    {
+      "pool_address": "9Tb2ohu5P16BpBarqd3N27WnkF51Ukfs8Z1GzzLDxVZW",
+      "dex": "raydium",
+      "lp_burned_pct": "0.00",
+      "lp_locked_pct": "99.72",
+      "effective_safe_pct": "99.72",
+      "lp_provider_count": 2,
+      "liquidity_usd": "1338266.00"
+    }
+  ],
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "All D01 signals absent. Active trading market with normal sell activity."
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.15
+      ],
+      "severity": "Info",
+      "reason": "effective_safe_pct=99.72% >> 70%. D02 does not fire."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.15
+      ],
+      "severity": "Info",
+      "reason": "After DexPool exclusion of top holder (15.58%): liquid top-10 pct \u2248 40.5% << 80%. gini_delta minimal over 24h. No signals fire."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No swaps_1h data in fixture (Phase 1 fixture). No volume spike. D04 BELOW."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No round-trip data in fixture (Phase 1 fixture). D05 BELOW."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "mint_authority=null. D06 BELOW."
+    }
+  }
+}

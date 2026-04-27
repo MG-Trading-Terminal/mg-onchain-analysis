@@ -1,0 +1,64 @@
+{
+  "_fixture_meta": {
+    "label": "negative",
+    "detector": "honeypot_sim",
+    "expected_confidence_max": 0.10,
+    "expected_severity": "Info",
+    "capture_date": "2026-04-21",
+    "notes": "HumidiFi WET token. CEX-listed on Coinbase, Bybit, Upbit. All honeypot signals absent: mint_authority null, freeze_authority null, standard SPL token program, 464 successful sell transactions observed. jup_verified=true, jup_strict=true. Used as negative fixture for D01 (honeypot) and D06 (mint anomaly).",
+    "signals_expected": {
+      "freeze_authority_active": false,
+      "transfer_fee_bps": 0,
+      "permanent_delegate_active": false,
+      "transfer_hook_present": false,
+      "buy_sell_ratio_above_sentinel": false,
+      "simulation_fail": false
+    }
+  },
+  "mint": "WETZjtprkDMCcUxPi9PfWnowMRZkiGGHDb9rABuRZ2U",
+  "name": "HumidiFi",
+  "symbol": "WET",
+  "tokenProgram": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  "mintAuthority": null,
+  "freezeAuthority": null,
+  "transferFee": {
+    "pct": 0,
+    "maxAmount": 0,
+    "authority": "11111111111111111111111111111111"
+  },
+  "permanentDelegate": null,
+  "transferHook": null,
+  "rugged": false,
+  "verification": {
+    "jup_verified": true,
+    "jup_strict": true,
+    "name": "HumidiFi",
+    "symbol": "WET"
+  },
+  "risks": [
+    {
+      "name": "Top 10 holders high ownership",
+      "description": "The top 10 users hold more than 70% token supply",
+      "level": "danger",
+      "score": 8821
+    },
+    {
+      "name": "Single holder ownership",
+      "value": "32.00%",
+      "description": "One user holds a large amount of the token supply",
+      "level": "warn"
+    },
+    {
+      "name": "High ownership",
+      "description": "The top users hold more than 80% token supply",
+      "level": "danger"
+    }
+  ],
+  "score": 19594,
+  "score_normalised": 59,
+  "totalHolders": 17711,
+  "totalMarketLiquidity": 1051184.34,
+  "observed_sells_24h": 464,
+  "observed_buys_24h": 319,
+  "buy_sell_ratio_24h": 0.70
+}

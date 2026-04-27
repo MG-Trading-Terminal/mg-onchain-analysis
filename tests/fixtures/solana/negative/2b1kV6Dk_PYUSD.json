@@ -1,0 +1,109 @@
+{
+  "_fixture_meta": {
+    "mint": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+    "symbol": "PYUSD",
+    "label": "negative",
+    "category": "token2022_legit",
+    "source_url": "https://api.rugcheck.xyz/v1/tokens/2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo/report",
+    "fetched_at": "2026-04-21T19:32:00Z",
+    "synthetic": false,
+    "notes": "PayPal USD \u2014 regulated stablecoin with freeze_authority AND permanent_delegate (compliance enforcement). Both S1 and S3 fire on D01 static pass. Critical edge-case: jup_strict=true should suppress to Low. Negative for rug/concentration purposes."
+  },
+  "token_meta": {
+    "mint": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+    "token_program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+    "name": "PayPal USD",
+    "symbol": "PYUSD",
+    "decimals": 6,
+    "supply_raw": "688543394400789",
+    "mint_authority": "8Jornc27vtAYPkwDzsZVgLQchAYyC8nD7aCNPCDV8Qk2",
+    "freeze_authority": "2apBGMsS6ti9RyF5TwQTDswXBWskiJP2LD4cUEDqYJjk",
+    "mutable": true,
+    "update_authority": "11111111111111111111111111111111",
+    "transfer_fee": {
+      "fee_bps": 0,
+      "max_amount": 0,
+      "authority": null
+    },
+    "permanent_delegate": "2apBGMsS6ti9RyF5TwQTDswXBWskiJP2LD4cUEDqYJjk",
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": {
+      "jup_verified": true,
+      "jup_strict": true
+    },
+    "rugcheck_score": 1,
+    "rugcheck_score_normalised": 1,
+    "risks": [],
+    "markets": [],
+    "lockers": {},
+    "creator": "5gUuDFHswKi2QMA1qJHf6FEVhNCrHnyAdfWniMaUUPE4",
+    "creator_balance_raw": "363619971508239",
+    "top_holders": []
+  },
+  "holder_snapshot_now": {
+    "total_holders": 180000,
+    "balances": {}
+  },
+  "holder_snapshot_prior_24h": null,
+  "holder_classifications": [],
+  "pool_rows": [],
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.2,
+        0.4
+      ],
+      "severity": "Low",
+      "reason": "Freeze authority active (S1: raw+=0.25) + permanent_delegate active (S3: raw+=0.20). Total raw=0.45 \u2192 sigmoid(-0.18)\u22480.46. However jup_strict=true context attenuates. Simulation expected to PASS (PayPal compliance enforcement \u2260 sell block). Confidence band 0.20\u20130.40. This fixture tests that D01 does not Critical-label a regulated stablecoin. Wider confidence band (0.20 delta) because without simulation the attenuation formula is implementation-specific.",
+      "calibration_flag": true,
+      "calibration_note": "Whether jup_strict context actually attenuates confidence depends on implementation-specific attenuation logic not yet in spec. If no attenuation is implemented, static confidence would be ~0.46 (Medium). Flag for Sprint 4 threshold review."
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "No DEX pools. No-pool Info event only."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "Supply concentrated in Paxos custody accounts (regulated). Liquid retail holder share << 80% ceiling after custody account exclusion via sidecar."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No swaps_1h data in fixture (Phase 1 fixture). No volume spike. D04 BELOW."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No round-trip data in fixture (Phase 1 fixture). D05 BELOW."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "SUPPRESSED_INFO",
+      "confidence_band": [
+        0.08,
+        0.12
+      ],
+      "severity": "Info",
+      "reason": "Signal A: mint_authority active. is_established_protocol=true. conf dampened to 0.10 Info."
+    }
+  }
+}

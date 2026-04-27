@@ -1,0 +1,47 @@
+{
+  "_label": "POS_D10_02",
+  "_description": "Synthetic fixture: pool initialized with $450 USD liquidity (≈3 SOL @ $150/SOL) and 50% LP locked. Signal A fires ($450 < $750 threshold). Signal B does NOT fire (50% locked ≠ 0%). Expected confidence = 0.45 (Signal A only).",
+  "_chain": "solana",
+  "_token": "ScamToken02222222222222222222222222222222222",
+  "_pool": "ScamPool0222222222222222222222222222222222222",
+  "_deployer": "ScamDeployer222222222222222222222222222222",
+  "_source": "Synthetic — research/03-feature-gap-2026-04-24.md §T1-1.",
+  "_note": "Signal B is gated on lp_locked_pct == 0.0% EXACTLY (not < 70%). 50% locked does NOT fire Signal B. This is intentional: D02 Signal B covers the 0–70% at-risk range on an ongoing basis. D10 only flags complete absence of any lock at birth. Expected: Signal A fires ($450 < $750), Signal B does NOT fire (50% ≠ 0%), confidence = 0.45.",
+
+  "pool_initialize": {
+    "initial_liquidity_usd": "450.000000",
+    "_sol_equivalent_at_150": "3.000000",
+    "initial_liquidity_usd_threshold": "750.000000"
+  },
+
+  "lp_state": {
+    "lockers": [
+      {
+        "locker_address": "SomeLock11111111111111111111111111111111111",
+        "locker_name": "PartialLock",
+        "locked_amount_raw": "500000",
+        "lp_total_supply_raw": "1000000",
+        "unlock_at": null
+      }
+    ],
+    "lp_locked_pct": "50.000000",
+    "lp_burned_pct": "0.000000",
+    "lp_safe_floor_pct": "0.700000"
+  },
+
+  "token_meta": {
+    "jup_verified": false,
+    "jup_strict": false,
+    "rugcheck_score": 85
+  },
+
+  "_expected": {
+    "detector_id": "launch_audit",
+    "signal_a_fired": true,
+    "signal_b_fired": false,
+    "signal_a_skipped": false,
+    "confidence": 0.45,
+    "severity": "Medium",
+    "_note_on_signal_b": "Signal B does NOT fire. 50% locked is structurally at-risk (< 70% safe floor) but D10's Signal B gate is lp_locked_pct == 0.0 exactly. D02 Signal B covers the 0–70% range on an ongoing basis."
+  }
+}

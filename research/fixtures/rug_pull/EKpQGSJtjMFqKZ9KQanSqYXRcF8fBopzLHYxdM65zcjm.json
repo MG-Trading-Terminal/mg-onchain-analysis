@@ -1,0 +1,80 @@
+{
+  "_fixture_meta": {
+    "label": "negative",
+    "detector": "rug_pull_lp_drain",
+    "signal": "none",
+    "expected_signal_a": false,
+    "expected_signal_b": false,
+    "expected_confidence_max": 0.30,
+    "expected_severity": "Info",
+    "note": "dogwifhat ($WIF) — legitimate memecoin with 99.59% LP burned on primary Raydium AMM pool. Effective safe pct = 99.59% burned >> lp_safe_floor_pct=70. No drain events. Signal B does not fire. Signal A does not fire (no Burn events above threshold). Negative fixture: detector must not fire on tokens with high LP burn. Source: RugCheck API 2026-04-21.",
+    "captured_at": "2026-04-21T00:00:00Z",
+    "source_api": "https://api.rugcheck.xyz/v1/tokens/EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm/report"
+  },
+  "mint": "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm",
+  "chain": "solana",
+  "symbol": "$WIF",
+  "name": "dogwifhat",
+  "decimals": 6,
+  "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  "total_supply_raw": "998839196079298",
+  "circulating_supply_raw": null,
+  "mint_authority": null,
+  "freeze_authority": null,
+  "creator": null,
+  "creator_balance_raw": "0",
+  "transfer_fee": null,
+  "permanent_delegate": null,
+  "transfer_hook_program": null,
+  "top_holders": [
+    { "address": "9HSgJUDbGigu6Qj1ya1yuwGqg8CAatEMra8sWwDRA7rH", "pct": "11.61", "amount_raw": "115985670484197", "is_insider": false },
+    { "address": "BcgjQXuT6125wXBXMzTvXPFHaWH5CaT68uS11mUrt3kc", "pct": "11.61", "amount_raw": "115985670484197", "is_insider": false },
+    { "address": "7dECGdaTQ1Kvv5pjgsyUcpsrc6zFh9RppMdRezER3bXy", "pct": "11.61", "amount_raw": "115985670484197", "is_insider": false }
+  ],
+  "total_holders": 180000,
+  "markets": [
+    {
+      "pool_address": "EP2ib6dYdEeqD8MfE2ezHCxX3kP3K2eLKkirfPm5eyMx",
+      "dex": "raydium_amm",
+      "lp_burned_pct": "99.59",
+      "liquidity_usd": "4948953.80",
+      "lp_provider_count": 20
+    },
+    {
+      "pool_address": "D6NdKrKNQPmRZCCnG1GqXtF7MMoHB7qR6GU5TkG59Qz1",
+      "dex": "orca_whirlpool",
+      "lp_burned_pct": "0.04",
+      "liquidity_usd": "36082.87",
+      "lp_provider_count": 8
+    },
+    {
+      "pool_address": "5rxahS44QWDXbCvUvTvNyvSdS3NMTi6XEGnULEfQ1Xd4",
+      "dex": "meteora",
+      "lp_burned_pct": "0.00",
+      "liquidity_usd": "8357.07",
+      "lp_provider_count": 20
+    }
+  ],
+  "total_market_liquidity_usd": "5129392.00",
+  "lockers": [
+    {
+      "locker_address": "CQurpF3WS3yEqFEt1Bu8s5zmZqznQG3EJkcYvsyg3sLc",
+      "locker_name": "Raydium LP Locker",
+      "locked_amount_raw": "3092065508978",
+      "unlock_at": null
+    }
+  ],
+  "graph_insiders_detected": false,
+  "insider_networks": [],
+  "launchpad": null,
+  "deploy_platform": null,
+  "rugged": false,
+  "verification": { "jup_verified": false, "jup_strict": false },
+  "rugcheck_score": 1160,
+  "_d02_state_at_capture": {
+    "primary_pool_lp_burned_pct": "99.59",
+    "effective_safe_pct": "99.59",
+    "signal_b_fires": false,
+    "reason": "effective_safe_pct 99.59 >= lp_safe_floor_pct 70 — detector does not fire"
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "_fixture_meta": {
+    "label": "positive_static_transfer_fee",
+    "detector": "honeypot_sim",
+    "expected_confidence_range": [0.50, 0.70],
+    "expected_severity": "Medium",
+    "capture_date": "2026-04-21",
+    "synthetic": true,
+    "notes": "SYNTHETIC fixture — constructed from documented Token-2022 transfer fee attack pattern (see dev.to/ohmygod article, March 2026). Represents a Token-2022 token with 9000 bps (90%) transfer fee, mutable fee authority still held by deployer, and matching rugged=true state. No real mint address because these tokens are ephemeral (live <24h before rug). Developer should replace with a real captured fixture from the test corpus once tokens with this pattern are encountered. Pattern documented: (1) token uses Token-2022 TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb program, (2) transferFee.pct=9000 (90%), (3) transferFeeConfigAuthority=deployer wallet (can raise to 100%), (4) no markets (never listed on DEX with meaningful buys/sells). Expected signals: sell_tax_threshold signal fires (0.90 >> 0.50 threshold). Expected confidence: sigmoid((0.90 - 0.50)/0.20) = sigmoid(2.0) = 0.88, capped contribution to weighted sum giving overall ~0.50-0.60.",
+    "signals_expected": {
+      "freeze_authority_active": false,
+      "transfer_fee_bps": 9000,
+      "transfer_fee_authority_active": true,
+      "permanent_delegate_active": false,
+      "transfer_hook_present": false,
+      "buy_sell_ratio_above_sentinel": true,
+      "simulation_fail": true
+    }
+  },
+  "mint": "SYNTHETIC_DO_NOT_USE_IN_PRODUCTION",
+  "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+  "creator": "DEPLOYER_WALLET_PLACEHOLDER",
+  "token": {
+    "mintAuthority": "DEPLOYER_WALLET_PLACEHOLDER",
+    "supply": 1000000000000000,
+    "decimals": 6,
+    "isInitialized": true,
+    "freezeAuthority": null
+  },
+  "transferFee": {
+    "pct": 9000,
+    "maxAmount": 999999999999999,
+    "authority": "DEPLOYER_WALLET_PLACEHOLDER"
+  },
+  "permanentDelegate": null,
+  "transferHook": null,
+  "rugged": true,
+  "score": 99999,
+  "risks": [
+    {
+      "name": "High Transfer Fee",
+      "value": "90.00%",
+      "description": "Token has an extremely high transfer fee of 9000 basis points (90%). Effective sell proceeds after fee would be 10% of expected value.",
+      "level": "danger"
+    },
+    {
+      "name": "Transfer Fee Authority Active",
+      "description": "The transfer fee authority is still held by the deployer and can raise the fee to 100% at any time.",
+      "level": "danger"
+    },
+    {
+      "name": "Mint Authority still enabled",
+      "level": "danger"
+    }
+  ],
+  "markets": [],
+  "verification": null,
+  "observed_sells_24h": 0,
+  "observed_buys_24h": 127,
+  "buy_sell_ratio_24h": 999.0,
+  "source_reference": "https://dev.to/ohmygod/solanas-permanent-delegate-burn-scam-how-token-2022-extensions-power-2026s-largest-automated-rug-4579"
+}

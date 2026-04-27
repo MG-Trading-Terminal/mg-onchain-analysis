@@ -1,0 +1,13 @@
+/target
+Cargo.lock
+*.swp
+.DS_Store
+.env
+.env.local
+.idea/
+.vscode/
+/.claude/settings.local.json
+/.claude/projects/
+/.claude/worktrees/
+/logs/
+*.log

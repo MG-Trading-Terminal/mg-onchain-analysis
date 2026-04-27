@@ -1,0 +1,115 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthMulti100XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "symbol": "MULTI100",
+    "label": "positive",
+    "category": "multi_signal",
+    "source_url": "synthetic/multi_signal/all_six_detectors_max_signal",
+    "fetched_at": "2026-04-21T20:49:00Z",
+    "synthetic": true,
+    "notes": "Maximum-signal fixture: all six detectors fire. D01 (freeze+fee_8000bps), D02 (0% LP locked), D03 (top10 delta=0.35+abs=0.91), D04 (Signal A vol_ratio=11x price+72%), D05 (Signal A 7 round-trips), D06 (Signal B 25% mint to deployer). Tests that detectors fire independently and do not cross-suppress each other. The is_established_protocol flag is false. Severity: every detector Critical or High. This is the full-alarm test fixture."
+  },
+  "token_meta": {
+    "mint": "SynthMulti100XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "MaxSignal100",
+    "symbol": "MULTI100",
+    "decimals": 6,
+    "supply_raw": "1250000000000000",
+    "mint_authority": "DevMaxSig100111111111111111111111111111111111",
+    "freeze_authority": "DevMaxSig100111111111111111111111111111111111",
+    "mutable": true,
+    "update_authority": "DevMaxSig100111111111111111111111111111111111",
+    "transfer_fee": { "transfer_fee_basis_points": 8000, "maximum_fee": "18446744073709551615", "transfer_fee_config_authority": "DevMaxSig100111111111111111111111111111111111", "withdraw_withheld_authority": "DevMaxSig100111111111111111111111111111111111" },
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 5800,
+    "rugcheck_score_normalised": 90,
+    "risks": [
+      { "name": "Freeze authority active", "level": "danger" },
+      { "name": "Transfer fee 8000bps (80%)", "level": "danger" },
+      { "name": "LP not burned or locked", "level": "danger" },
+      { "name": "Mint authority active", "level": "danger" },
+      { "name": "High holder concentration", "level": "danger" }
+    ],
+    "markets": [ { "pool_address": "MaxSigPool100111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "liquidity_usd": "55000.00", "lp_provider_count": 1 } ],
+    "lockers": {},
+    "creator": "DevMaxSig100111111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "55000.00"
+  },
+  "token_age_days": 10,
+  "holder_snapshot_now": {
+    "total_holders": 120,
+    "total_supply_raw": 1250000000000000,
+    "balances": {
+      "MaxSig100_001111111111111111111111111111": 285000000000000,
+      "MaxSig100_011111111111111111111111111111": 198000000000000,
+      "MaxSig100_021111111111111111111111111111": 158000000000000,
+      "MaxSig100_031111111111111111111111111111": 120000000000000,
+      "MaxSig100_041111111111111111111111111111": 82000000000000,
+      "MaxSig100_051111111111111111111111111111": 56000000000000,
+      "MaxSig100_061111111111111111111111111111": 32000000000000,
+      "MaxSig100_071111111111111111111111111111": 18000000000000,
+      "MaxSig100_081111111111111111111111111111": 10000000000000,
+      "WashBot100_0111111111111111111111111111111": 8000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 115,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.56",
+    "gini_liquid_after_exclusion": "0.68"
+  },
+  "holder_classifications": [],
+  "pool_rows": [ { "pool_address": "MaxSigPool100111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "lp_locked_pct": "0.00", "effective_safe_pct": "0.00", "lp_provider_count": 1, "liquidity_usd": "55000.00" } ],
+  "mint_events_30d": [
+    { "block": 285300000, "to": "DevMaxSig100111111111111111111111111111111111", "amount_raw": "250000000000000", "is_lp_address": false }
+  ],
+  "swaps_1h": { "volume_usd": "380000.00", "trade_count": 260, "unique_buyers": 235, "unique_sellers": 25, "buy_count": 235, "sell_count": 25, "price_start": "0.000044", "price_end": "0.000076", "price_change_pct": "0.727" },
+  "swaps_7d_daily_baseline": { "day_count_nonzero": 4, "mean_daily_volume_usd": "34500.00", "std_daily_volume_usd": "7000.00", "volume_multiplier_observed": "11.01", "volume_z_score": "43.3" },
+  "signal_a_round_trips": [
+    { "sender": "WashBot100_0111111111111111111111111111111", "pool": "MaxSigPool100111111111111111111111111111111", "round_trip_count": 7, "avg_volume_diff_pct": "0.022", "first_seen_block": 285400100, "last_seen_block": 285401500, "wash_volume_usd": "29000.00", "direction": "buy_first" }
+  ],
+  "pool_total_volume_1h_usd": "380000.00",
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "FIRES",
+      "confidence_band": [0.70, 0.85],
+      "severity": "High",
+      "reason": "Signal 1 (freeze_authority): raw_s1=0.40. Signal 2 (transfer_fee 8000bps>=5000): raw_s2=0.30. Combined raw=0.40+0.30=0.70. sigmoid(0.70)=0.668. Signal 5 (buy ratio): buy=235, sell=25, ratio=9.4>=3.0. raw_s5=min(0.40,0.10+(9.4-3)/3*0.10)=min(0.40,0.10+0.213)=0.313. Total raw=0.70+0.313=1.013. sigmoid(1.013)=0.734. Cap D01 at 0.90. Final: 0.734 High."
+    },
+    "d02_rug_pull": {
+      "verdict": "FIRES",
+      "confidence_band": [0.78, 0.88],
+      "severity": "High",
+      "reason": "Signal B: effective_safe=0.0%. conf=0.75. Single provider +0.05 -> 0.80 High. $55k at risk."
+    },
+    "d03_concentration": {
+      "verdict": "FIRES",
+      "confidence_band": [0.85, 1.00],
+      "severity": "Critical",
+      "reason": "top10_now=(285+198+158+120+82+56+32+18+10+8)e12/1250e12=967/1250=0.774. Prior top10=0.56 (on prior supply 1000e12). Signal 2: delta=0.774-0.56=0.214>=0.10. conf=min(1.0,0.50+0.214/0.10*0.25)=min(1.0,1.035)=1.0 Critical. Signal 3: 0.774<0.80 -> does NOT fire independently. Signal 1: gini_now~0.90 (estimated), prior=0.68, delta=0.22>=0.05. Signal 2 dominates at 1.0 Critical."
+    },
+    "d04_pump_dump": {
+      "verdict": "FIRES",
+      "confidence_band": [0.85, 0.95],
+      "severity": "Critical",
+      "reason": "Signal A: vol_1h=380k, baseline=34.5k, vol_multiplier=11.01x>=5x. price=+72.7%>=30%. raw=(11.01/5-1)*0.5+(0.727/0.30-1)*0.3=(1.202)*0.5+(1.423)*0.3=0.601+0.427=1.028. sigmoid(1.028)=0.736. Signal C: mint_authority active + minted 250e12 to deployer before pump. Deployer distributed these tokens into the pump. amplifier +0.15 -> 0.736+0.15=0.886. Cap A+C=0.95. Final: 0.886 Critical."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "FIRES",
+      "confidence_band": [0.72, 0.88],
+      "severity": "High",
+      "reason": "Signal A: WashBot100 7 round-trips, avg_vol_diff=2.2%<5%, count=7>=3. conf=0.60+(7-3)/3*0.10+(0.05-0.022)/0.05*0.15=0.60+0.133+0.084=0.817. Signal C: wash_vol=29k/380k=7.6% < 30% threshold -> Signal C does NOT amplify. Final: 0.817 High."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "FIRES",
+      "confidence_band": [0.80, 0.90],
+      "severity": "Critical",
+      "reason": "Signal B: mint 250e12 to non-LP address, pct=250e12/1000e12=25%>=5%. conf=min(0.85, 0.55+(0.25-0.05)/0.05*0.30+0.30)=min(0.85,0.55+1.20+0.30)=min(0.85,2.05)=0.85. Signal A: mint_authority active, age=10d>7d, conf=0.20 (subsumed). Signal C: token_age=10d<14d -> does NOT apply. Final D06: 0.85 Critical."
+    }
+  }
+}

@@ -1,0 +1,152 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthNeg074T22TTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+    "symbol": "T22J74",
+    "label": "negative",
+    "category": "token2022_legit",
+    "source_url": "synthetic/token2022_legit/t22j_safe",
+    "fetched_at": "2026-04-21T21:40:00Z",
+    "synthetic": true,
+    "notes": "Token-2022 transfer hook for royalty distribution. Hook program is known-safe (verified). D01 Signal 4 fires (transfer_hook present). Low confidence \u2014 hook classified as known-safe. Tests that known-safe hooks fire Low confidence not High."
+  },
+  "token_meta": {
+    "mint": "SynthNeg074T22TTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+    "token_program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+    "name": "T22Hook074",
+    "symbol": "T22J74",
+    "decimals": 6,
+    "supply_raw": "500000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevT22_J741111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": "KnownSafeHookProgram074111111111111111111111",
+    "rugged": false,
+    "verification": {
+      "jup_verified": false,
+      "jup_strict": false
+    },
+    "rugcheck_score": 640,
+    "rugcheck_score_normalised": 20,
+    "risks": [],
+    "markets": [
+      {
+        "pool_address": "T22Pool074111111111111111111111111111111",
+        "dex": "raydium",
+        "lp_burned_pct": "100.00",
+        "liquidity_usd": "72400.00",
+        "lp_provider_count": 1
+      }
+    ],
+    "lockers": {},
+    "creator": "DevT22_J741111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "72400.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 1190,
+    "total_supply_raw": 500000000000000,
+    "balances": {
+      "T22Holder074_011111111111111111111111": 28000000000000,
+      "T22Holder074_021111111111111111111111": 22000000000000,
+      "T22Holder074_031111111111111111111111": 16000000000000,
+      "T22Holder074_041111111111111111111111": 12000000000000,
+      "T22Holder074_051111111111111111111111": 8000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 1180,
+    "total_supply_raw": 500000000000000,
+    "top10_pct_liquid_after_exclusion": "0.18",
+    "gini_liquid_after_exclusion": "0.55"
+  },
+  "holder_classifications": [],
+  "pool_rows": [
+    {
+      "pool_address": "T22Pool074111111111111111111111111111111",
+      "dex": "raydium",
+      "lp_burned_pct": "100.00",
+      "lp_locked_pct": "0.00",
+      "effective_safe_pct": "100.00",
+      "lp_provider_count": 1,
+      "liquidity_usd": "72400.00"
+    }
+  ],
+  "swaps_1h": {
+    "volume_usd": "34200.00",
+    "trade_count": 42,
+    "unique_buyers": 35,
+    "price_start": "0.000056",
+    "price_end": "0.000057",
+    "price_change_pct": "0.018"
+  },
+  "swaps_7d_daily_baseline": {
+    "day_count_nonzero": 5,
+    "mean_daily_volume_usd": "39900.00",
+    "std_daily_volume_usd": "2500.00",
+    "volume_multiplier_observed": "0.86",
+    "volume_z_score": "-0.4"
+  },
+  "signal_a_round_trips": [],
+  "pool_total_volume_1h_usd": "34200.00",
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "FIRES",
+      "confidence_band": [
+        0.3,
+        0.6
+      ],
+      "severity": "Low",
+      "reason": "transfer_hook present: D01 Signal 4 fires at raw_s4=0.20. sigmoid(0.20)=0.550. Low. Hook program verified as royalty-distribution \u2014 classified. If unclassified, D01 would fire at full Signal 4 weight.",
+      "calibration_flag": true,
+      "calibration_note": "Known-safe hook fires D01 Low. Unclassified hooks should fire Medium per D01 spec. This tests the graduated response. Sprint 5: implement hook_program classification lookup to distinguish royalty vs unknown hooks."
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "LP 100% burned. effective_safe=100%."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "top10_now~0.18. prior=0.18. Stable. No D03 signals."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "vol_multiplier=0.86 < 5.0. price_change=+1.8% < 30%."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No round-trip events detected."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "mint_authority=null. No mint events."
+    }
+  }
+}

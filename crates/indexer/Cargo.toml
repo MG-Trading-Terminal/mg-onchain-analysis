@@ -1,0 +1,66 @@
+[package]
+name        = "mg-onchain-indexer"
+version.workspace     = true
+edition.workspace     = true
+rust-version.workspace = true
+license.workspace     = true
+repository.workspace  = true
+description = "Block-to-events pipeline: subscribe → batch → write → checkpoint → reorg-delete"
+
+[dependencies]
+# Workspace-shared
+anyhow.workspace      = true
+tokio.workspace       = true
+tracing.workspace     = true
+serde.workspace       = true
+serde_json.workspace  = true
+futures.workspace     = true
+thiserror.workspace   = true
+
+# Crate-local: cancellation token for graceful shutdown
+tokio-util = { version = "0.7", features = ["rt"] }
+# async-trait: required for dyn PoolInitializeHook (hooks.rs).
+async-trait.workspace = true
+
+# sqlx is needed in sink.rs to execute DELETE queries via PgStore::pool()
+# without touching crates/storage source code.
+sqlx.workspace  = true
+chrono.workspace = true
+rust_decimal.workspace = true
+bs58.workspace  = true
+
+# Internal crates
+mg-onchain-common        = { path = "../common" }
+mg-onchain-chain-adapter = { path = "../chain-adapter" }
+mg-onchain-storage       = { path = "../storage" }
+mg-onchain-graph         = { path = "../graph" }
+
+[dev-dependencies]
+# Graph mock stores for graph_writer unit tests (gated by test-utils feature).
+mg-onchain-graph = { path = "../graph", features = ["test-utils"] }
+
+# Integration test: real Postgres via Docker containers
+testcontainers         = "0.23"
+testcontainers-modules = { version = "0.11", features = ["postgres"] }
+# async-trait needed for implementing AsyncCheckpointStore in tests
+async-trait.workspace = true
+# TOML parsing used in config unit tests
+toml = "0.8"
+# Sprint 2/4 exit test: honeypot detector + compute_static pure-path assertion.
+mg-onchain-detectors      = { path = "../detectors", features = ["test-utils"] }
+# MockSolanaRpc for TokenRegistry construction in exit test.
+mg-onchain-token-registry = { path = "../token-registry", features = ["test-utils"] }
+# NotWiredPoolAccountProvider for HoneypotDetector construction in exit tests.
+mg-onchain-dex-adapter    = { path = "../dex-adapter" }
+# Sprint 5 exit test: scoring roundtrip + gateway + SDK.
+mg-onchain-scoring    = { path = "../scoring" }
+mg-onchain-gateway    = { path = "../gateway" }
+mg-onchain-client-sdk = { path = "../client-sdk" }
+# reqwest for gateway readiness polling (without pulling full SDK into dependencies).
+reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+# futures::StreamExt for WS stream consumption in gateway step.
+futures.workspace = true
+# axum needed to call axum::serve() directly in the gateway spin-up step.
+axum = { version = "0.8", features = ["macros", "ws"] }
+# Note: cargo will resolve the compatible version set; if 0.23/0.11 resolve fails,
+# bump to testcontainers = "0.27" / testcontainers-modules = "0.15".

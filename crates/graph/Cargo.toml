@@ -1,0 +1,43 @@
+[package]
+name        = "mg-onchain-graph"
+version.workspace     = true
+edition.workspace     = true
+rust-version.workspace = true
+license.workspace     = true
+repository.workspace  = true
+description = "Address graph: wallet clustering, whale tracking, smart money labels"
+
+[dependencies]
+anyhow.workspace      = true
+tokio.workspace       = true
+tracing.workspace     = true
+thiserror.workspace   = true
+serde.workspace       = true
+serde_json.workspace  = true
+chrono.workspace      = true
+rust_decimal.workspace = true
+
+mg-onchain-common   = { path = "../common" }
+mg-onchain-storage  = { path = "../storage" }
+
+sqlx = { version = "0.8", features = [
+    "runtime-tokio-rustls",
+    "postgres",
+    "chrono",
+    "migrate",
+    "macros",
+    "uuid",
+] }
+uuid = { version = "1", features = ["v4", "v5", "serde"] }
+toml.workspace = true
+async-trait.workspace = true
+
+[features]
+# Expose MockClusterStore for downstream crates that need it in their own tests.
+test-utils = []
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full", "test-util"] }
+# Enable test-utils feature of mg-onchain-storage so that MockWalletPnlCorpusStore
+# and MockTokenPriceProvider are available in smart_money.rs unit tests.
+mg-onchain-storage = { path = "../storage", features = ["test-utils"] }

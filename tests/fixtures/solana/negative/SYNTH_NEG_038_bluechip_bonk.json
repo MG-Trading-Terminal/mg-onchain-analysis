@@ -1,0 +1,83 @@
+{
+  "_fixture_meta": {
+    "mint": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+    "symbol": "BONK",
+    "label": "negative",
+    "category": "bluechip",
+    "source_url": "synthetic/bluechip/bonk_meme_established",
+    "fetched_at": "2026-04-21T20:52:00Z",
+    "synthetic": true,
+    "notes": "BONK — established Solana meme token. jup_verified=true, jup_strict=true. mint_authority=null (burned). Large holder base 800k+. Many small holders, very low Gini on liquid holdings. High daily volume. Tests that organic high-volume tokens with many holders do not trigger D04. Top holders are CEX wallets and market makers."
+  },
+  "token_meta": {
+    "mint": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "Bonk",
+    "symbol": "BONK",
+    "decimals": 5,
+    "supply_raw": "93718000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": false,
+    "update_authority": null,
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": true, "jup_strict": true },
+    "rugcheck_score": 80,
+    "rugcheck_score_normalised": 3,
+    "risks": [],
+    "markets": [
+      { "pool_address": "BonkPool01111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "liquidity_usd": "8500000.00", "lp_provider_count": 320 },
+      { "pool_address": "BonkPool02111111111111111111111111111111111", "dex": "orca", "lp_burned_pct": "0.00", "liquidity_usd": "5200000.00", "lp_provider_count": 210 }
+    ],
+    "lockers": {},
+    "creator": "6JZoszTBzkGsskbheswiS6z2LRGckyFY4SpEGiLZqA9p",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "13700000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 820000,
+    "total_supply_raw": 93718000000000000000,
+    "balances": {
+      "BonkCEX01111111111111111111111111111111111": 8200000000000000000,
+      "BonkCEX02111111111111111111111111111111111": 5800000000000000000,
+      "BonkMM01111111111111111111111111111111111": 3200000000000000000,
+      "BonkHolder01111111111111111111111111111111": 820000000000000000,
+      "BonkHolder02111111111111111111111111111111": 640000000000000000,
+      "BonkHolder03111111111111111111111111111111": 510000000000000000,
+      "BonkHolder04111111111111111111111111111111": 390000000000000000,
+      "BonkHolder05111111111111111111111111111111": 290000000000000000,
+      "BonkHolder06111111111111111111111111111111": 220000000000000000,
+      "BonkHolder07111111111111111111111111111111": 180000000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 819200,
+    "total_supply_raw": 93718000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.22",
+    "gini_liquid_after_exclusion": "0.71"
+  },
+  "holder_classifications": [
+    { "address": "BonkCEX01111111111111111111111111111111111", "type": "cex_hot_wallet", "label": "Bybit BONK wallet" },
+    { "address": "BonkCEX02111111111111111111111111111111111", "type": "cex_hot_wallet", "label": "OKX BONK wallet" },
+    { "address": "BonkMM01111111111111111111111111111111111", "type": "market_maker", "label": "Wintermute BONK MM" }
+  ],
+  "pool_rows": [
+    { "pool_address": "BonkPool01111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "lp_locked_pct": "0.00", "effective_safe_pct": "0.00", "lp_provider_count": 320, "liquidity_usd": "8500000.00" },
+    { "pool_address": "BonkPool02111111111111111111111111111111111", "dex": "orca", "lp_burned_pct": "0.00", "lp_locked_pct": "0.00", "effective_safe_pct": "0.00", "lp_provider_count": 210, "liquidity_usd": "5200000.00" }
+  ],
+  "swaps_1h": { "volume_usd": "12500000.00", "trade_count": 22000, "unique_buyers": 11000, "price_start": "0.0000182", "price_end": "0.0000186", "price_change_pct": "0.022" },
+  "swaps_7d_daily_baseline": { "day_count_nonzero": 7, "mean_daily_volume_usd": "11800000.00", "std_daily_volume_usd": "2200000.00", "volume_multiplier_observed": "1.06", "volume_z_score": "0.3" },
+  "signal_a_round_trips": [],
+  "pool_total_volume_1h_usd": "12500000.00",
+  "expected": {
+    "d01_honeypot": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "No static honeypot signals. jup_strict=true." },
+    "d02_rug_pull": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "is_established_protocol=true (jup_strict). D02 suppressed. Also 320+ LP providers — not a single-provider pool." },
+    "d03_concentration": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.08], "severity": "Info", "reason": "After CEX/MM exclusion: top10_pct_liquid=0.22. gini_delta~0 (stable). No signal." },
+    "d04_pump_dump": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "vol_multiplier=1.06 << 5.0. price_change=+2.2% << 30%. Organic high-volume token." },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "No round-trip events in 22000 trades. 11k unique buyers confirms organic diversity." },
+    "d06_mint_burn_anomaly": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "mint_authority=null. No mint events possible." }
+  }
+}

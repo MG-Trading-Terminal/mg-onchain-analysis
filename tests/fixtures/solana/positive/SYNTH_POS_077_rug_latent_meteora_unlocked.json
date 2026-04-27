@@ -1,0 +1,76 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthRug077AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "symbol": "RUG077",
+    "label": "positive",
+    "category": "rug_latent",
+    "source_url": "synthetic/rug_pull/meteora_dlmm_0pct_locked",
+    "fetched_at": "2026-04-21T20:26:00Z",
+    "synthetic": true,
+    "notes": "D02 Signal B via Meteora DLMM pool: 0% LP locked, single provider. High-risk. conf=0.75. Tests non-Raydium DEX coverage."
+  },
+  "token_meta": {
+    "mint": "SynthRug077AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "MeteoraRug077",
+    "symbol": "RUG077",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevMeteora077111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 2600,
+    "rugcheck_score_normalised": 55,
+    "risks": [ { "name": "LP Vault unlocked", "level": "danger" } ],
+    "markets": [
+      { "pool_address": "MeteoraPool077111111111111111111111111111111", "dex": "meteora_dlmm", "lp_burned_pct": "0.00", "liquidity_usd": "48000.00", "lp_provider_count": 1 }
+    ],
+    "lockers": {},
+    "creator": "DevMeteora077111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "48000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 520,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "MetHolder077_0111111111111111111111111111": 62000000000000,
+      "MetHolder077_0211111111111111111111111111": 44000000000000,
+      "MetHolder077_0311111111111111111111111111": 31000000000000,
+      "MetHolder077_0411111111111111111111111111": 21000000000000,
+      "MetHolder077_0511111111111111111111111111": 14000000000000,
+      "MetHolder077_0611111111111111111111111111": 9200000000000,
+      "MetHolder077_0711111111111111111111111111": 6000000000000,
+      "MetHolder077_0811111111111111111111111111": 3900000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 510,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.191",
+    "gini_liquid_after_exclusion": "0.46"
+  },
+  "holder_classifications": [],
+  "pool_rows": [
+    { "pool_address": "MeteoraPool077111111111111111111111111111111", "dex": "meteora_dlmm", "lp_burned_pct": "0.00", "lp_locked_pct": "0.00", "effective_safe_pct": "0.00", "lp_provider_count": 1, "liquidity_usd": "48000.00" }
+  ],
+  "expected": {
+    "d01_honeypot": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.15], "severity": "Info", "reason": "No honeypot signals." },
+    "d02_rug_pull": {
+      "verdict": "FIRES",
+      "confidence_band": [0.70, 0.75],
+      "severity": "High",
+      "reason": "Signal B: effective_safe_pct=0%, lp_provider_count=1. conf=0.75. Meteora DLMM pool same Signal B logic as Raydium — DEX type does not affect D02 signal."
+    },
+    "d03_concentration": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "top10=0.191; stable." },
+    "d04_pump_dump": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No spike." },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No self-dealing." },
+    "d06_mint_burn_anomaly": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "mint_authority=null." }
+  }
+}

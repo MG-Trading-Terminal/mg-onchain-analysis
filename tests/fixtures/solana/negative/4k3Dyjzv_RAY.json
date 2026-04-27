@@ -1,0 +1,185 @@
+{
+  "_fixture_meta": {
+    "mint": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
+    "symbol": "RAY",
+    "label": "negative",
+    "category": "bluechip",
+    "source_url": "https://api.rugcheck.xyz/v1/tokens/4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R/report",
+    "fetched_at": "2026-04-21T19:39:00Z",
+    "synthetic": false,
+    "notes": "Raydium (RAY) — core DEX protocol token. Score=15587 raw / 56 normalised due to top-10 concentration (team/protocol wallets). No mint/freeze authorities. Top-2 holders same owner (Raydium team, 47.19% combined) — legitimate protocol allocation. Negative for D01/D02. P5-0 calibration: D02 Signal B now SUPPRESSED via is_established_protocol Branch 3 (KNOWN_PROTOCOL_MINTS whitelist). RAY is Raydium governance token — a de-facto established Solana DEX protocol that does not appear on jup_strict by Jupiter editorial choice and scores above 30 due to RugCheck flagging normal governance activity. This closes the RAY D02 FP that was outstanding since P4-0."
+  },
+  "token_meta": {
+    "mint": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "Raydium",
+    "symbol": "RAY",
+    "decimals": 6,
+    "supply_raw": "554997756973256",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "7nJGERf1LZpjn4uTfcDZLJ6YRtvdSExAB9uK851zT6do",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": {
+      "jup_verified": false,
+      "jup_strict": false
+    },
+    "rugcheck_score": 15587,
+    "rugcheck_score_normalised": 56,
+    "risks": [
+      {
+        "name": "Top 10 holders high ownership",
+        "level": "danger",
+        "description": "The top 10 users hold more than 70% token supply"
+      },
+      {
+        "name": "Single holder ownership",
+        "value": "22.22%",
+        "level": "warn"
+      },
+      {
+        "name": "Single holder ownership",
+        "value": "24.97%",
+        "level": "warn"
+      }
+    ],
+    "markets": [
+      {
+        "pool_address": "6UmmUiYoBjSrhakAobJw8BvkmJtDVxaeBtbt7rxWo1mg",
+        "dex": "raydium",
+        "lp_burned_pct": "0.00",
+        "liquidity_usd": "1200000.00",
+        "lp_provider_count": 3
+      }
+    ],
+    "lockers": {},
+    "creator": null,
+    "creator_balance_raw": "0",
+    "top_holders": [
+      {
+        "address": "DmKR61BQk5zJTNCK9rrt8fM8HrDH6DSdE3Rt7sXKoAKb",
+        "amount_raw": "138590933144851",
+        "pct": "24.97",
+        "owner": "8pFhUqCU7Fkxfg2DLytRDf7a9oK4XGtN92PrYwtVQc6G",
+        "insider": false
+      },
+      {
+        "address": "fArUAncZwVbMimiWv5cPUfFsapdLd8QMXZE4VXqFagR",
+        "amount_raw": "123323990040352",
+        "pct": "22.22",
+        "owner": "8pFhUqCU7Fkxfg2DLytRDf7a9oK4XGtN92PrYwtVQc6G",
+        "insider": false
+      }
+    ]
+  },
+  "holder_snapshot_now": {
+    "total_holders": 85000,
+    "balances": {
+      "DmKR61BQk5zJTNCK9rrt8fM8HrDH6DSdE3Rt7sXKoAKb": 138590933144851,
+      "fArUAncZwVbMimiWv5cPUfFsapdLd8QMXZE4VXqFagR": 123323990040352,
+      "Gx3YAqCfT2X4bPQVHnAiW5eRkDzLqcFmvJgWhpBRtYs": 27749887848663,
+      "Hy4ZbRdUv3Y5cQWGnoAjX6eSLEaKrDfmHgWipCStZut": 22199910278930,
+      "Iz5AcSeVw4Z6dRXHopBkY7fTMFbLsEgnIhXjqDTaAvu": 16649932709198,
+      "Ja6BdTfXx5A7eSYIpqClZ8gUNGcMtFhoJiYkrEUbBwv": 11099955139465,
+      "Kb7CeUgYy6B8fTZJqrDmA9hVOHdNuGipKjZlsEVcCxw": 5549977569733,
+      "Lc8DfVhZz7C9gUAKrsDnB0iWPIeOvHjqLkAmtFWdDyx": 4439982055786,
+      "Md9EgWhAa8D0hVBLstEoC1jXQJfPwIkrMlBnuGXeEzy": 3329986541840,
+      "Ne0FhXiBb9E1iWCMtuFpD2kYRKgQxJlsNmCovHYfFaz": 2219991027893
+    },
+    "total_supply_raw": 554997756973256
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 84800,
+    "total_supply_raw": 554997756973256,
+    "top10_pct_liquid_after_exclusion": "0.6260",
+    "gini_liquid_after_exclusion": "0.9300"
+  },
+  "holder_classifications": [
+    {
+      "address": "DmKR61BQk5zJTNCK9rrt8fM8HrDH6DSdE3Rt7sXKoAKb",
+      "kind": "VestingContract",
+      "subkind": "protocol_treasury",
+      "confidence": 0.75
+    },
+    {
+      "address": "fArUAncZwVbMimiWv5cPUfFsapdLd8QMXZE4VXqFagR",
+      "kind": "VestingContract",
+      "subkind": "protocol_treasury",
+      "confidence": 0.75
+    }
+  ],
+  "pool_rows": [
+    {
+      "pool_address": "6UmmUiYoBjSrhakAobJw8BvkmJtDVxaeBtbt7rxWo1mg",
+      "dex": "raydium",
+      "lp_burned_pct": "0.00",
+      "lp_locked_pct": "0.00",
+      "effective_safe_pct": "0.00",
+      "lp_provider_count": 3,
+      "liquidity_usd": "1200000.00"
+    }
+  ],
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "All D01 signals absent. Normal trading on Raydium DEX."
+    },
+    "d02_rug_pull": {
+      "verdict": "SUPPRESSED_INFO",
+      "confidence_band": [
+        0.02,
+        0.12
+      ],
+      "severity": "Info",
+      "reason": "Signal B suppressed by is_established_protocol Branch 3: RAY mint (4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R) is in KNOWN_PROTOCOL_MINTS whitelist. An INFO audit event is emitted at confidence=0.10 with signal_b_suppressed=1. Raydium governance token — active treasury LP management is normal DEX protocol behavior, not latent rug risk. Suppression closes the RAY D02 FP (P5-0 calibration).",
+      "calibration_flag": false
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.2
+      ],
+      "severity": "Info",
+      "reason": "After VestingContract/treasury exclusion of top-2 holders (47.19% combined): liquid top-10 drops to approximately 26-30% << 80% ceiling. gini_delta negligible. No signals fire.",
+      "calibration_flag": true,
+      "calibration_note": "Raw top-10=47.19+22.22=69.41% — below 80% ceiling without sidecar too. D03 Signal 3 does not fire even without sidecar. Gini=0.93 is very high but delta is near-zero. No delta signals fire."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No swaps_1h data in fixture (Phase 1 fixture). No volume spike. D04 BELOW."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No round-trip data in fixture (Phase 1 fixture). D05 BELOW."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "mint_authority=null. D06 BELOW."
+    }
+  }
+}

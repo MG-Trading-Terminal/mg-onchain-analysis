@@ -1,0 +1,99 @@
+{
+  "_label": "SYNTH_POS_D11_01",
+  "_description": "7 coordinated wallets buying the same token within 6 seconds. Lambda=0.001/s; p_value ≈ 2.2e-11; temporal_tightness=0.80. D11 must fire with confidence >= 0.70.",
+  "_chain": "Solana",
+  "_source": "Synthetic — design 0018 §12.1. Mazza et al. 2019 (RTbust) coordinated-botnet buy pattern.",
+  "_algorithm": "jaccard_dbscan; delta_seconds=30; action_source=swap_buy",
+  "token_mint": "SYNTH_TOKEN_D11_POS_01",
+  "is_established_protocol": false,
+  "observed_at_block_time": "2026-04-24T10:00:30Z",
+  "lambda_token_per_second": 0.001,
+  "baseline_events_7d": 605,
+  "swaps": [
+    {
+      "wallet": "WALLET_D11_P01_A",
+      "tx_hash": "TX_D11_P01_A001",
+      "block_time": "2026-04-24T10:00:04Z",
+      "block_height": 100000,
+      "is_buy": true,
+      "amount_raw": "1000000000",
+      "pool": "POOL_D11_POS_01"
+    },
+    {
+      "wallet": "WALLET_D11_P01_B",
+      "tx_hash": "TX_D11_P01_B001",
+      "block_time": "2026-04-24T10:00:05Z",
+      "block_height": 100002,
+      "is_buy": true,
+      "amount_raw": "2000000000",
+      "pool": "POOL_D11_POS_01"
+    },
+    {
+      "wallet": "WALLET_D11_P01_C",
+      "tx_hash": "TX_D11_P01_C001",
+      "block_time": "2026-04-24T10:00:05Z",
+      "block_height": 100002,
+      "is_buy": true,
+      "amount_raw": "1500000000",
+      "pool": "POOL_D11_POS_01"
+    },
+    {
+      "wallet": "WALLET_D11_P01_D",
+      "tx_hash": "TX_D11_P01_D001",
+      "block_time": "2026-04-24T10:00:06Z",
+      "block_height": 100004,
+      "is_buy": true,
+      "amount_raw": "3000000000",
+      "pool": "POOL_D11_POS_01"
+    },
+    {
+      "wallet": "WALLET_D11_P01_E",
+      "tx_hash": "TX_D11_P01_E001",
+      "block_time": "2026-04-24T10:00:07Z",
+      "block_height": 100006,
+      "is_buy": true,
+      "amount_raw": "800000000",
+      "pool": "POOL_D11_POS_01"
+    },
+    {
+      "wallet": "WALLET_D11_P01_F",
+      "tx_hash": "TX_D11_P01_F001",
+      "block_time": "2026-04-24T10:00:09Z",
+      "block_height": 100010,
+      "is_buy": true,
+      "amount_raw": "1200000000",
+      "pool": "POOL_D11_POS_01"
+    },
+    {
+      "wallet": "WALLET_D11_P01_G",
+      "tx_hash": "TX_D11_P01_G001",
+      "block_time": "2026-04-24T10:00:10Z",
+      "block_height": 100012,
+      "is_buy": true,
+      "amount_raw": "900000000",
+      "pool": "POOL_D11_POS_01"
+    }
+  ],
+  "_math_verification": {
+    "lambda_per_second": 0.001,
+    "delta_seconds": 30,
+    "p_one": "1 - exp(-0.001 * 30) = 1 - exp(-0.03) ≈ 0.02956",
+    "p_joint_k7": "0.02956^7 ≈ 2.2e-11",
+    "temporal_spread_seconds": 6,
+    "temporal_tightness": "1 - 6/30 = 0.80",
+    "S_size": "sigmoid((7-5)/5) = sigmoid(0.4) ≈ 0.599",
+    "S_tight": 0.80,
+    "S_stat": "1 - 2.2e-11 / 1e-6 ≈ 1.0",
+    "conf_raw": "0.4*0.599 + 0.3*0.80 + 0.3*1.0 = 0.2396 + 0.24 + 0.30 = 0.7796",
+    "conf_final": "min(0.7796, 0.90) = 0.7796"
+  },
+  "_expected": {
+    "detector_id": "synchronized_activity_v1",
+    "fires": true,
+    "cluster_size": 7,
+    "temporal_tightness_min": 0.75,
+    "p_value_max": 1e-9,
+    "confidence_min": 0.70,
+    "severity": "High"
+  }
+}

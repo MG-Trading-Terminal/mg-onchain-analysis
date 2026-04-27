@@ -1,0 +1,193 @@
+{
+  "_fixture_meta": {
+    "mint": "SYNTH_NEG_017_midcap_meme",
+    "symbol": "MID17",
+    "label": "negative",
+    "category": "meme_distributed",
+    "source_url": "synthetic",
+    "fetched_at": "2026-04-21T20:00:00Z",
+    "synthetic": true,
+    "notes": "Synthetic: mid-cap established meme, 200K holders, 95% LP locked."
+  },
+  "token_meta": {
+    "mint": "SYNTH_NEG_017_midcap_meme",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "MidCapMeme 17",
+    "symbol": "MID17",
+    "decimals": 6,
+    "supply_raw": "999000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": false,
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": {
+      "jup_verified": false,
+      "jup_strict": false
+    },
+    "rugcheck_score": 50,
+    "rugcheck_score_normalised": 3,
+    "risks": [],
+    "markets": [
+      {
+        "pool_address": "pool_017_11111111111111111111111111111111",
+        "dex": "raydium",
+        "lp_burned_pct": "0.00",
+        "liquidity_usd": "2500000.0",
+        "lp_provider_count": 2
+      }
+    ],
+    "lockers": {
+      "pool_017_11111111111111111111111111111111": {
+        "type": "raydium_locker",
+        "usdcLocked": 2500000.0
+      }
+    },
+    "creator": "creator_017_111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "top_holders": [
+      {
+        "address": "holder_017_01_1111111111111111111111111111",
+        "amount_raw": "8991000000000",
+        "pct": "0.90"
+      },
+      {
+        "address": "holder_017_02_1111111111111111111111111111",
+        "amount_raw": "8541450000000",
+        "pct": "0.85"
+      },
+      {
+        "address": "holder_017_03_1111111111111111111111111111",
+        "amount_raw": "8091900000000",
+        "pct": "0.81"
+      },
+      {
+        "address": "holder_017_04_1111111111111111111111111111",
+        "amount_raw": "7642350000000",
+        "pct": "0.77"
+      },
+      {
+        "address": "holder_017_05_1111111111111111111111111111",
+        "amount_raw": "7192800000000",
+        "pct": "0.72"
+      },
+      {
+        "address": "holder_017_06_1111111111111111111111111111",
+        "amount_raw": "6743250000000",
+        "pct": "0.68"
+      },
+      {
+        "address": "holder_017_07_1111111111111111111111111111",
+        "amount_raw": "6293700000000",
+        "pct": "0.63"
+      },
+      {
+        "address": "holder_017_08_1111111111111111111111111111",
+        "amount_raw": "5844149999999",
+        "pct": "0.58"
+      },
+      {
+        "address": "holder_017_09_1111111111111111111111111111",
+        "amount_raw": "5394600000000",
+        "pct": "0.54"
+      },
+      {
+        "address": "holder_017_10_1111111111111111111111111111",
+        "amount_raw": "4945050000000",
+        "pct": "0.50"
+      }
+    ]
+  },
+  "holder_snapshot_now": {
+    "total_holders": 200000,
+    "balances": {
+      "holder_017_01_1111111111111111111111111111": 8991000000000,
+      "holder_017_02_1111111111111111111111111111": 8541450000000,
+      "holder_017_03_1111111111111111111111111111": 8091900000000,
+      "holder_017_04_1111111111111111111111111111": 7642350000000,
+      "holder_017_05_1111111111111111111111111111": 7192800000000,
+      "holder_017_06_1111111111111111111111111111": 6743250000000,
+      "holder_017_07_1111111111111111111111111111": 6293700000000,
+      "holder_017_08_1111111111111111111111111111": 5844149999999,
+      "holder_017_09_1111111111111111111111111111": 5394600000000,
+      "holder_017_10_1111111111111111111111111111": 4945050000000
+    },
+    "total_supply_raw": 999000000000000
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 199950,
+    "total_supply_raw": 999000000000000,
+    "top10_pct_liquid_after_exclusion": "0.0890",
+    "gini_liquid_after_exclusion": "0.7390"
+  },
+  "holder_classifications": [],
+  "pool_rows": [
+    {
+      "pool_address": "pool_017_11111111111111111111111111111111",
+      "dex": "raydium",
+      "lp_burned_pct": "0.00",
+      "lp_locked_pct": "95.00",
+      "effective_safe_pct": "95.00",
+      "lp_provider_count": 2,
+      "liquidity_usd": "2500000.0"
+    }
+  ],
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "All D01 honeypot signals absent: no freeze/fee/delegate/hook."
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.15
+      ],
+      "severity": "Info",
+      "reason": "effective_safe_pct=95.00% >= 70% floor. Signal B suppressed."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.15
+      ],
+      "severity": "Info",
+      "reason": "top10_pct_liquid=0.0900 << 0.80. gini_delta=0.0010 << 0.05. No signals fire."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No swaps_1h data in fixture (Phase 1 fixture). No volume spike. D04 BELOW."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No round-trip data in fixture (Phase 1 fixture). D05 BELOW."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "mint_authority=null. D06 BELOW."
+    }
+  }
+}

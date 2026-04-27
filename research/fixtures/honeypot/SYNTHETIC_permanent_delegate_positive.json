@@ -1,0 +1,62 @@
+{
+  "_fixture_meta": {
+    "label": "positive_static_permanent_delegate",
+    "detector": "honeypot_sim",
+    "expected_confidence_range": [0.20, 0.35],
+    "expected_severity": "Low",
+    "capture_date": "2026-04-21",
+    "synthetic": true,
+    "notes": "SYNTHETIC fixture — constructed from documented Token-2022 PermanentDelegate attack pattern (cryptorank.io/news, March 2026). The PermanentDelegate extension grants a designated authority unconditional power to transfer or burn any holder's tokens without their signature. Token 'RED' was cited as one example where tokens were burned 7 seconds after purchase. No stable mint address because these tokens are ephemeral. Developer should replace with a real captured fixture once the detector corpus accumulates these. Pattern: (1) Token-2022 program, (2) permanentDelegate = deployer address (non-null), (3) no freeze authority, (4) transfer fee = 0 bps (permanent delegate is the attack vector, not fee), (5) zero successful sell txs because the delegate burns tokens before they can be sold. Expected signal: permanent_delegate_active fires at weight 0.20 contribution. buy_sell_ratio fires at 999 (zero sells). Combined: moderate-low confidence since no sell tax. If simulation is run, the simulate will show token balance dropped to zero after buy (burned by delegate) — simulation_fail=true if sell is attempted after balance=0.",
+    "signals_expected": {
+      "freeze_authority_active": false,
+      "transfer_fee_bps": 0,
+      "permanent_delegate_active": true,
+      "permanent_delegate_address": "DEPLOYER_WALLET_PLACEHOLDER",
+      "transfer_hook_present": false,
+      "buy_sell_ratio_above_sentinel": true,
+      "simulation_fail": true
+    }
+  },
+  "mint": "SYNTHETIC_DO_NOT_USE_IN_PRODUCTION",
+  "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+  "creator": "DEPLOYER_WALLET_PLACEHOLDER",
+  "token": {
+    "mintAuthority": null,
+    "supply": 1000000000000000,
+    "decimals": 6,
+    "isInitialized": true,
+    "freezeAuthority": null
+  },
+  "transferFee": {
+    "pct": 0,
+    "maxAmount": 0,
+    "authority": "11111111111111111111111111111111"
+  },
+  "permanentDelegate": "DEPLOYER_WALLET_PLACEHOLDER",
+  "transferHook": null,
+  "rugged": true,
+  "score": 75000,
+  "risks": [
+    {
+      "name": "Permanent Delegate",
+      "description": "Token has a permanent delegate that can transfer or burn any holder's tokens without their authorization.",
+      "level": "danger"
+    },
+    {
+      "name": "Large Amount of LP Unlocked",
+      "value": "100.00%",
+      "level": "danger"
+    }
+  ],
+  "markets": [
+    {
+      "pubkey": "POOL_ADDRESS_PLACEHOLDER",
+      "marketType": "raydium_cpmm"
+    }
+  ],
+  "verification": null,
+  "observed_sells_24h": 0,
+  "observed_buys_24h": 312,
+  "buy_sell_ratio_24h": 999.0,
+  "source_reference": "https://cryptorank.io/news/feed/0cf43-scammers-exploit-solana-token-feature-to-burn-users-crypto"
+}

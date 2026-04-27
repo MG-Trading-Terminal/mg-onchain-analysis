@@ -1,0 +1,11 @@
+# mg-onchain-analysis storage (Postgres 16+)
+# Copy to config/storage.toml and fill in real credentials.
+# NEVER commit config/storage.toml — only this .example file is tracked.
+
+# Postgres connection URL.
+# Format: postgres://user:password@host:port/database
+postgres_url = "postgres://user:password@localhost:5432/mg_onchain"
+
+# Set to true to apply migrations automatically at service startup.
+# Set to false if migrations are applied by an external tool (e.g. in CI).
+migrations_auto_apply = true

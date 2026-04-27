@@ -1,0 +1,142 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthMint064nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+    "symbol": "MINT064",
+    "label": "positive",
+    "category": "mint_anomaly",
+    "source_url": "synthetic/mint_burn/signal_b_burn_from_non_lp",
+    "fetched_at": "2026-04-21T20:13:00Z",
+    "synthetic": true,
+    "notes": "D06 Signal B (burn variant): large burn from non-LP address. Deployer burns 12% of supply from their wallet. Burn-then-remint laundering setup (E-D06-6). Signal B fires on burn event. Signal A also fires (mint_authority still active)."
+  },
+  "token_meta": {
+    "mint": "SynthMint064nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "BurnAnomaly064",
+    "symbol": "MINT064",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": "BurnDev064111111111111111111111111111111111",
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "BurnDev064111111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 4400,
+    "rugcheck_score_normalised": 74,
+    "risks": [
+      { "name": "Mint Authority still enabled", "level": "danger" }
+    ],
+    "markets": [
+      {
+        "pool_address": "BurnPool064111111111111111111111111111111111",
+        "dex": "raydium",
+        "lp_burned_pct": "85.00",
+        "liquidity_usd": "41000.00",
+        "lp_provider_count": 2
+      }
+    ],
+    "lockers": {},
+    "creator": "BurnDev064111111111111111111111111111111111",
+    "creator_balance_raw": "8000000000000",
+    "total_market_liquidity_usd": "41000.00",
+    "detected_at": "2026-03-15T10:00:00Z"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 410,
+    "total_supply_raw": 880000000000000,
+    "balances": {
+      "BurnDev064111111111111111111111111111111111": 8000000000000,
+      "BurnHolder064_011111111111111111111111111": 78000000000000,
+      "BurnHolder064_021111111111111111111111111": 54000000000000,
+      "BurnHolder064_031111111111111111111111111": 38000000000000,
+      "BurnHolder064_041111111111111111111111111": 25000000000000,
+      "BurnHolder064_051111111111111111111111111": 16000000000000,
+      "BurnHolder064_061111111111111111111111111": 10000000000000,
+      "BurnHolder064_071111111111111111111111111": 6500000000000,
+      "BurnHolder064_081111111111111111111111111": 4200000000000,
+      "BurnHolder064_091111111111111111111111111": 2800000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 408,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.31",
+    "gini_liquid_after_exclusion": "0.58"
+  },
+  "holder_classifications": [
+    { "address": "BurnDev064111111111111111111111111111111111", "kind": "deployer" }
+  ],
+  "pool_rows": [
+    {
+      "pool_address": "BurnPool064111111111111111111111111111111111",
+      "dex": "raydium",
+      "lp_burned_pct": "85.00",
+      "lp_locked_pct": "0.00",
+      "effective_safe_pct": "85.00",
+      "lp_provider_count": 2,
+      "liquidity_usd": "41000.00"
+    }
+  ],
+  "burn_events_30d": [
+    {
+      "day_offset": -2,
+      "tx_hash": "BurnTx064A111111111111111111111111111111111111",
+      "from_address": "BurnDev064111111111111111111111111111111111",
+      "to_address": "11111111111111111111111111111111",
+      "amount_raw": "120000000000000",
+      "supply_change_pct": "-0.120",
+      "burner_is_known_lp": false,
+      "burner_holder_kind": "deployer"
+    }
+  ],
+  "mint_events_30d": [],
+  "signal_c_data": {
+    "cumulative_supply_change_30d_pct": "0.00",
+    "mint_event_count_30d": 0,
+    "token_age_days": 37,
+    "mint_authority": "BurnDev064111111111111111111111111111111111",
+    "supply_base": "circulating"
+  },
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.15],
+      "severity": "Info",
+      "reason": "No honeypot signals."
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.10],
+      "severity": "Info",
+      "reason": "LP 85% burned; effective_safe=85%. D02 Signal B does not fire."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.10],
+      "severity": "Info",
+      "reason": "top10 stable ~0.31. No delta signals."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.10],
+      "severity": "Info",
+      "reason": "No volume spike. Burn event is not a price pump."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.10],
+      "severity": "Info",
+      "reason": "No self-dealing patterns."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "FIRES",
+      "confidence_band": [0.82, 0.87],
+      "severity": "High",
+      "reason": "Signal B (burn variant) fires: deployer burned 12% of supply (120e12/1000e12=0.12 >= 0.05 threshold). Burner ('BurnDev064...') is NOT a known LP address. conf=min(0.85, 0.55+(0.12-0.05)/0.05*0.30+0.30)=min(0.85, 0.55+0.42+0.30)=0.85. Signal A also fires: mint_authority active, token_age=37d > 7d. conf_A=0.20. Signal C: no non-LP mints; authority active but no cumulative minting -> Signal C does not fire. Both Signal A and Signal B emitted."
+    }
+  }
+}

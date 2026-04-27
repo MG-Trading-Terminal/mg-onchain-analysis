@@ -1,0 +1,130 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthHonP066pppppppppppppppppppppppppppppppp",
+    "symbol": "HON066",
+    "label": "positive",
+    "category": "honeypot_active",
+    "source_url": "synthetic/honeypot/s5_ratio_with_pump_signal",
+    "fetched_at": "2026-04-21T20:15:00Z",
+    "synthetic": true,
+    "notes": "D01 S5 (high buy/sell ratio) co-fires with D04 pump signal. 45 buys 0 sells in pool window. Also has vol spike. Multi-detector: honeypot + pump. Evasion-aware: no static flags to evade static checks, only behavioral."
+  },
+  "token_meta": {
+    "mint": "SynthHonP066pppppppppppppppppppppppppppppppp",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "HonPump066",
+    "symbol": "HON066",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevHonP066111111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 3200,
+    "rugcheck_score_normalised": 62,
+    "risks": [],
+    "markets": [
+      {
+        "pool_address": "HonPool066111111111111111111111111111111111",
+        "dex": "raydium",
+        "lp_burned_pct": "0.00",
+        "liquidity_usd": "7400.00",
+        "lp_provider_count": 1
+      }
+    ],
+    "lockers": {},
+    "creator": "DevHonP066111111111111111111111111111111111",
+    "creator_balance_raw": "620000000000000",
+    "total_market_liquidity_usd": "7400.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 48,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "DevHonP066111111111111111111111111111111111": 620000000000000,
+      "HonHolder066_011111111111111111111111111": 140000000000000,
+      "HonHolder066_021111111111111111111111111": 92000000000000,
+      "HonHolder066_031111111111111111111111111": 58000000000000,
+      "HonHolder066_041111111111111111111111111": 38000000000000,
+      "HonHolder066_051111111111111111111111111": 22000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": null,
+  "holder_classifications": [
+    { "address": "DevHonP066111111111111111111111111111111111", "kind": "deployer" }
+  ],
+  "pool_rows": [
+    {
+      "pool_address": "HonPool066111111111111111111111111111111111",
+      "dex": "raydium",
+      "lp_burned_pct": "0.00",
+      "lp_locked_pct": "0.0",
+      "effective_safe_pct": "0.0",
+      "lp_provider_count": 1,
+      "liquidity_usd": "7400.00"
+    }
+  ],
+  "pool_trade_window": {
+    "buy_count": 45,
+    "sell_count": 0,
+    "observation_slots": 500
+  },
+  "swaps_1h": {
+    "volume_usd": "62000.00",
+    "trade_count": 45,
+    "unique_buyers": 44,
+    "price_start": "0.0000074",
+    "price_end": "0.0000128",
+    "price_change_pct": "0.730"
+  },
+  "swaps_7d_daily_baseline": {
+    "day_count_nonzero": 0,
+    "mean_daily_volume_usd": "0.00",
+    "std_daily_volume_usd": "0.00",
+    "volume_multiplier_observed": null,
+    "volume_z_score": null
+  },
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "FIRES",
+      "confidence_band": [0.45, 0.65],
+      "severity": "Medium",
+      "reason": "S5 fires: buy_count=45 >= min_buy_count=5, sell_count=0, ratio=undefined (all buys, zero sells). Weight S5=0.20. raw_weight=0.20. sigmoid(0.20/0.55-1.0)=sigmoid(-0.636)=0.346. Above Low threshold. Behavioral signal only — no static flags."
+    },
+    "d02_rug_pull": {
+      "verdict": "FIRES",
+      "confidence_band": [0.70, 0.75],
+      "severity": "High",
+      "reason": "LP 0% burned, single provider. Signal B fires at 0.75."
+    },
+    "d03_concentration": {
+      "verdict": "FIRES",
+      "confidence_band": [0.65, 0.82],
+      "severity": "High",
+      "reason": "Deployer holds 62%; top 6 = 97%. Signal 3 fires: top10 >= 0.80. No prior snapshot so Signal 1/2 inactive."
+    },
+    "d04_pump_dump": {
+      "verdict": "FIRES",
+      "confidence_band": [0.68, 0.78],
+      "severity": "High",
+      "reason": "Signal B: burst fallback (baseline_days=0). vol_1h=62k > 5k dust. burst_ratio=1.0 >= 0.90. confidence=0.75. No insider sell data (no sells recorded)."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.10],
+      "severity": "Info",
+      "reason": "No sell transactions → no round-trips possible. 44 unique buyers."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.05],
+      "severity": "Info",
+      "reason": "mint_authority=null. No supply events."
+    }
+  }
+}

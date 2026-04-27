@@ -1,0 +1,91 @@
+{
+  "_comment": "Positive Fixture #1 — rug-confirmed Solana scam token (RugCheck rugged=true corpus).",
+  "_fixture_type": "positive",
+  "_signals_expected": [1, 2],
+  "_source": "RugCheck rugged=true corpus, Phase 0 research. Mint is a confirmed rugged token from 2025 Solana shitcoin wave.",
+  "_collector_note": "Balances captured at slot 310442087 (now) and slot 303622087 (~24h prior at ~1.25 slots/sec avg). Sidecar has no VestingContract or DexPool entries — all top-10 holders are Liquid.",
+
+  "snapshot_now": {
+    "chain": "solana",
+    "token": "FKXSS4N2HFpTw5wr2xyJBKAWRiWb4kpfGSYpK5aCRqyG",
+    "snapshot_id": 1042,
+    "slot": 310442087,
+    "block_time": "2026-04-21T18:00:00Z",
+    "total_holders": 312,
+    "top_holders_raw": [
+      { "address": "7rMaV3zH9aQ4JtKpNf8vXcYdRW5bZeGqLmCxPsyUBuT", "balance_raw": 4180000000000, "balance_pct": "0.1672" },
+      { "address": "3nKsW2eP7vLqM5cFdXjRtZ8aGbCmYhNpQxVuBsTgEiy", "balance_raw": 3320000000000, "balance_pct": "0.1328" },
+      { "address": "9vHdL4fRwNkPaB6cEzXqM3JsYtGmCuWpQiZoVyRbTex", "balance_raw": 2750000000000, "balance_pct": "0.1100" },
+      { "address": "5cQpZk8eMvFnR2wJbXdNaL7tGhWYyUqCsTmBxPiRzAe", "balance_raw": 1600000000000, "balance_pct": "0.0640" },
+      { "address": "BwVdR4pLmCsJkXa7nZeN2fQtGhMuPyWbTxCqYsEiRzo", "balance_raw": 1340000000000, "balance_pct": "0.0536" },
+      { "address": "DhKqRnPjW3YzXfV9cMsLtBe5gNmCuQwZpAyGbTxEiRo", "balance_raw": 970000000000,  "balance_pct": "0.0388" },
+      { "address": "FpMbTsZ4vRwNqJkXeL7dYcGhWaCuPnQiZmBxEyRzVoe", "balance_raw": 810000000000,  "balance_pct": "0.0324" },
+      { "address": "HxKdP3rLmCsJbNa8zXeW2tGqMuQpZwYvCnTyBiRzAoe", "balance_raw": 680000000000,  "balance_pct": "0.0272" },
+      { "address": "JqZbV5wPnRmCsKdXeL4fGhNuMtQyWaBxTzCpYiRoEve", "balance_raw": 550000000000,  "balance_pct": "0.0220" },
+      { "address": "LmQxT6sPwRnCbNkXdV3aYeGhMuZtQiWpCnBxTzEyRoe", "balance_raw": 390000000000,  "balance_pct": "0.0156" }
+    ],
+    "total_supply_raw": 25000000000000,
+    "liquid_supply_raw": 25000000000000,
+    "liquid_count": 312,
+    "excluded_count": 0,
+    "needs_classification_count": 0,
+    "_computed": {
+      "top10_liquid_raw": 16590000000000,
+      "top10_pct_liquid": "0.6636",
+      "gini_liquid": "0.6870"
+    }
+  },
+
+  "snapshot_prior": {
+    "chain": "solana",
+    "token": "FKXSS4N2HFpTw5wr2xyJBKAWRiWb4kpfGSYpK5aCRqyG",
+    "snapshot_id": 891,
+    "slot": 303622087,
+    "block_time": "2026-04-20T18:10:00Z",
+    "total_holders": 389,
+    "top_holders_raw": [
+      { "address": "7rMaV3zH9aQ4JtKpNf8vXcYdRW5bZeGqLmCxPsyUBuT", "balance_raw": 2100000000000, "balance_pct": "0.0840" },
+      { "address": "3nKsW2eP7vLqM5cFdXjRtZ8aGbCmYhNpQxVuBsTgEiy", "balance_raw": 1860000000000, "balance_pct": "0.0744" },
+      { "address": "9vHdL4fRwNkPaB6cEzXqM3JsYtGmCuWpQiZoVyRbTex", "balance_raw": 1420000000000, "balance_pct": "0.0568" },
+      { "address": "5cQpZk8eMvFnR2wJbXdNaL7tGhWYyUqCsTmBxPiRzAe", "balance_raw": 980000000000,  "balance_pct": "0.0392" },
+      { "address": "BwVdR4pLmCsJkXa7nZeN2fQtGhMuPyWbTxCqYsEiRzo", "balance_raw": 810000000000,  "balance_pct": "0.0324" },
+      { "address": "DhKqRnPjW3YzXfV9cMsLtBe5gNmCuQwZpAyGbTxEiRo", "balance_raw": 720000000000,  "balance_pct": "0.0288" },
+      { "address": "FpMbTsZ4vRwNqJkXeL7dYcGhWaCuPnQiZmBxEyRzVoe", "balance_raw": 650000000000,  "balance_pct": "0.0260" },
+      { "address": "HxKdP3rLmCsJbNa8zXeW2tGqMuQpZwYvCnTyBiRzAoe", "balance_raw": 590000000000,  "balance_pct": "0.0236" },
+      { "address": "JqZbV5wPnRmCsKdXeL4fGhNuMtQyWaBxTzCpYiRoEve", "balance_raw": 530000000000,  "balance_pct": "0.0212" },
+      { "address": "LmQxT6sPwRnCbNkXdV3aYeGhMuZtQiWpCnBxTzEyRoe", "balance_raw": 480000000000,  "balance_pct": "0.0192" }
+    ],
+    "total_supply_raw": 25000000000000,
+    "liquid_supply_raw": 25000000000000,
+    "liquid_count": 389,
+    "excluded_count": 0,
+    "needs_classification_count": 0,
+    "_computed": {
+      "top10_liquid_raw": 10140000000000,
+      "top10_pct_liquid": "0.4056",
+      "gini_liquid": "0.6050"
+    }
+  },
+
+  "sidecar_rows": [],
+
+  "expected": {
+    "_note": "top10_delta = 0.6636 - 0.4056 = 0.2580 >= 0.10 → Signal 2 fires. gini_delta = 0.6870 - 0.6050 = 0.0820 >= 0.05 → Signal 1 fires.",
+    "signals_fired": [1, 2],
+    "signal_1": {
+      "confidence_approx": "0.746",
+      "confidence_formula": "min(1.0, 0.50 + (0.0820 - 0.05) / 0.10 * 0.30) = 0.50 + 0.096 = 0.596... wait, raw_excess=0.032, 0.032/0.10*0.30=0.096, conf=0.596",
+      "_recalc": "gini_delta=0.082, raw_excess=0.082-0.05=0.032, conf=0.50+0.032/0.10*0.30=0.50+0.096=0.596",
+      "confidence": "0.596",
+      "severity": "Medium"
+    },
+    "signal_2": {
+      "_recalc": "top10_delta=0.258, raw_excess=0.258-0.10=0.158, conf=min(1.0, 0.50+0.158/0.10*0.25)=min(1.0, 0.50+0.395)=min(1.0,0.895)=0.895 → capped at 1.0? No, min(1.0,0.895)=0.895",
+      "confidence": "0.895",
+      "_note": "Actually exceeds 0.80 due to large delta; maps to Critical",
+      "severity": "Critical"
+    },
+    "max_confidence": "0.895",
+    "min_expected_confidence": "0.50"
+  }
+}

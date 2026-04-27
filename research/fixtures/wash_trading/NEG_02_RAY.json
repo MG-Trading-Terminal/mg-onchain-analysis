@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "fixture_id": "NEG_02_RAY",
+    "synthetic": false,
+    "calibration_flag": true,
+    "expected_correct": false,
+    "description": "RAY — established-protocol but does NOT satisfy is_established_protocol() per token_status.rs (jup_verified=false, score=56, not jup_strict). Signal A may fire on RAY MM activity. This is a documented calibration gap identical to D02/D04 RAY FP debt. Fixture serves to document the gap, not assert a passing test.",
+    "expected_signal": "signal_a_possible_fp",
+    "expected_confidence_max": 0.75,
+    "source": "live_reference",
+    "token_mint": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
+    "created": "2026-04-21",
+    "spec_ref": "docs/designs/0008-detector-05-wash-trading.md §10 NEG_02"
+  },
+  "token": {
+    "chain": "solana",
+    "mint": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
+    "symbol": "RAY",
+    "decimals": 6,
+    "rugcheck_score": 56,
+    "verification": {
+      "jup_verified": false,
+      "jup_strict": false
+    },
+    "total_market_liquidity_usd": "8000000.00",
+    "is_established_protocol_result": false,
+    "is_established_protocol_reason": "jup_verified=false AND jup_strict=false — neither branch of is_established_protocol() satisfied. score=56 above threshold 40. RAY is a known FP for structural detectors (D02 Signal B, D04 Signal C) — same debt applies to D05 Signal A."
+  },
+  "pool": {
+    "address": "6UmmUiYoBjSrhakAobJw8BvkmJtDVxaeBtbt7rxWo1mg",
+    "dex": "raydium_v4",
+    "liquidity_usd": "8000000.00",
+    "note": "Representative RAY/USDC Raydium pool"
+  },
+  "trading_pattern_summary": {
+    "note": "Raydium's own market maker wallet may produce H1-like round-trips on RAY. If Signal A fires on RAY, it is a false positive stemming from the same is_established_protocol() gap identified for D02 and D04.",
+    "mm_wallet_behavior": "Raydium treasury MM may execute rapid round-trips within 25 slots with <1% vol diff as part of legitimate spread maintenance",
+    "expected_round_trips": "2-5 per 24h window for the primary MM wallet"
+  },
+  "expected_result": {
+    "signal_a_suppressed_by_established_protocol": false,
+    "signal_a_may_fire": true,
+    "calibration_gap": "If Signal A fires on RAY, this is an accepted FP. The detector behaves correctly per current is_established_protocol() logic (RAY does not satisfy either branch). Mitigation requires either: (a) adding RAY to an explicit suppression list, or (b) resolving the jup_verified=false gap for RAY specifically. Tagged for separate D05 P4-0 calibration task.",
+    "action_for_developer": "Run the fixture. If Signal A fires with confidence > 0.50 on RAY MM activity, set calibration_flag=true and add TODO comment linking to calibration task. Do not block the detector on this known FP."
+  },
+  "cross_reference": "Identical gap documented for D02 Signal B (4k3Dyjzv_RAY.json in solana-corpus-phase1.md, calibration_flag=true) and D04 Signal C (RAY pattern). D05 inherits the same debt.",
+  "test_assertion": "calibration_flag=true means test PASSES regardless of whether Signal A fires; the fixture exists to document the FP, not to assert correctness"
+}

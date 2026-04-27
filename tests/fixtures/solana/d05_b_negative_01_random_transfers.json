@@ -1,0 +1,85 @@
+{
+  "_fixture": "d05_b_negative_01_random_transfers",
+  "_detector": "wash_trading_h1 / Signal B (graph cycles)",
+  "_signal": "10 organic transfers with no cyclic structure. A→B, A→C, D→E, F→G, H→B, C→I, J→A, E→K, L→M, N→O. No wallet sends back to any prior sender. Expected: Signal B does NOT fire.",
+  "_design": "docs/designs/0017-d05-signal-b-graph-cycles.md §5 (negative case)",
+  "chain": "solana",
+  "token": "NEGToken1111111111111111111111111111111111",
+  "transfers": [
+    {
+      "from_address": "WALLET_A_1111111111111111111111111111111111111",
+      "to_address":   "WALLET_B_2222222222222222222222222222222222222",
+      "amount_raw": "8000000000",
+      "block_time": "2024-01-15T10:00:00Z",
+      "block_height": 250000
+    },
+    {
+      "from_address": "WALLET_A_1111111111111111111111111111111111111",
+      "to_address":   "WALLET_C_3333333333333333333333333333333333333",
+      "amount_raw": "5000000000",
+      "block_time": "2024-01-15T10:02:00Z",
+      "block_height": 250010
+    },
+    {
+      "from_address": "WALLET_D_4444444444444444444444444444444444444",
+      "to_address":   "WALLET_E_5555555555555555555555555555555555555",
+      "amount_raw": "3500000000",
+      "block_time": "2024-01-15T10:05:00Z",
+      "block_height": 250030
+    },
+    {
+      "from_address": "WALLET_F_6666666666666666666666666666666666666",
+      "to_address":   "WALLET_G_7777777777777777777777777777777777777",
+      "amount_raw": "2000000000",
+      "block_time": "2024-01-15T10:10:00Z",
+      "block_height": 250060
+    },
+    {
+      "from_address": "WALLET_H_8888888888888888888888888888888888888",
+      "to_address":   "WALLET_B_2222222222222222222222222222222222222",
+      "amount_raw": "1500000000",
+      "block_time": "2024-01-15T10:15:00Z",
+      "block_height": 250090
+    },
+    {
+      "from_address": "WALLET_C_3333333333333333333333333333333333333",
+      "to_address":   "WALLET_I_9999999999999999999999999999999999999",
+      "amount_raw": "4500000000",
+      "block_time": "2024-01-15T10:20:00Z",
+      "block_height": 250120
+    },
+    {
+      "from_address": "WALLET_J_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      "to_address":   "WALLET_A_1111111111111111111111111111111111111",
+      "amount_raw": "7000000000",
+      "block_time": "2024-01-15T10:25:00Z",
+      "block_height": 250150
+    },
+    {
+      "from_address": "WALLET_E_5555555555555555555555555555555555555",
+      "to_address":   "WALLET_K_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+      "amount_raw": "2800000000",
+      "block_time": "2024-01-15T10:30:00Z",
+      "block_height": 250180
+    },
+    {
+      "from_address": "WALLET_L_CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+      "to_address":   "WALLET_M_DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+      "amount_raw": "1200000000",
+      "block_time": "2024-01-15T10:35:00Z",
+      "block_height": 250210
+    },
+    {
+      "from_address": "WALLET_N_EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE",
+      "to_address":   "WALLET_O_FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+      "amount_raw": "900000000",
+      "block_time": "2024-01-15T10:40:00Z",
+      "block_height": 250240
+    }
+  ],
+  "expected": {
+    "signal_b_fires": false,
+    "cycle_count": 0,
+    "rationale": "No vertex has an outgoing edge back to any prior sender in the same connected component. No strongly-connected component of size >= 3 exists. Tarjan SCC finds no qualifying SCCs; Johnson emits no cycles."
+  }
+}

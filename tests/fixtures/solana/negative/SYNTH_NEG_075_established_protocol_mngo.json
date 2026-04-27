@@ -1,0 +1,66 @@
+{
+  "_fixture_meta": {
+    "mint": "MangoCzJ36AjZyKwVlaQkfdGFWyRmh4xqRNqKqZADo",
+    "symbol": "MNGO",
+    "label": "negative",
+    "category": "established_protocol_governance",
+    "source_url": "synthetic/established_protocol/mngo_mango_markets",
+    "fetched_at": "2026-04-21T21:41:00Z",
+    "synthetic": true,
+    "notes": "Mango Markets governance token (MNGO). jup_verified=true. Post-exploit token — Mango was exploited in Oct 2022 (Avraham Eisenberg). The token itself is not a scam; the exploit was a price manipulation attack. The governance token continues to trade. Tests that an 'exploit-associated' token but not a rug token passes all 6 detectors (exploit was economic, not a rug pull)."
+  },
+  "token_meta": {
+    "mint": "MangoCzJ36AjZyKwVlaQkfdGFWyRmh4xqRNqKqZADo",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "Mango", "symbol": "MNGO", "decimals": 6,
+    "supply_raw": "10000000000000000",
+    "mint_authority": null, "freeze_authority": null, "mutable": false,
+    "update_authority": null, "transfer_fee": null, "permanent_delegate": null, "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": true, "jup_strict": false },
+    "rugcheck_score": 310,
+    "rugcheck_score_normalised": 14,
+    "risks": [],
+    "markets": [{ "pool_address": "MNGOPool011111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "liquidity_usd": "480000.00", "lp_provider_count": 38 }],
+    "lockers": {},
+    "creator": "MangoMarketsDAO111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "480000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 18000,
+    "total_supply_raw": 10000000000000000,
+    "balances": {
+      "MangoDAOTreasury11111111111111111111111111": 2800000000000000,
+      "MangoVesting011111111111111111111111111111": 1800000000000000,
+      "MNGOHolder01111111111111111111111111111": 48000000000000,
+      "MNGOHolder02111111111111111111111111111": 38000000000000,
+      "MNGOHolder03111111111111111111111111111": 29000000000000,
+      "MNGOHolder04111111111111111111111111111": 22000000000000,
+      "MNGOHolder05111111111111111111111111111": 17000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 17900,
+    "total_supply_raw": 10000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.19",
+    "gini_liquid_after_exclusion": "0.61"
+  },
+  "holder_classifications": [
+    { "address": "MangoDAOTreasury11111111111111111111111111", "type": "dao_treasury", "label": "Mango DAO Treasury" },
+    { "address": "MangoVesting011111111111111111111111111111", "type": "vesting_contract", "label": "Mango Vesting" }
+  ],
+  "pool_rows": [{ "pool_address": "MNGOPool011111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "lp_locked_pct": "0.00", "effective_safe_pct": "0.00", "lp_provider_count": 38, "liquidity_usd": "480000.00" }],
+  "swaps_1h": { "volume_usd": "185000.00", "trade_count": 620, "unique_buyers": 310, "price_start": "0.0082", "price_end": "0.0083", "price_change_pct": "0.012" },
+  "swaps_7d_daily_baseline": { "day_count_nonzero": 7, "mean_daily_volume_usd": "175000.00", "std_daily_volume_usd": "35000.00", "volume_multiplier_observed": "1.06", "volume_z_score": "0.3" },
+  "signal_a_round_trips": [],
+  "pool_total_volume_1h_usd": "185000.00",
+  "expected": {
+    "d01_honeypot": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "No static honeypot signals." },
+    "d02_rug_pull": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "is_established_protocol=true (jup_verified=true). D02 suppressed. 38 LP providers." },
+    "d03_concentration": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.08], "severity": "Info", "reason": "After DAO/vesting exclusion: top10_pct_liquid=0.19. gini_delta~0. No signal." },
+    "d04_pump_dump": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "vol_multiplier=1.06. price_change=+1.2%." },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "No round-trip events." },
+    "d06_mint_burn_anomaly": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "mint_authority=null." }
+  }
+}

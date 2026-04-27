@@ -1,0 +1,37 @@
+[package]
+name        = "mg-onchain-client-sdk"
+version.workspace     = true
+edition.workspace     = true
+rust-version.workspace = true
+license.workspace     = true
+repository.workspace  = true
+description = "Thin Rust client SDK for consumers (bot-trader, mg-custody, market maker, exchange)"
+
+[dependencies]
+# Path dep: shared domain types only (no server-side crates)
+mg-onchain-common = { path = "../common" }
+
+# Workspace deps
+tokio         = { workspace = true }
+serde         = { workspace = true }
+serde_json    = { workspace = true }
+tracing       = { workspace = true }
+thiserror     = { workspace = true }
+chrono        = { workspace = true }
+futures       = { workspace = true }
+url           = { workspace = true }
+
+# SDK-specific: not already in workspace
+reqwest = { version = "0.12", features = ["json", "rustls-tls", "gzip"], default-features = false }
+
+# tokio-tungstenite for WebSocket client
+tokio-tungstenite = { version = "0.29", features = ["rustls-tls-webpki-roots"] }
+
+# secrecy: prevent accidental debug-leak of bearer tokens
+secrecy = { version = "0.8", features = ["serde"] }
+
+[dev-dependencies]
+wiremock          = "0.6"
+tokio-test        = "0.4"
+pretty_assertions = "1"
+tokio             = { workspace = true }

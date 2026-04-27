@@ -1,0 +1,48 @@
+{
+  "_label": "POS_D10_01",
+  "_description": "Synthetic fixture: pool initialized with $300 USD liquidity (≈2 SOL @ $150/SOL) and 0% LP locked. Both Signal A and Signal B fire. Expected confidence = 0.80 (clamped from 1.00).",
+  "_chain": "solana",
+  "_token": "ScamToken01111111111111111111111111111111111",
+  "_pool": "ScamPool0111111111111111111111111111111111111",
+  "_deployer": "ScamDeployer111111111111111111111111111111",
+  "_source": "Synthetic — research/03-feature-gap-2026-04-24.md §T1-1. RugWatch (machenxi + rookiester, 2024-2025) <5 SOL threshold; Sprint 24 USD-normalised to $750.",
+  "_note": "Signal B gate is == 0.0% (no lock at all), not < 70%. 0% locked fires B. Both signals fire → cross-signal bonus: conf_raw = 0.45 + 0.45 + 0.10 = 1.00 → clamped to 0.80.",
+
+  "pool_initialize": {
+    "initial_liquidity_usd": "300.000000",
+    "_sol_equivalent_at_150": "2.000000",
+    "initial_liquidity_usd_threshold": "750.000000"
+  },
+
+  "lp_state": {
+    "lockers": [],
+    "lp_locked_pct": "0.000000",
+    "lp_burned_pct": "0.000000",
+    "lp_safe_floor_pct": "0.700000"
+  },
+
+  "token_meta": {
+    "jup_verified": false,
+    "jup_strict": false,
+    "rugcheck_score": 95
+  },
+
+  "_expected": {
+    "detector_id": "launch_audit",
+    "signal_a_fired": true,
+    "signal_b_fired": true,
+    "signal_a_skipped": false,
+    "confidence": 0.80,
+    "severity": "Critical",
+    "_severity_note": "0.80 is the Critical floor ([0.80, 1.00] per severity_from_confidence). The spec's 'High floor for launch-stage' means minimum severity; both signals at 0.80 = Critical.",
+    "evidence_keys": [
+      "launch_audit/initial_liquidity_usd",
+      "launch_audit/initial_liquidity_usd_threshold",
+      "launch_audit/lp_locked_pct",
+      "launch_audit/lp_safe_floor_pct",
+      "launch_audit/signal_a_fired",
+      "launch_audit/signal_b_fired",
+      "launch_audit/signal_a_skipped"
+    ]
+  }
+}

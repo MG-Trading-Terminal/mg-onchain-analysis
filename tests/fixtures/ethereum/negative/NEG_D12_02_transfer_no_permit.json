@@ -1,0 +1,31 @@
+{
+  "_label": "NEG_D12_02",
+  "_description": "Normal P2P ERC-20 USDC transfer. Destination not in drainer list. No Permit2 event in window. Must NOT fire. A1 fails (recipient not in known list). A2 fails (no matching Permit2 event).",
+  "_chain": "ethereum",
+  "_token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "_source": "Synthetic — normal user-to-user USDC transfer. No Permit2 involvement.",
+  "_adr_note": "Synthetic fixture. No RPC call required.",
+  "transfers": [
+    {
+      "chain": "ethereum",
+      "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "from_address": "0xsender00000000000000000000000000000001bb",
+      "to_address": "0xrecipient00000000000000000000000000001cc",
+      "amount_raw": "500000000",
+      "tx_hash": "0xd12neg02dddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "log_index": 0,
+      "block_height": 19600000,
+      "block_time": "2024-03-20T12:00:00Z",
+      "decimals": 6
+    }
+  ],
+  "permit2_events": [],
+  "_known_drainer_addresses_for_test": [
+    "0x3c116dedca98c1813eadb17b71e869c0faba0f5e"
+  ],
+  "_expected": {
+    "detector_id": "permit2_drainer_v1",
+    "fires": false,
+    "suppression_reason": "no_permit2_event_and_not_known_drainer"
+  }
+}

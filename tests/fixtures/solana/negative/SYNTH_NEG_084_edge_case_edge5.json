@@ -1,0 +1,155 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthNeg084EdgeEEEEEEEEEEEEEEEEEEEEEEEEEEEE",
+    "symbol": "EDGE584",
+    "label": "negative",
+    "category": "edge_case",
+    "source_url": "synthetic/edge_case/edge5_boundary",
+    "fetched_at": "2026-04-21T21:50:00Z",
+    "synthetic": true,
+    "notes": "Edge case: jup_verified=true token with active mint_authority (stablecoin issuer pattern). D06 Signal A fires at dampened 0.10 (Info) because is_established_protocol=true. Tests that established protocol with mint_authority produces Info (not suppressed completely)."
+  },
+  "token_meta": {
+    "mint": "SynthNeg084EdgeEEEEEEEEEEEEEEEEEEEEEEEEEEEE",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "EdgeMintAuthEstab084",
+    "symbol": "EDGE584",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": "EstablishedIssuer084111111111111111111111111",
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevEdge0841111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": {
+      "jup_verified": true,
+      "jup_strict": false
+    },
+    "rugcheck_score": 900,
+    "rugcheck_score_normalised": 22,
+    "risks": [],
+    "markets": [
+      {
+        "pool_address": "EdgePool084111111111111111111111111111111",
+        "dex": "raydium",
+        "lp_burned_pct": "100.00",
+        "liquidity_usd": "52000.00",
+        "lp_provider_count": 1
+      }
+    ],
+    "lockers": {},
+    "creator": "DevEdge0841111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "52000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 580,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "EdgeHolder084_001111111111111111111111": 50000000000000,
+      "EdgeHolder084_011111111111111111111111": 45000000000000,
+      "EdgeHolder084_021111111111111111111111": 40000000000000,
+      "EdgeHolder084_031111111111111111111111": 35000000000000,
+      "EdgeHolder084_041111111111111111111111": 30000000000000,
+      "EdgeHolder084_051111111111111111111111": 25000000000000,
+      "EdgeHolder084_061111111111111111111111": 20000000000000,
+      "EdgeHolder084_071111111111111111111111": 15000000000000,
+      "EdgeHolder084_081111111111111111111111": 10000000000000,
+      "EdgeHolder084_091111111111111111111111": 5000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 570,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.29",
+    "gini_liquid_after_exclusion": "0.58"
+  },
+  "holder_classifications": [],
+  "pool_rows": [
+    {
+      "pool_address": "EdgePool084111111111111111111111111111111",
+      "dex": "raydium",
+      "lp_burned_pct": "100.00",
+      "lp_locked_pct": "0.00",
+      "effective_safe_pct": "100.00",
+      "lp_provider_count": 1,
+      "liquidity_usd": "52000.00"
+    }
+  ],
+  "swaps_1h": {
+    "volume_usd": "11640.00",
+    "trade_count": 55,
+    "unique_buyers": 48,
+    "price_start": "0.000052",
+    "price_end": "0.00005210",
+    "price_change_pct": "0.002"
+  },
+  "swaps_7d_daily_baseline": {
+    "day_count_nonzero": 6,
+    "mean_daily_volume_usd": "12000.00",
+    "std_daily_volume_usd": "2500.00",
+    "volume_multiplier_observed": "0.97",
+    "volume_z_score": "-0.2"
+  },
+  "signal_a_round_trips": [],
+  "pool_total_volume_1h_usd": "11640.00",
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No static honeypot signals."
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "LP 100.00% burned. effective_safe=100.00%."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "top10_now~0.29. prior=0.29. Stable. No D03 signals."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.15
+      ],
+      "severity": "Info",
+      "reason": "vol_multiplier=0.97 < 5.0. price_change=0.2% < 30%."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No round-trip events meeting count threshold."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "SUPPRESSED_INFO",
+      "confidence_band": [
+        0.02,
+        0.12
+      ],
+      "severity": "Info",
+      "reason": "Signal A: mint_authority active. is_established_protocol=true (jup_verified=true). conf dampened from 0.20 to 0.10 Info. Not suppressed \u2014 returns SUPPRESSED_INFO for consumer audit."
+    }
+  }
+}

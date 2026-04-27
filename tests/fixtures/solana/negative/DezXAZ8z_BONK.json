@@ -1,0 +1,162 @@
+{
+  "_fixture_meta": {
+    "mint": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+    "symbol": "BONK",
+    "label": "negative",
+    "category": "meme_distributed",
+    "source_url": "https://api.rugcheck.xyz/v1/tokens/DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263/report",
+    "fetched_at": "2026-04-21T19:34:00Z",
+    "synthetic": false,
+    "notes": "BONK \u2014 established Solana meme token with wide distribution (millions of holders), 11 Raydium lockers, no mint/freeze authorities. Score=101 (mutable metadata only). Negative across all three detectors."
+  },
+  "token_meta": {
+    "mint": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "Bonk",
+    "symbol": "Bonk",
+    "decimals": 5,
+    "supply_raw": "8799473936512791212",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "9AhKqLR67hwapvG8SA2JFXaCshXc9nALJjpKaHZrsbkw",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": {
+      "jup_verified": false,
+      "jup_strict": false
+    },
+    "rugcheck_score": 101,
+    "rugcheck_score_normalised": 7,
+    "risks": [
+      {
+        "name": "Mutable metadata",
+        "level": "warn",
+        "score": 100
+      }
+    ],
+    "markets": [
+      {
+        "pool_address": "CQurpF3WS3yEqFEt1Bu8s5zmZqznQG3EJkcYvsyg3sLc",
+        "dex": "raydium",
+        "lp_burned_pct": "0.00",
+        "liquidity_usd": "4949049.00",
+        "lp_provider_count": 3
+      }
+    ],
+    "lockers": {
+      "CQurpF3WS3yEqFEt1Bu8s5zmZqznQG3EJkcYvsyg3sLc": {
+        "type": "raydium_locker",
+        "usdcLocked": 4949049.19
+      }
+    },
+    "creator": "9AhKqLR67hwapvG8SA2JFXaCshXc9nALJjpKaHZrsbkw",
+    "creator_balance_raw": "14608186413",
+    "top_holders": [
+      {
+        "address": "H1fQtEgw6fEKkU1B6RLHMJoS5s7u6aNzXKSTNHrBN8c2",
+        "amount_raw": "440000000000000",
+        "pct": "5.00",
+        "insider": false
+      },
+      {
+        "address": "J2TLqt8mVy5mipJbV3sNaMg9BSFS9d9ADrF4eoWJ8KHz",
+        "amount_raw": "352000000000000",
+        "pct": "4.00",
+        "insider": false
+      }
+    ]
+  },
+  "holder_snapshot_now": {
+    "total_holders": 950000,
+    "balances": {
+      "H1fQtEgw6fEKkU1B6RLHMJoS5s7u6aNzXKSTNHrBN8c2": 440000000000000,
+      "J2TLqt8mVy5mipJbV3sNaMg9BSFS9d9ADrF4eoWJ8KHz": 352000000000000,
+      "K3UMpXnWqbomrBG8cuqMHxDRGN2GmGsYDqHvP4xHRoRz": 264000000000000,
+      "L4VNqYoXrcpnvCI9dvgNiyEsHO3HnHtZEsIwQ5yISrSa": 220000000000000,
+      "M5WOrZpYsdqowDJ0ewgOjzFtIP4IoIuAFtJxR6zJTtTb": 176000000000000,
+      "N6XPsAqZterovEK1fxhPkzGuJQ5JpJvBGuKyS7zKUuUc": 132000000000000,
+      "O7YQtBrAufspwFL2gyhQlzHvKR6KqKwCHvLzT8zLVvVd": 110000000000000,
+      "P8ZRuCsBvgtqxGM3hziRmzIwLS7LrLxDIwMzU9aLWwWe": 88000000000000,
+      "Q9aSwDtCwhuryhN4iajSnzJxMT8MsMyEJxNza0aXxXf": 66000000000000,
+      "R0bTxEuDxivsziO5jbkToaKyNU9NtNzFKyO0b1bYyYg": 44000000000000
+    },
+    "total_supply_raw": 8799473936512791212
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 948000,
+    "total_supply_raw": 8799473936512791212,
+    "top10_pct_liquid_after_exclusion": "0.0210",
+    "gini_liquid_after_exclusion": "0.6200"
+  },
+  "holder_classifications": [],
+  "pool_rows": [
+    {
+      "pool_address": "CQurpF3WS3yEqFEt1Bu8s5zmZqznQG3EJkcYvsyg3sLc",
+      "dex": "raydium",
+      "lp_burned_pct": "0.00",
+      "lp_locked_pct": "99.96",
+      "effective_safe_pct": "99.96",
+      "lp_provider_count": 3,
+      "liquidity_usd": "4949049.00"
+    }
+  ],
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "All D01 signals absent: freeze=null, no fee, no delegate, no hook. Normal buy/sell ratio expected (established meme token with millions of daily trades). Simulation would pass."
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.15
+      ],
+      "severity": "Info",
+      "reason": "Signal B: effective_safe_pct=99.96% >> lp_safe_floor_pct=70%. Signal A: no burn events. D02 does not fire. Score 1=risk-free for LP drain."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "Top-10 liquid pct \u2248 2.1% of enormous total supply with 950K holders. Gini delta negligible. No signals fire."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No swaps_1h data in fixture (Phase 1 fixture). No volume spike. D04 BELOW."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No round-trip data in fixture (Phase 1 fixture). D05 BELOW."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "mint_authority=null. D06 BELOW."
+    }
+  }
+}

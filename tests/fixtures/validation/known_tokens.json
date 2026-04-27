@@ -1,0 +1,30 @@
+[
+  {
+    "chain": "solana",
+    "token": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+    "name": "BONK (established)",
+    "expected_severity": "Low",
+    "synthetic_setup": "established_token_baseline"
+  },
+  {
+    "chain": "ethereum",
+    "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "name": "USDC (established)",
+    "expected_severity": "Low",
+    "synthetic_setup": "established_token_baseline"
+  },
+  {
+    "chain": "ethereum",
+    "token": "0x000000000000000000000000000000000000dEaD",
+    "name": "Synthetic rug pull",
+    "expected_severity": "Critical",
+    "synthetic_setup": "synthetic_rug_baseline"
+  },
+  {
+    "chain": "solana",
+    "token": "11111111111111111111111111111111",
+    "name": "Synthetic honeypot",
+    "expected_severity": "Critical",
+    "synthetic_setup": "synthetic_honeypot_baseline"
+  }
+]

@@ -1,0 +1,161 @@
+{
+  "_fixture_meta": {
+    "mint": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
+    "symbol": "JUP",
+    "label": "negative",
+    "category": "bluechip",
+    "source_url": "https://api.rugcheck.xyz/v1/tokens/JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN/report",
+    "fetched_at": "2026-04-21T19:38:00Z",
+    "synthetic": false,
+    "notes": "Jupiter (JUP) \u2014 top DEX aggregator governance token. Score=101 (mutable metadata only). No mint/freeze authorities. Top-2 holders are Jupiter DAO treasury/team wallets (49% combined \u2014 legitimate protocol allocation). Raydium lockers present. Negative across all detectors."
+  },
+  "token_meta": {
+    "mint": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "Jupiter",
+    "symbol": "JUP",
+    "decimals": 6,
+    "supply_raw": "6863982191668554",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "61aq585V8cR2sZBeawJFt2NPqmN7zDi1sws4KLs5xHXV",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": {
+      "jup_verified": false,
+      "jup_strict": false
+    },
+    "rugcheck_score": 101,
+    "rugcheck_score_normalised": 7,
+    "risks": [
+      {
+        "name": "Mutable metadata",
+        "level": "warn",
+        "score": 100
+      }
+    ],
+    "markets": [],
+    "lockers": {
+      "5Z2YAbbCeagp8kMTAD61fvbT5bcw45Qjubz8t8YobtZR": {
+        "type": "raydium_locker",
+        "usdcLocked": 4.93
+      }
+    },
+    "creator": null,
+    "creator_balance_raw": "0",
+    "top_holders": [
+      {
+        "address": "6G4XDSge4txj5tBkA5gZqefXXE3BRxqA37Yb1pmrHv6N",
+        "amount_raw": "1700000000001000",
+        "pct": "24.77",
+        "owner": "EXJHiMkj6NRFDfhWBMKccHNwdSpCT7tdvQeRf87yHm6T",
+        "insider": false
+      },
+      {
+        "address": "26ddLrqXDext6caX1gRxARePN4kzajyGiAUz9JmzmTGQ",
+        "amount_raw": "1682700001583080",
+        "pct": "24.51",
+        "owner": "61aq585V8cR2sZBeawJFt2NPqmN7zDi1sws4KLs5xHXV",
+        "insider": false
+      }
+    ]
+  },
+  "holder_snapshot_now": {
+    "total_holders": 320000,
+    "balances": {
+      "6G4XDSge4txj5tBkA5gZqefXXE3BRxqA37Yb1pmrHv6N": 1700000000001000,
+      "26ddLrqXDext6caX1gRxARePN4kzajyGiAUz9JmzmTGQ": 1682700001583080,
+      "HpVkDQ1dJFZXJmEA1xkiWMRCVN6LVQF1QZqWfGMBpMX2": 210000000000000,
+      "Jq8KfZhbN5cMsVW4nXfKrq2YHtNgK5bCTpEjhm9zAVu": 185000000000000,
+      "Km9LgWiQo6mTaXbP5yFsVz3NHKJ4dCuGqEjpn0yBWwe": 140000000000000,
+      "Ln0MhXjRp7nUbYcQ6zGtWa4OIKL5eDvHrFkqm1zCXxf": 95000000000000,
+      "Mo1NiYkSq8oVcZdR7aHuXb5PJLM6fEwItGlrn2aDYyg": 72000000000000,
+      "Np2OjZlTr9pWdAeS8bIvYc6QKMN7gFxJuHmsn3bEZzh": 58000000000000,
+      "Oq3PkAmUs0qXeBfT9cJwZd7RLNO8hGyKvIjtn4cFAai": 45000000000000,
+      "Pr4QlBnVt1rYfCgU0dKxAe8SMOP9iHzLwJkuo5dGBbj": 38000000000000
+    },
+    "total_supply_raw": 6863982191668554
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 319500,
+    "total_supply_raw": 6863982191668554,
+    "top10_pct_liquid_after_exclusion": "0.6470",
+    "gini_liquid_after_exclusion": "0.9100"
+  },
+  "holder_classifications": [
+    {
+      "address": "6G4XDSge4txj5tBkA5gZqefXXE3BRxqA37Yb1pmrHv6N",
+      "kind": "VestingContract",
+      "subkind": "protocol_treasury",
+      "confidence": 0.85
+    },
+    {
+      "address": "26ddLrqXDext6caX1gRxARePN4kzajyGiAUz9JmzmTGQ",
+      "kind": "VestingContract",
+      "subkind": "protocol_treasury",
+      "confidence": 0.85
+    }
+  ],
+  "pool_rows": [],
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "All D01 signals absent. Active DEX with normal trading."
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "No pool_rows with meaningful liquidity in RugCheck response at fetch time. No LP drain events. D02 emits no-pool Info."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.15
+      ],
+      "severity": "Info",
+      "reason": "After VestingContract/treasury exclusion of top-2 holders (49.28% combined): liquid top-10 pct drops to approximately 22-25% << 80% ceiling. gini_delta negligible. No signals fire.",
+      "calibration_flag": true,
+      "calibration_note": "Raw top-10 pct without sidecar = 49.28% (below 80% ceiling anyway). D03 Signal 3 would not fire even without sidecar. gini_delta across snapshots is near-zero. The classification of treasury wallets is informational but does not affect verdict here."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No swaps_1h data in fixture (Phase 1 fixture). No volume spike. D04 BELOW."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No round-trip data in fixture (Phase 1 fixture). D05 BELOW."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "mint_authority=null. D06 BELOW."
+    }
+  }
+}

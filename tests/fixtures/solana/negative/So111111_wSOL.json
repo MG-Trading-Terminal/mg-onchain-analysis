@@ -1,0 +1,107 @@
+{
+  "_fixture_meta": {
+    "mint": "So11111111111111111111111111111111111111112",
+    "symbol": "SOL",
+    "label": "negative",
+    "category": "bluechip",
+    "source_url": "https://api.rugcheck.xyz/v1/tokens/So11111111111111111111111111111111111111112/report",
+    "fetched_at": "2026-04-21T19:30:00Z",
+    "synthetic": false,
+    "notes": "Wrapped SOL \u2014 canonical bluechip negative. All authorities null, jup_strict=true, score=1. Zero risk signals on any detector."
+  },
+  "token_meta": {
+    "mint": "So11111111111111111111111111111111111111112",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "Wrapped SOL",
+    "symbol": "SOL",
+    "decimals": 9,
+    "supply_raw": "0",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "AqH29mZfQFgRpfwaPoTMWSKJ5kqauoc1FwVBRksZyQrt",
+    "transfer_fee": {
+      "fee_bps": 0,
+      "max_amount": 0,
+      "authority": null
+    },
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": {
+      "jup_verified": true,
+      "jup_strict": true
+    },
+    "rugcheck_score": 1,
+    "rugcheck_score_normalised": 1,
+    "risks": [],
+    "markets": [],
+    "lockers": {},
+    "creator": "AqH29mZfQFgRpfwaPoTMWSKJ5kqauoc1FwVBRksZyQrt",
+    "creator_balance_raw": "0",
+    "top_holders": []
+  },
+  "holder_snapshot_now": {
+    "total_holders": 0,
+    "balances": {}
+  },
+  "holder_snapshot_prior_24h": null,
+  "holder_classifications": [],
+  "pool_rows": [],
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "All honeypot signals absent: freeze_authority=null, no transfer_fee, no permanent_delegate, no transfer_hook. No pool to derive buy/sell ratio. Static score raw=0.0 \u2192 sigmoid(-1.82)\u22480.14 \u2192 below Info threshold. jup_strict=true would further attenuate if any signal fires."
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "No markets/pools found. D02 emits no-pool Info event with confidence=0.02. No Signal A or B fires."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "No holder snapshot available (wSOL has no SPL holder accounts). MissingDependencyData \u2192 Info only."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No swaps_1h data in fixture (Phase 1 fixture). No volume spike. D04 BELOW."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No round-trip data in fixture (Phase 1 fixture). D05 BELOW."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "mint_authority=null. D06 BELOW."
+    }
+  }
+}

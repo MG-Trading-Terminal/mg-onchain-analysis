@@ -1,0 +1,100 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthNeg085OrgCEXList{'E'*22}EEEEEEEEEE",
+    "symbol": "CEXLST085",
+    "label": "negative",
+    "category": "edge_case",
+    "source_url": "synthetic/edge_case/organic_cex_listing_spike",
+    "fetched_at": "2026-04-21T22:51:00Z",
+    "synthetic": true,
+    "notes": "Critical false-positive regression: CEX listing announcement causes organic volume spike 6.2x and price +38% in 1h. D04 Signal A would fire (6.2x>=5x, +38%>=30%). But this is NOT a pump-and-dump — it is a legitimate CEX listing event. This fixture deliberately produces a D04 positive verdict to acknowledge that the detector CANNOT distinguish organic CEX listing pumps from coordinated pump-and-dumps in the first 30-60 minutes. The label is 'negative' (not a scam) but the expected D04 verdict is FIRES. This is a known false-positive category. Evidence bundle must include buy_sell_ratio (organic CEX listing has sell pressure too, ratio ~1.2) vs pump-and-dump (ratio typically >5)."
+  },
+  "token_meta": {
+    "mint": "SynthNeg085OrgCEXListEEEEEEEEEEEEEEEEEEEEEE",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "CexListingToken085",
+    "symbol": "CEXLST085",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevCEXList085111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 1100,
+    "rugcheck_score_normalised": 28,
+    "risks": [],
+    "markets": [ { "pool_address": "CEXListPool08511111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "100.00", "liquidity_usd": "95000.00", "lp_provider_count": 1 } ],
+    "lockers": {},
+    "creator": "DevCEXList085111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "95000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 2800,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "CEXList085_011111111111111111111111111": 42000000000000,
+      "CEXList085_021111111111111111111111111": 35000000000000,
+      "CEXList085_031111111111111111111111111": 28000000000000,
+      "CEXList085_041111111111111111111111111": 22000000000000,
+      "CEXList085_051111111111111111111111111": 18000000000000,
+      "CEXList085_061111111111111111111111111": 14000000000000,
+      "CEXList085_071111111111111111111111111": 11000000000000,
+      "CEXList085_081111111111111111111111111": 8500000000000,
+      "CEXList085_091111111111111111111111111": 6500000000000,
+      "CEXList085_101111111111111111111111111": 5000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 1200,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.22",
+    "gini_liquid_after_exclusion": "0.59"
+  },
+  "holder_classifications": [],
+  "pool_rows": [ { "pool_address": "CEXListPool08511111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "100.00", "lp_locked_pct": "0.00", "effective_safe_pct": "100.00", "lp_provider_count": 1, "liquidity_usd": "95000.00" } ],
+  "swaps_1h": {
+    "volume_usd": "520000.00",
+    "trade_count": 1850,
+    "unique_buyers": 1420,
+    "unique_sellers": 1180,
+    "buy_count": 980,
+    "sell_count": 870,
+    "price_start": "0.000065",
+    "price_end": "0.000090",
+    "price_change_pct": "0.385"
+  },
+  "swaps_7d_daily_baseline": { "day_count_nonzero": 5, "mean_daily_volume_usd": "83870.00", "std_daily_volume_usd": "18000.00", "volume_multiplier_observed": "6.20", "volume_z_score": "24.0" },
+  "signal_a_round_trips": [],
+  "pool_total_volume_1h_usd": "520000.00",
+  "cex_listing_context": {
+    "cex_name": "Bybit",
+    "listing_announced_at": "2026-04-21T21:00:00Z",
+    "listing_live_at": "2026-04-21T22:00:00Z"
+  },
+  "expected": {
+    "d01_honeypot": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No static honeypot signals. buy_count/sell_count ratio=980/870=1.13 — organic bidirectional flow confirms not a honeypot." },
+    "d02_rug_pull": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "LP 100% burned." },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.12],
+      "severity": "Info",
+      "reason": "top10_now=(42+35+28+22+18+14+11+8.5+6.5+5)e12/1e15=0.190. prior=0.22. Slight decrease (holders increased 1200->2800 via CEX listing distribution). Signal 2: delta=-0.03 (decrease). Signal 3: 0.190<0.80. No D03 signal."
+    },
+    "d04_pump_dump": {
+      "verdict": "FIRES",
+      "confidence_band": [0.60, 0.75],
+      "severity": "High",
+      "reason": "Signal A: vol_1h=520k, baseline=83.87k, vol_multiplier=6.20x>=5x. price=+38.5%>=30%. raw=(6.20/5-1)*0.5+(0.385/0.30-1)*0.3=(0.24)*0.5+(0.283)*0.3=0.120+0.085=0.205. sigmoid(0.205)=0.551. Clamped to min 0.60. Final: 0.60 High. KNOWN FALSE POSITIVE: This is a legitimate CEX listing event. buy_sell_ratio=1.13 is distinctly organic (pump-and-dumps show ratio >5). D04 cannot distinguish CEX listing spike from coordinated pump in signal-A-only path. Mitigation: Signal C requires insider sell (none present). Human review required.",
+      "calibration_flag": true,
+      "calibration_note": "This is the canonical CEX-listing false positive case. D04 Signal A fires correctly given the data, but the outcome is not adversarial. Mitigation requires external CEX announcement data not available in on-chain observables. Acceptable false positive: rate is low (major CEX listings are rare events). Sprint 5: consider integrating external CEX announcement feed to suppress D04 during confirmed listing windows."
+    },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "No round-trip events. 1420 unique buyers, 1180 unique sellers — highly organic." },
+    "d06_mint_burn_anomaly": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "mint_authority=null." }
+  }
+}

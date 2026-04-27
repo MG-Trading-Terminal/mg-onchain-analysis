@@ -1,0 +1,209 @@
+# alerts.yml — Prometheus alerting rules for Solana Agave validator
+#
+# Reference in prometheus.yml:
+#   rule_files:
+#     - "alerts.yml"
+#
+# All thresholds are chosen to give actionable alerts before service impact:
+#   - Slot lag > 50 slots: one epoch slot is ~0.4s; 50 slots = ~20s behind tip.
+#     The chain-adapter uses confirmed commitment; 20s lag means stale detection.
+#   - Validator down: immediate alert; detectors go dark.
+#   - Disk >85%: at Solana's write rate (~10–50 GB/day on accounts), 85% gives
+#     ~1-3 days notice before full disk (which causes immediate crash).
+#   - Memory >90%: OOM imminent within minutes under typical accounts-db growth.
+#   - gRPC latency > 500ms p99: consumer chain-adapter will timeout on subscribe.
+
+groups:
+  - name: solana_validator
+    rules:
+
+      # -----------------------------------------------------------------------
+      # Slot lag — local confirmed slot vs network tip
+      # -----------------------------------------------------------------------
+      - alert: SolanaSlotLagHigh
+        expr: |
+          (
+            solana_validator_root_slot{job="agave-validator"}
+            - on() group_left()
+            solana_validator_root_slot{job="agave-validator", commitment="confirmed"}
+          ) > 50
+        for: 2m
+        labels:
+          severity: warning
+          chain: solana
+        annotations:
+          summary: "Solana validator slot lag > 50"
+          description: >
+            Validator is {{ $value }} slots behind confirmed tip.
+            This means chain-adapter events are delayed by >20 seconds.
+            Check CPU governor (should be 'performance'), NVMe I/O saturation,
+            and network connectivity to entrypoints.
+
+      - alert: SolanaSlotLagCritical
+        expr: |
+          (
+            solana_validator_root_slot{job="agave-validator"}
+            - on() group_left()
+            solana_validator_root_slot{job="agave-validator", commitment="confirmed"}
+          ) > 300
+        for: 5m
+        labels:
+          severity: critical
+          chain: solana
+        annotations:
+          summary: "Solana validator slot lag CRITICAL (>300 slots)"
+          description: >
+            Validator is {{ $value }} slots behind confirmed tip (~{{ $value | humanizeDuration }} delay).
+            Detectors are receiving stale data. Immediate investigation required.
+            Check: journalctl -fu agave-validator | grep -i 'error\|lag\|slot'
+
+      # -----------------------------------------------------------------------
+      # Validator process down
+      # -----------------------------------------------------------------------
+      - alert: SolanaValidatorDown
+        expr: up{job="agave-validator"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          chain: solana
+        annotations:
+          summary: "Solana validator metrics endpoint unreachable"
+          description: >
+            The agave-validator Prometheus endpoint on port 1234 is not responding.
+            The validator process may have crashed.
+            Check: systemctl status agave-validator
+                   journalctl -fu agave-validator | tail -100
+
+      # -----------------------------------------------------------------------
+      # Yellowstone gRPC plugin down
+      # -----------------------------------------------------------------------
+      - alert: YellowstonePluginDown
+        expr: up{job="yellowstone-grpc"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          chain: solana
+        annotations:
+          summary: "Yellowstone gRPC plugin metrics endpoint unreachable"
+          description: >
+            The yellowstone-grpc Prometheus endpoint on port 8999 is not responding.
+            The plugin may have failed to load or the gRPC server crashed.
+            Check: journalctl -fu agave-validator | grep -i 'geyser\|plugin\|yellowstone'
+                   grpcurl --plaintext localhost:10000 list
+
+      # -----------------------------------------------------------------------
+      # gRPC backpressure — channel overflow
+      # -----------------------------------------------------------------------
+      - alert: YellowstoneChannelOverflow
+        expr: |
+          rate(yellowstone_grpc_channel_overflow_total[5m]) > 0
+        for: 3m
+        labels:
+          severity: warning
+          chain: solana
+        annotations:
+          summary: "Yellowstone gRPC channel overflow detected"
+          description: >
+            The plugin's internal event channel is overflowing at {{ $value }} drops/sec.
+            The chain-adapter consumer is not reading fast enough, or channel_capacity
+            in yellowstone-grpc-config.json is too small.
+            Increase channel_capacity or investigate consumer throughput.
+
+      # -----------------------------------------------------------------------
+      # gRPC subscriber count
+      # -----------------------------------------------------------------------
+      - alert: YellowstoneNoSubscribers
+        expr: |
+          yellowstone_grpc_subscribers_total{job="yellowstone-grpc"} == 0
+        for: 5m
+        labels:
+          severity: warning
+          chain: solana
+        annotations:
+          summary: "No active Yellowstone gRPC subscribers"
+          description: >
+            No consumers are connected to the gRPC stream.
+            The chain-adapter may have crashed or lost its connection.
+            Check: systemctl status onchain-service (or the chain-adapter process)
+
+      # -----------------------------------------------------------------------
+      # Disk space — all mounts
+      # -----------------------------------------------------------------------
+      - alert: DiskSpaceWarning
+        expr: |
+          (
+            node_filesystem_avail_bytes{job="node-exporter", mountpoint=~"/mnt/(accounts|ledger|snapshots)"}
+            / node_filesystem_size_bytes{job="node-exporter", mountpoint=~"/mnt/(accounts|ledger|snapshots)"}
+          ) < 0.15
+        for: 10m
+        labels:
+          severity: warning
+          chain: solana
+        annotations:
+          summary: "Disk space < 15% on {{ $labels.mountpoint }}"
+          description: >
+            {{ $labels.mountpoint }} has {{ $value | humanizePercentage }} free.
+            At Solana's write rate, this may fill within 1-3 days.
+            Actions:
+              - Reduce ledger retention: add --limit-ledger-size <slots> to startup flags
+              - Remove old snapshots: rm -f /mnt/snapshots/snapshot-*.tar.zst
+              - Check disk growth: du -sh /mnt/accounts/* /mnt/ledger/*
+
+      - alert: DiskSpaceCritical
+        expr: |
+          (
+            node_filesystem_avail_bytes{job="node-exporter", mountpoint=~"/mnt/(accounts|ledger|snapshots)"}
+            / node_filesystem_size_bytes{job="node-exporter", mountpoint=~"/mnt/(accounts|ledger|snapshots)"}
+          ) < 0.05
+        for: 5m
+        labels:
+          severity: critical
+          chain: solana
+        annotations:
+          summary: "Disk space CRITICAL (<5%) on {{ $labels.mountpoint }}"
+          description: >
+            {{ $labels.mountpoint }} has {{ $value | humanizePercentage }} free.
+            The validator will crash immediately when disk is full.
+            Immediate action required — clear space NOW.
+
+      # -----------------------------------------------------------------------
+      # Memory pressure
+      # -----------------------------------------------------------------------
+      - alert: MemoryPressureHigh
+        expr: |
+          (
+            1 - (
+              node_memory_MemAvailable_bytes{job="node-exporter"}
+              / node_memory_MemTotal_bytes{job="node-exporter"}
+            )
+          ) > 0.90
+        for: 5m
+        labels:
+          severity: critical
+          chain: solana
+        annotations:
+          summary: "Memory pressure > 90%"
+          description: >
+            {{ $value | humanizePercentage }} of RAM is in use.
+            OOM killer may trigger within minutes, crashing the validator.
+            Actions:
+              - Check what's consuming memory: ps aux --sort=-%mem | head -10
+              - Reduce --account-index flags to free accounts-db memory
+              - Add NVMe swap as emergency relief (see troubleshooting section)
+
+      # -----------------------------------------------------------------------
+      # OOM killer events
+      # -----------------------------------------------------------------------
+      - alert: OOMKillerEvent
+        expr: |
+          increase(node_vmstat_oom_kill{job="node-exporter"}[5m]) > 0
+        labels:
+          severity: critical
+          chain: solana
+        annotations:
+          summary: "OOM killer fired on validator host"
+          description: >
+            The Linux OOM killer terminated a process.
+            If it killed agave-validator, the service will restart automatically.
+            Root cause is insufficient RAM for the current --account-index configuration.
+            Check: dmesg | grep -E 'oom|killed|Out of memory' | tail -20

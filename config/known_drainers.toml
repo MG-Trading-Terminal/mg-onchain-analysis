@@ -1,0 +1,142 @@
+# known_drainers.toml — Known Permit2 Drainer Address Seed List
+#
+# Sprint 18 initial seed + Sprint 23 multi-chain extension + Sprint 25 audit.
+# Used by D12 Signal A1 (known-drainer cluster label match).
+# Loaded at startup via OnceLock<KnownDrainerSet> in d12_permit2_drainer.rs.
+#
+# Per ADR 0003: NO runtime Scam Sniffer API / Chainalysis API calls.
+# This file is the static seed; automated refresh is Sprint 19 scope
+# (scamsniffer/scam-database GitHub, permissive licence).
+#
+# Address format: 0x-prefixed lowercase hex (42 chars).
+# All addresses normalized at load time; lookup is O(1) HashSet contains.
+#
+# IMPORTANT: These are SEED addresses from public disclosures. They may be
+# incomplete or include re-used infrastructure wallets. Treat as strong signal
+# but not ground truth. See design 0019 §5.1 for confidence adjustment rationale.
+#
+# EOA cross-chain semantic (Sprint 25 B.2 decision):
+# ====================================================
+# Drainer clusters (Inferno, Pink, Angel) are operated by EOA wallets. An EOA is
+# a private key; the SAME private key controls address 0xABC on Ethereum, 0xABC on
+# BSC, and 0xABC on Polygon. There is NO separate address per chain — the address
+# IS the public key, chain-agnostic.
+#
+# Therefore: the `addresses` list is a FLAT list valid across ALL chains in the
+# `chains` field. We do NOT need separate per-chain address lists. The existing
+# Ethereum-discovered addresses are also the BSC/Polygon addresses for the same
+# drainer operator infrastructure.
+#
+# The `chains = [...]` field tags WHICH chains this drainer is OBSERVED ON (i.e.,
+# where it has documented activity), NOT different addresses per chain.
+#
+# Sprint 25 WebFetch research results:
+#   - scamsniffer/scam-database (GitHub): flat unlabeled address list, no per-drainer
+#     or per-chain metadata. Addresses cannot be mapped to specific drainer clusters
+#     without independent cross-referencing. SPEC-NOTE retained.
+#   - ScamSniffer post (2023-12-23): 404 — URL no longer available.
+#   - Blockaid blog (2024-02-05): 404 — URL no longer available.
+#   - ZachXBT investigations GitHub: repository not found / private.
+#   - Dune beetle/pink-drainer: auth-gated dashboard, no public address list.
+#
+#   Decision: given EOA cross-chain semantic, no NEW addresses are needed for
+#   BSC/Polygon — the existing seed addresses are already the correct multi-chain
+#   addresses. The `chains` field correctly tags cross-chain activity scope.
+#   Sprint 19 automated refresh will expand the address set from scam-database.
+#
+# `chains` field: EVM chain names where this cluster operates.
+# Entries without a `chains` field default to ["ethereum"] (backwards compat).
+# Multi-chain drainers that reuse infrastructure across chains have all chains listed.
+#
+# Verification status:
+#   "verified"     — confirmed on-chain via public explorer during Sprint 18
+#   "unverified"   — cited in disclosure but not individually confirmed on-chain;
+#                    expand and verify in Sprint 19
+#
+# Expand via Sprint 19 automated refresh:
+#   Weekly job fetches https://github.com/scamsniffer/scam-database (ISC-compatible)
+#   Diffs against this file → opens PR for review. Zero runtime API dependency.
+# =============================================================================
+
+[[drainers]]
+name    = "Inferno Drainer"
+cluster = "inferno"
+status  = "unverified"
+# Multi-chain: Inferno Drainer operated across Ethereum, BSC, and Polygon.
+# Scam Sniffer 2023 report documents cross-chain activity.
+#
+# EOA cross-chain semantic (Sprint 25): the existing seed address
+# (0x3c116dedca98c1813eadb17b71e869c0faba0f5e) is the correct address for
+# BSC and Polygon as well — same private key, same address on all EVM chains.
+# The `chains = [...]` field tags the observed activity scope, not separate addresses.
+#
+# SPEC-NOTE: Sprint 19 automated refresh will replace this single seed with the
+# full Inferno cluster address set from scam-database + chain-explorer verification.
+chains  = ["ethereum", "bsc", "polygon"]
+notes   = """
+Multi-chain drainer-as-a-service. Primary EVM cluster. Operated 2023–2024.
+Estimated $87M+ stolen across 100,000+ victims (SlowMist Monthly Reports 2023;
+Scam Sniffer Q4 2023). Announced shutdown December 2023; relaunched as
+Inferno Drainer V2 April 2024 with rotated infrastructure.
+Cross-chain activity documented on Ethereum, BSC, and Polygon.
+"""
+source  = "Scam Sniffer public disclosure 2023-12-23 https://scamsniffer.io/post/inferno-drainer-shutdown/"
+addresses = [
+    # Treasury/fee wallet cited in Scam Sniffer 2023-12-23 disclosure.
+    # SPEC-NOTE: placeholder — verify on-chain in Sprint 19 fixture capture.
+    "0x3c116dedca98c1813eadb17b71e869c0faba0f5e",
+]
+
+[[drainers]]
+name    = "Pink Drainer"
+cluster = "pink"
+status  = "unverified"
+# Pink Drainer was primarily Ethereum-focused based on available disclosures.
+# SPEC-NOTE: add additional chains if cross-chain activity is confirmed in Sprint 19.
+chains  = ["ethereum"]
+notes   = """
+Drainer-as-a-service charging 20-30% commission. Operated 2023-2024.
+Estimated $75M stolen before self-announced shutdown May 2024.
+21,131 victims documented in Dune beetle/pink-drainer dashboard.
+"""
+source  = "ZachXBT Telegram May 2024; Dune beetle/pink-drainer https://dune.com/beetle/pink-drainer"
+addresses = [
+    # Fee collection wallet cited in ZachXBT analysis and Dune dashboard.
+    # SPEC-NOTE: placeholder — verify via Dune SQL query in Sprint 19.
+    "0x54d3b81a58d5b1fc51c620e2c8f5ea0c97c9c2ab",
+]
+
+[[drainers]]
+name    = "Angel Drainer"
+cluster = "angel"
+status  = "unverified"
+# Angel Drainer: Ethena attack was Ethereum-specific (Permit2 on Ethereum mainnet).
+chains  = ["ethereum"]
+notes   = """
+~$25M including Ethena protocol attack February 2024. Used Permit2 specifically
+in the Ethena attack: $400K in Safe multisig tokens drained via PermitBatch.
+Source: Blockaid blog 2024-02-05.
+"""
+source  = "Blockaid blog 2024-02-05 https://www.blockaid.io/blog/angel-drainer-exploits-ethena-protocol"
+addresses = [
+    # Angel Drainer operator wallet from Blockaid incident analysis.
+    # SPEC-NOTE: placeholder — exact address requires live lookup from Blockaid post.
+    # Verify and replace with confirmed address in Sprint 19.
+    "0x0000000000000000000000000000000000000001",  # PLACEHOLDER — replace Sprint 19
+]
+
+[[drainers]]
+name    = "Monkey Drainer"
+cluster = "monkey"
+status  = "unverified"
+# Monkey Drainer: early Ethereum-based drainer; no cross-chain activity documented.
+chains  = ["ethereum"]
+notes   = """
+Early Permit2 drainer (2022-2023). ~$13M before shutdown January 2023.
+Source: PeckShield alert thread.
+"""
+source  = "PeckShield alert https://twitter.com/peckshield/status/1609851661052792832"
+addresses = [
+    # SPEC-NOTE: placeholder — exact address requires Sprint 19 fixture capture.
+    "0x0000000000000000000000000000000000000002",  # PLACEHOLDER — replace Sprint 19
+]

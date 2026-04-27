@@ -1,0 +1,152 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthNeg072T22TTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+    "symbol": "T22H72",
+    "label": "negative",
+    "category": "token2022_legit",
+    "source_url": "synthetic/token2022_legit/t22h_safe",
+    "fetched_at": "2026-04-21T21:38:00Z",
+    "synthetic": true,
+    "notes": "Token-2022 default-account-state=frozen. New accounts start frozen \u2014 requires explicit thaw. Legitimate for KYC/whitelist compliance tokens. D01: freeze_authority present, which fires Signal 1. But is_established_protocol context needed."
+  },
+  "token_meta": {
+    "mint": "SynthNeg072T22TTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+    "token_program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+    "name": "T22DefaultState072",
+    "symbol": "T22H72",
+    "decimals": 6,
+    "supply_raw": "500000000000000",
+    "mint_authority": null,
+    "freeze_authority": "DevT22H072111111111111111111111111111111",
+    "mutable": true,
+    "update_authority": "DevT22_H721111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": {
+      "jup_verified": false,
+      "jup_strict": false
+    },
+    "rugcheck_score": 520,
+    "rugcheck_score_normalised": 16,
+    "risks": [],
+    "markets": [
+      {
+        "pool_address": "T22Pool072111111111111111111111111111111",
+        "dex": "raydium",
+        "lp_burned_pct": "100.00",
+        "liquidity_usd": "71200.00",
+        "lp_provider_count": 1
+      }
+    ],
+    "lockers": {},
+    "creator": "DevT22_H721111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "71200.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 1170,
+    "total_supply_raw": 500000000000000,
+    "balances": {
+      "T22Holder072_011111111111111111111111": 28000000000000,
+      "T22Holder072_021111111111111111111111": 22000000000000,
+      "T22Holder072_031111111111111111111111": 16000000000000,
+      "T22Holder072_041111111111111111111111": 12000000000000,
+      "T22Holder072_051111111111111111111111": 8000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 1160,
+    "total_supply_raw": 500000000000000,
+    "top10_pct_liquid_after_exclusion": "0.18",
+    "gini_liquid_after_exclusion": "0.55"
+  },
+  "holder_classifications": [],
+  "pool_rows": [
+    {
+      "pool_address": "T22Pool072111111111111111111111111111111",
+      "dex": "raydium",
+      "lp_burned_pct": "100.00",
+      "lp_locked_pct": "0.00",
+      "effective_safe_pct": "100.00",
+      "lp_provider_count": 1,
+      "liquidity_usd": "71200.00"
+    }
+  ],
+  "swaps_1h": {
+    "volume_usd": "33600.00",
+    "trade_count": 42,
+    "unique_buyers": 35,
+    "price_start": "0.000056",
+    "price_end": "0.000057",
+    "price_change_pct": "0.018"
+  },
+  "swaps_7d_daily_baseline": {
+    "day_count_nonzero": 5,
+    "mean_daily_volume_usd": "39200.00",
+    "std_daily_volume_usd": "2500.00",
+    "volume_multiplier_observed": "0.86",
+    "volume_z_score": "-0.4"
+  },
+  "signal_a_round_trips": [],
+  "pool_total_volume_1h_usd": "33600.00",
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "FIRES",
+      "confidence_band": [
+        0.3,
+        0.6
+      ],
+      "severity": "Low",
+      "reason": "freeze_authority present for default-frozen whitelist compliance. D01 Signal 1 fires at raw_s1=0.40. sigmoid(0.40)=0.599. Medium-Low. This is a calibration case \u2014 D01 fires at Low confidence for KYC tokens.",
+      "calibration_flag": true,
+      "calibration_note": "KYC/whitelist tokens legitimately use freeze_authority. D01 fires Low confidence. Sprint 5: consider a KYC token classification that dampens D01 Signal 1 similar to established_protocol dampening."
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "LP 100% burned. effective_safe=100%."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "top10_now~0.18. prior=0.18. Stable. No D03 signals."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "vol_multiplier=0.86 < 5.0. price_change=+1.8% < 30%."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No round-trip events detected."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "mint_authority=null. No mint events."
+    }
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "_comment": "Yellowstone gRPC Geyser plugin configuration for mg-onchain-analysis.",
+  "_comment_version": "Compatible with yellowstone-grpc v12.2.0+solana.3.1.13 (Agave v3.1.13).",
+  "_comment_source": "https://github.com/rpcpool/yellowstone-grpc/blob/v12.2.0+solana.3.1.13/yellowstone-grpc-geyser/config.json",
+
+  "libpath": "/home/sol/yellowstone-grpc/target/release/libyellowstone_grpc_geyser.so",
+
+  "_comment_libpath": "MUST be an absolute path. Relative paths cause the validator to panic on startup.",
+
+  "log": {
+    "level": "info"
+  },
+
+  "grpc": {
+    "address": "0.0.0.0:10000",
+
+    "_comment_address": "Binds gRPC on all interfaces, port 10000. This is the endpoint chain-adapter connects to. If you expose this to untrusted networks, either (a) add an x_token below, or (b) put a firewall rule in front. For single-consumer local deployment, plain localhost binding is sufficient — change to 127.0.0.1:10000.",
+
+    "tls": null,
+
+    "_comment_tls": "null = plaintext gRPC (HTTP/2 without TLS). Acceptable for trusted private network or loopback. To enable TLS: { \"cert_path\": \"/path/to/cert.pem\", \"key_path\": \"/path/to/key.pem\" }",
+
+    "compression": {
+      "accept": ["gzip", "zstd"],
+      "send": ["none", "gzip", "zstd"]
+    },
+
+    "max_decoding_message_size": "4_194_304",
+
+    "_comment_max_decoding": "4 MB. Increase if you subscribe to full block updates. Not needed for transaction + account stream.",
+
+    "channel_capacity": "100_000",
+
+    "_comment_channel_capacity": "Internal event queue depth (number of messages) for each subscription stream. 100_000 is appropriate for a single-consumer deployment where the consumer (chain-adapter) keeps up. Increase to 500_000 if you observe backpressure / channel-full errors in the plugin metrics (yellowstone_grpc_channel_overflow_total). Decreasing this value will cause more drops under burst.",
+
+    "unary_concurrency_limit": 100,
+
+    "_comment_unary": "Max concurrent unary RPC calls (e.g. getLatestBlockhash via gRPC). 100 is sufficient for single-consumer. Does not affect streaming subscriptions.",
+
+    "tokio_config": {
+      "worker_threads": 8,
+      "_comment_workers": "Number of async worker threads for the gRPC server. 8 is appropriate for a 16-core machine. On 32+ core machines increase to 12-16. CPU affinity (cpu_affinity field) can be set to avoid interfering with the validator's own threads — leave null unless you observe CPU contention."
+    }
+  },
+
+  "prometheus": {
+    "address": "0.0.0.0:8999"
+  },
+
+  "_comment_prometheus": "Exposes plugin Prometheus metrics at http://<host>:8999/metrics. Scraped by prometheus.yml.example job 'yellowstone-grpc'.",
+
+  "x_token": null,
+
+  "_comment_x_token": "Authentication token(s) for stream subscribers. null = no auth (trusted network). For multi-tenant or internet-exposed deployments, set to a list of allowed tokens: [\"token1\", \"token2\"]. Clients must then pass 'x-token: <token>' in gRPC metadata. config/adapters.toml auth_token field corresponds to this.",
+
+  "filters": {
+    "_comment": "Subscription filter limits. These cap what a single subscriber can request. Increase if the chain-adapter subscription is rejected with RESOURCE_EXHAUSTED.",
+
+    "max_account_subscriptions": 100,
+    "max_transaction_subscriptions": 10,
+    "max_slot_subscriptions": 1,
+    "max_block_subscriptions": 1,
+    "max_entry_subscriptions": 0,
+
+    "_comment_limits": "Limits are per-subscriber. The chain-adapter uses 1 transaction subscription + 1 slot subscription + 1 account subscription — well within these limits.",
+
+    "filter_name_size_limit": 128,
+    "filter_names_collection_limit": 4096,
+
+    "account": {
+      "any": false
+    },
+
+    "_comment_account_any": "false = only stream accounts that match a subscriber's filter (e.g. owner = TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA). true = stream all accounts (very high volume — avoid for single-consumer RPC node).",
+
+    "block_fail_action": "log"
+  },
+
+  "snapshot": {
+    "plugin_channel_capacity": null,
+    "client_channel_capacity": "50_000_000",
+
+    "_comment_snapshot": "Channel capacity for full account snapshot streaming (used by tools that need a point-in-time account state dump, not the live event stream). Leave plugin_channel_capacity null for default. 50_000_000 client capacity is the upstream default."
+  }
+}

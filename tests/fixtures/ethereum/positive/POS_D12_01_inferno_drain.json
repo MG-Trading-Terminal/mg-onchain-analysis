@@ -1,0 +1,42 @@
+{
+  "_label": "POS_D12_01",
+  "_description": "Synthetic Inferno Drainer-style drain. Single token (USDC). A1 signal fires on known-drainer address match. Drainer address sourced from Scam Sniffer 2023-12-23 disclosure seed list (placeholder; verify Sprint 19). USDC amount = 5,000 USDC (5_000_000_000 raw, 6 decimals → $5,000 USD estimated). Expected confidence = 0.70 (A1 only). Severity::High.",
+  "_chain": "ethereum",
+  "_token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "_source": "Synthetic — mimics Inferno Drainer tx pattern documented in Scam Sniffer 2023-12-23 disclosure. Token = USDC mainnet. Drainer address = known cluster seed (placeholder). Real Inferno drain tx hashes are documented in SlowMist Monthly Reports 2023 and require Sprint 19 ADR 0003 carve-out fixture capture.",
+  "_source_url": "https://scamsniffer.io/post/inferno-drainer-shutdown/",
+  "_adr_note": "ADR 0003 carve-out: this synthetic fixture was constructed from documented attack pattern without requiring a live RPC call. Sprint 19 will replace with real captured tx data.",
+  "transfers": [
+    {
+      "chain": "ethereum",
+      "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "from_address": "0xvictim000000000000000000000000000000001",
+      "to_address": "0x3c116dedca98c1813eadb17b71e869c0faba0f5e",
+      "amount_raw": "5000000000",
+      "tx_hash": "0xd12pos01aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "log_index": 1,
+      "block_height": 18800000,
+      "block_time": "2024-01-15T10:00:00Z",
+      "decimals": 6
+    }
+  ],
+  "permit2_events": [],
+  "_known_drainer_addresses_for_test": [
+    "0x3c116dedca98c1813eadb17b71e869c0faba0f5e"
+  ],
+  "_expected": {
+    "detector_id": "permit2_drainer_v1",
+    "fires": true,
+    "min_confidence": 0.65,
+    "max_confidence": 0.75,
+    "signal_a1_hit": true,
+    "signal_a2_hit": false,
+    "victim_address": "0xvictim000000000000000000000000000000001",
+    "drainer_address": "0x3c116dedca98c1813eadb17b71e869c0faba0f5e",
+    "drainer_cluster": "Inferno Drainer",
+    "amount_raw": "5000000000",
+    "amount_usd_est": "5000",
+    "batch_size": 1,
+    "severity": "High"
+  }
+}

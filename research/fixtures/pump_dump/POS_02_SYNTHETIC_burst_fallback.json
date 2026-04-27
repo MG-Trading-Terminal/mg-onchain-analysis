@@ -1,0 +1,150 @@
+{
+  "fixture_id": "POS_02_SYNTHETIC_burst_fallback",
+  "synthetic": true,
+  "detector": "pump_dump",
+  "category": "burst_fallback",
+  "label": "positive",
+  "source": "Synthetic construction per docs/designs/0007-detector-04-pump-dump.md §11.1 Positive 2",
+  "mint": "SYNTH_POS_BURST_001",
+  "chain": "solana",
+  "token_name": "Synthetic Dormant-Then-Burst Token",
+  "token_symbol": "SYNTH_BURST",
+
+  "token_meta": {
+    "decimals": 9,
+    "total_supply_raw": "1000000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "transfer_fee_bps": 0,
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "jup_verified": false,
+    "jup_strict": false,
+    "rugcheck_score": 85,
+    "total_holders": 47,
+    "total_market_liquidity_usd": "120000",
+    "launchpad": null,
+    "deploy_platform": null
+  },
+
+  "observation_window": {
+    "start": "2026-04-20T14:00:00Z",
+    "end": "2026-04-20T15:00:00Z",
+    "window_hours": 1,
+    "baseline_window_start": "2026-04-13T14:00:00Z",
+    "baseline_window_end": "2026-04-20T14:00:00Z"
+  },
+
+  "swaps_1h": {
+    "volume_usd": "50000",
+    "buy_count": 312,
+    "sell_count": 89,
+    "unique_wallets": 47
+  },
+
+  "swaps_24h": {
+    "volume_usd": "50000",
+    "note": "All 24h volume is in the 1h window; token was dormant the prior 23h"
+  },
+
+  "baseline_7d": {
+    "days_with_nonzero_volume": 0,
+    "median_volume_usd": "0",
+    "mean_volume_usd": "0",
+    "std_volume_usd": "0",
+    "note": "Token launched 90 days prior but had zero DEX trading volume for 89 days"
+  },
+
+  "market_cap": {
+    "fdv_usd": "500000",
+    "circulating_supply_pct": "100",
+    "market_cap_proxy": "fdv",
+    "market_cap_usd": "500000",
+    "above_filter": false,
+    "filter_threshold_usd": "60000000"
+  },
+
+  "deployer_clusters": {
+    "populated": false,
+    "note": "Phase 2 — deployer_clusters table empty for this token"
+  },
+
+  "top_holders_proxy": [
+    {
+      "address": "WALLET_A_insider",
+      "balance_raw": "600000000000000000",
+      "balance_pct_total_supply": "0.60",
+      "holder_classification": "unclassified",
+      "above_1pct_floor": true,
+      "note": "Proxy insider — 60% supply holder, not a known pool/vesting/CEX address"
+    },
+    {
+      "address": "WALLET_B_small",
+      "balance_raw": "5000000000000000",
+      "balance_pct_total_supply": "0.005",
+      "holder_classification": "unclassified",
+      "above_1pct_floor": false,
+      "note": "Below 1% proxy floor — not included in Signal C check"
+    }
+  ],
+
+  "insider_sell_data_24h_post_spike": {
+    "spike_time": "2026-04-20T15:00:00Z",
+    "window_end": "2026-04-21T15:00:00Z",
+    "WALLET_A_insider": {
+      "sold_raw": "330000000000000000",
+      "sold_pct_of_holdings": "0.55",
+      "note": "55% of holdings sold within 24h — above 40% insider_sell_pct threshold"
+    },
+    "total_insider_sold_pct": "0.55"
+  },
+
+  "signal_evaluation": {
+    "signal_a_applicable": false,
+    "signal_a_reason": "baseline_days_available = 0; median_volume_usd = 0",
+    "signal_b_applicable": true,
+    "burst_concentration_ratio": "1.00",
+    "burst_threshold": "0.90",
+    "burst_ratio_above_threshold": true,
+    "volume_1h_usd": "50000",
+    "min_burst_volume_usd_threshold": "5000",
+    "volume_1h_above_dust_filter": true,
+    "signal_c_applicable": true,
+    "signal_c_source": "top_holders_proxy",
+    "insider_sell_pct_observed": "0.55",
+    "insider_sell_pct_threshold": "0.40",
+    "signal_c_fires": true,
+    "is_established_protocol": false
+  },
+
+  "expected_output": {
+    "fires": true,
+    "signal_fired": "insider_amplified_burst",
+    "confidence_before_c": "0.75",
+    "confidence_after_c": "0.85",
+    "confidence_formula": "min(0.75 + 0.15, 0.85) = 0.85",
+    "severity": "High",
+    "evidence_keys": {
+      "pump_dump/volume_1h_usd": "50000",
+      "pump_dump/baseline_7d_median_usd": "0",
+      "pump_dump/burst_concentration_ratio": "1.00",
+      "pump_dump/baseline_days_available": "0",
+      "pump_dump/insider_sold_pct": "0.55",
+      "pump_dump/market_cap_usd": "500000"
+    },
+    "evidence_notes": "signal=insider_amplified_burst insider_source=top_holders_proxy",
+    "signal_c_applied": true
+  },
+
+  "unit_test_assertions": [
+    "compute_signal_b_confidence(burst_ratio=1.00, threshold=0.90) == Decimal::from_str('0.75').unwrap()",
+    "apply_signal_c_amplifier(base=0.75, amplifier=0.15, base_is_signal_b=true) == Decimal::from_str('0.85').unwrap()",
+    "resolve_insider_addresses returns InsiderSet { source: 'top_holders_proxy' } when deployer_clusters is empty",
+    "insider_sold_pct 0.55 >= threshold 0.40 -> Signal C fires"
+  ],
+
+  "notes": [
+    "Pure Signal B regression. Tests Query B SQL path and burst_ratio formula.",
+    "Tests Signal C degraded mode: top_holders_proxy (not deployer_clusters).",
+    "burst_ratio = 1.00 is the maximum case. Intermediate test: POS_02b (not a required fixture) would test burst_ratio = 0.95 → confidence = 0.625."
+  ]
+}

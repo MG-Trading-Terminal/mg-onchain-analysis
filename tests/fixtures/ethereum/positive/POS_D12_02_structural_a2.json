@@ -1,0 +1,56 @@
+{
+  "_label": "POS_D12_02",
+  "_description": "Synthetic A2 structural correlation. Fresh drainer address (NOT in known list). Permit + same-tx Transfer with max_uint160 approval. Mimics Angel Drainer / Ethena attack pattern (Blockaid 2024-02-05). Token = WETH. Expected conf = 0.55 (A2) + 0.05 (max_approval) = 0.60. Severity::High.",
+  "_chain": "ethereum",
+  "_token": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+  "_source": "Synthetic — structurally identical to Angel Drainer Ethena attack (Blockaid 2024-02-05). Real tx: block ~19,200,000 range. Token = WETH mainnet (18 decimals). Drainer address is fresh (not in known list) to exercise A2-only path.",
+  "_source_url": "https://www.blockaid.io/blog/angel-drainer-exploits-ethena-protocol",
+  "_adr_note": "Synthetic fixture per ADR 0003. Real Angel Drainer tx hashes available in Blockaid post for Sprint 19 verification.",
+  "transfers": [
+    {
+      "chain": "ethereum",
+      "token": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "from_address": "0xvictim000000000000000000000000000000002",
+      "to_address": "0xfreshdrainer000000000000000000000000002a",
+      "amount_raw": "1000000000000000000",
+      "tx_hash": "0xd12pos02bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "log_index": 2,
+      "block_height": 19200000,
+      "block_time": "2024-02-05T14:30:00Z",
+      "decimals": 18
+    }
+  ],
+  "permit2_events": [
+    {
+      "chain": "ethereum",
+      "token": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "owner": "0xvictim000000000000000000000000000000002",
+      "spender": "0xfreshdrainer000000000000000000000000002a",
+      "amount_raw": "1461501637330902918203684832716283019655932542975",
+      "expiration_unix": 9999999999,
+      "nonce": 0,
+      "tx_hash": "0xd12pos02bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "log_index": 1,
+      "block_height": 19200000,
+      "block_time": "2024-02-05T14:30:00Z",
+      "event_kind": "permit"
+    }
+  ],
+  "_known_drainer_addresses_for_test": [],
+  "_expected": {
+    "detector_id": "permit2_drainer_v1",
+    "fires": true,
+    "min_confidence": 0.58,
+    "max_confidence": 0.65,
+    "signal_a1_hit": false,
+    "signal_a2_hit": true,
+    "permit_amount_is_max": true,
+    "victim_address": "0xvictim000000000000000000000000000000002",
+    "drainer_address": "0xfreshdrainer000000000000000000000000002a",
+    "drainer_cluster": null,
+    "amount_raw": "1000000000000000000",
+    "amount_usd_est": "3000",
+    "batch_size": 1,
+    "severity": "High"
+  }
+}

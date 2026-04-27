@@ -1,0 +1,146 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthMint065oooooooooooooooooooooooooooooooo",
+    "symbol": "MINT065",
+    "label": "positive",
+    "category": "mint_anomaly",
+    "source_url": "synthetic/mint_burn/signal_c_trickle_mint_evasion",
+    "fetched_at": "2026-04-21T20:14:00Z",
+    "synthetic": true,
+    "notes": "D06 trickle-mint evasion (E-D06-2) caught by Signal C. 8 mints x 3% each = 24% cumulative over 28 days. No individual mint >= 5% threshold so Signal B never fires per event. Signal C catches cumulative 24% >= 20%. Token age 35d >= 14d."
+  },
+  "token_meta": {
+    "mint": "SynthMint065oooooooooooooooooooooooooooooooo",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "TrickleMint065",
+    "symbol": "MINT065",
+    "decimals": 6,
+    "supply_raw": "1240000000000000",
+    "mint_authority": "TrickleDev065111111111111111111111111111111",
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "TrickleDev065111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 4800,
+    "rugcheck_score_normalised": 76,
+    "risks": [
+      { "name": "Mint Authority still enabled", "level": "danger" }
+    ],
+    "markets": [
+      {
+        "pool_address": "TricklePool065111111111111111111111111111111",
+        "dex": "raydium",
+        "lp_burned_pct": "88.00",
+        "liquidity_usd": "36000.00",
+        "lp_provider_count": 2
+      }
+    ],
+    "lockers": {},
+    "creator": "TrickleDev065111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "36000.00",
+    "detected_at": "2026-03-17T10:00:00Z"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 640,
+    "total_supply_raw": 1240000000000000,
+    "balances": {
+      "TrickleInsider065_011111111111111111111111": 96000000000000,
+      "TrickleInsider065_021111111111111111111111": 84000000000000,
+      "TrickleInsider065_031111111111111111111111": 72000000000000,
+      "TrickleInsider065_041111111111111111111111": 60000000000000,
+      "TrickleInsider065_051111111111111111111111": 48000000000000,
+      "TrickleInsider065_061111111111111111111111": 36000000000000,
+      "TrickleInsider065_071111111111111111111111": 24000000000000,
+      "TrickleHolder065_08111111111111111111111111": 18000000000000,
+      "TrickleHolder065_09111111111111111111111111": 12000000000000,
+      "TrickleHolder065_10111111111111111111111111": 8000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 638,
+    "total_supply_raw": 1240000000000000,
+    "top10_pct_liquid_after_exclusion": "0.37",
+    "gini_liquid_after_exclusion": "0.62"
+  },
+  "holder_classifications": [
+    { "address": "TrickleDev065111111111111111111111111111111", "kind": "deployer" },
+    { "address": "TrickleInsider065_011111111111111111111111", "kind": "insider" },
+    { "address": "TrickleInsider065_021111111111111111111111", "kind": "insider" },
+    { "address": "TrickleInsider065_031111111111111111111111", "kind": "insider" },
+    { "address": "TrickleInsider065_041111111111111111111111", "kind": "insider" },
+    { "address": "TrickleInsider065_051111111111111111111111", "kind": "insider" },
+    { "address": "TrickleInsider065_061111111111111111111111", "kind": "insider" },
+    { "address": "TrickleInsider065_071111111111111111111111", "kind": "insider" }
+  ],
+  "pool_rows": [
+    {
+      "pool_address": "TricklePool065111111111111111111111111111111",
+      "dex": "raydium",
+      "lp_burned_pct": "88.00",
+      "lp_locked_pct": "0.00",
+      "effective_safe_pct": "88.00",
+      "lp_provider_count": 2,
+      "liquidity_usd": "36000.00"
+    }
+  ],
+  "mint_events_30d": [
+    { "day_offset": -28, "tx_hash": "TrickleTx065A111111111111111111111111111111111", "from_address": "11111111111111111111111111111111", "to_address": "TrickleInsider065_011111111111111111111111", "amount_raw": "30000000000000", "supply_change_pct": "0.030", "recipient_is_known_lp": false, "recipient_holder_kind": "insider" },
+    { "day_offset": -24, "tx_hash": "TrickleTx065B111111111111111111111111111111111", "from_address": "11111111111111111111111111111111", "to_address": "TrickleInsider065_021111111111111111111111", "amount_raw": "30000000000000", "supply_change_pct": "0.030", "recipient_is_known_lp": false, "recipient_holder_kind": "insider" },
+    { "day_offset": -21, "tx_hash": "TrickleTx065C111111111111111111111111111111111", "from_address": "11111111111111111111111111111111", "to_address": "TrickleInsider065_031111111111111111111111", "amount_raw": "30000000000000", "supply_change_pct": "0.030", "recipient_is_known_lp": false, "recipient_holder_kind": "insider" },
+    { "day_offset": -18, "tx_hash": "TrickleTx065D111111111111111111111111111111111", "from_address": "11111111111111111111111111111111", "to_address": "TrickleInsider065_041111111111111111111111", "amount_raw": "30000000000000", "supply_change_pct": "0.030", "recipient_is_known_lp": false, "recipient_holder_kind": "insider" },
+    { "day_offset": -14, "tx_hash": "TrickleTx065E111111111111111111111111111111111", "from_address": "11111111111111111111111111111111", "to_address": "TrickleInsider065_051111111111111111111111", "amount_raw": "30000000000000", "supply_change_pct": "0.030", "recipient_is_known_lp": false, "recipient_holder_kind": "insider" },
+    { "day_offset": -10, "tx_hash": "TrickleTx065F111111111111111111111111111111111", "from_address": "11111111111111111111111111111111", "to_address": "TrickleInsider065_061111111111111111111111", "amount_raw": "30000000000000", "supply_change_pct": "0.030", "recipient_is_known_lp": false, "recipient_holder_kind": "insider" },
+    { "day_offset": -6, "tx_hash": "TrickleTx065G111111111111111111111111111111111", "from_address": "11111111111111111111111111111111", "to_address": "TrickleInsider065_071111111111111111111111", "amount_raw": "30000000000000", "supply_change_pct": "0.030", "recipient_is_known_lp": false, "recipient_holder_kind": "insider" },
+    { "day_offset": -2, "tx_hash": "TrickleTx065H111111111111111111111111111111111", "from_address": "11111111111111111111111111111111", "to_address": "TrickleInsider065_011111111111111111111111", "amount_raw": "30000000000000", "supply_change_pct": "0.030", "recipient_is_known_lp": false, "recipient_holder_kind": "insider" }
+  ],
+  "signal_c_data": {
+    "cumulative_supply_change_30d_pct": "0.240",
+    "mint_event_count_30d": 8,
+    "token_age_days": 35,
+    "mint_authority": "TrickleDev065111111111111111111111111111111",
+    "supply_base": "circulating"
+  },
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.15],
+      "severity": "Info",
+      "reason": "No honeypot signals."
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.10],
+      "severity": "Info",
+      "reason": "LP 88% burned. effective_safe=88%. D02 does not fire."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.15],
+      "severity": "Info",
+      "reason": "top10 ~0.37, stable. No D03 signals."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.10],
+      "severity": "Info",
+      "reason": "No volume spike. Trickle mints are gradual supply inflation, not pump events."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.10],
+      "severity": "Info",
+      "reason": "No self-dealing patterns."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "FIRES",
+      "confidence_band": [0.77, 0.83],
+      "severity": "High",
+      "reason": "Signal B: each individual mint = 3% < 5% threshold -> Signal B does NOT fire on individual events. Signal C fires: mint_authority active, cumulative_30d=24% >= 20%, token_age=35d >= 14d, all mints to non-LP insiders. conf=min(0.95, 0.75+(0.24-0.20)*1.0)=0.79. Severity: 0.79 -> High (0.65-0.80 band). Signal A omitted (C subsumes). Evidence: E-D06-2 trickle-mint evasion caught."
+    }
+  }
+}

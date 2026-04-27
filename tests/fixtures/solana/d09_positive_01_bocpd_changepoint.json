@@ -1,0 +1,127 @@
+{
+  "_label": "POS_D09_01",
+  "_description": "Synthetic fixture: deployer with 10 well-behaved launches (stable regime) followed by 1 high-risk launch (regime shift). The BOCPD detects the shift via mass migration to the new-regime run-length slots.",
+  "_chain": "solana",
+  "_deployer": "RegimeShiftDeployer1111111111111111111111111",
+  "_source": "Synthetic — design 0016 §13.1 (observation #11 scenario). Adams & MacKay 2007 (arXiv:0710.3742) BOCPD regime shift example.",
+  "_note": "P(r_t=0) per observation is intentionally not asserted on a single outlier. BOCPD with H=1/300 requires multiple new-regime observations to concentrate mass. The fixture validates that composite scores are correctly computed and that D09 fires after sustained new-regime behavior.",
+
+  "stable_phase": {
+    "_description": "Observations 1-10: legitimate deployer pattern. Long gaps, LP locked, good liquidity, many holders, no prior rugs.",
+    "observations": [
+      {
+        "_obs": 1, "_token": "StableToken001111111111111111111111111111111",
+        "log_gap_seconds": 14.7,
+        "lp_locked_pct": 0.90,
+        "log_initial_liquidity_usd": 8.5,
+        "holder_count_at_1h": 150.0,
+        "prior_rug_rate": 0.0,
+        "_composite_score_approx": 0.07,
+        "_gap_days": 30
+      },
+      {
+        "_obs": 2, "_token": "StableToken002222222222222222222222222222222",
+        "log_gap_seconds": 14.5,
+        "lp_locked_pct": 0.85,
+        "log_initial_liquidity_usd": 8.2,
+        "holder_count_at_1h": 120.0,
+        "prior_rug_rate": 0.0,
+        "_composite_score_approx": 0.08
+      },
+      {
+        "_obs": 3, "_token": "StableToken003333333333333333333333333333333",
+        "log_gap_seconds": 14.8,
+        "lp_locked_pct": 0.92,
+        "log_initial_liquidity_usd": 8.8,
+        "holder_count_at_1h": 200.0,
+        "prior_rug_rate": 0.0,
+        "_composite_score_approx": 0.06
+      },
+      {
+        "_obs": 4, "_token": "StableToken004444444444444444444444444444444",
+        "log_gap_seconds": 14.2,
+        "lp_locked_pct": 0.88,
+        "log_initial_liquidity_usd": 8.0,
+        "holder_count_at_1h": 100.0,
+        "prior_rug_rate": 0.0,
+        "_composite_score_approx": 0.09
+      },
+      {
+        "_obs": 5, "_token": "StableToken005555555555555555555555555555555",
+        "log_gap_seconds": 14.9,
+        "lp_locked_pct": 0.95,
+        "log_initial_liquidity_usd": 9.0,
+        "holder_count_at_1h": 180.0,
+        "prior_rug_rate": 0.0,
+        "_composite_score_approx": 0.05
+      },
+      {
+        "_obs": 6, "_token": "StableToken006666666666666666666666666666666",
+        "log_gap_seconds": 14.6,
+        "lp_locked_pct": 0.87,
+        "log_initial_liquidity_usd": 8.3,
+        "holder_count_at_1h": 130.0,
+        "prior_rug_rate": 0.0,
+        "_composite_score_approx": 0.08
+      },
+      {
+        "_obs": 7, "_token": "StableToken007777777777777777777777777777777",
+        "log_gap_seconds": 14.3,
+        "lp_locked_pct": 0.91,
+        "log_initial_liquidity_usd": 8.6,
+        "holder_count_at_1h": 160.0,
+        "prior_rug_rate": 0.0,
+        "_composite_score_approx": 0.07
+      },
+      {
+        "_obs": 8, "_token": "StableToken008888888888888888888888888888888",
+        "log_gap_seconds": 15.0,
+        "lp_locked_pct": 0.93,
+        "log_initial_liquidity_usd": 8.7,
+        "holder_count_at_1h": 140.0,
+        "prior_rug_rate": 0.0,
+        "_composite_score_approx": 0.06
+      },
+      {
+        "_obs": 9, "_token": "StableToken009999999999999999999999999999999",
+        "log_gap_seconds": 14.4,
+        "lp_locked_pct": 0.89,
+        "log_initial_liquidity_usd": 8.1,
+        "holder_count_at_1h": 110.0,
+        "prior_rug_rate": 0.0,
+        "_composite_score_approx": 0.09
+      },
+      {
+        "_obs": 10, "_token": "StableTokenAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "log_gap_seconds": 14.7,
+        "lp_locked_pct": 0.90,
+        "log_initial_liquidity_usd": 8.4,
+        "holder_count_at_1h": 145.0,
+        "prior_rug_rate": 0.0,
+        "_composite_score_approx": 0.07
+      }
+    ]
+  },
+
+  "spike_observation": {
+    "_description": "Observation 11: abrupt regime shift. 1-minute gap, 0% LP lock, $50 initial liquidity, 3 holders, 0% prior rug rate (deployer has no prior rugs yet — just changed behavior).",
+    "_obs": 11,
+    "_token": "SpikeToken0BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+    "log_gap_seconds": 4.11,
+    "lp_locked_pct": 0.0,
+    "log_initial_liquidity_usd": 3.93,
+    "holder_count_at_1h": 3.0,
+    "prior_rug_rate": 0.0,
+    "_composite_score_approx": 0.52,
+    "_composite_score_formula": "0.25*(1-sigmoid(4.11/10)) + 0.25*(1-0.0) + 0.15*(1-sigmoid(3.93/8)) + 0.10*(1-sigmoid(3/100)) + 0.25*0.0",
+    "_gap_minutes": 1
+  },
+
+  "_expected": {
+    "detector_id": "deployer_changepoint",
+    "fires": true,
+    "_note_on_when_fires": "D09 does NOT fire on observation #11 alone (BOCPD with H=1/300 requires multiple new-regime observations). This fixture validates that the composite score is correctly computed as high (~0.52) for the spike observation, and that the BOCPD mass migrates correctly over subsequent new-regime observations.",
+    "spike_composite_score_gt": 0.45,
+    "stable_composite_score_lt": 0.15
+  }
+}

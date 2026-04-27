@@ -1,0 +1,82 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthRug092PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+    "symbol": "RUG092",
+    "label": "positive",
+    "category": "rug_latent",
+    "source_url": "synthetic/rug_latent/locker_expiry_imminent",
+    "fetched_at": "2026-04-21T20:41:00Z",
+    "synthetic": true,
+    "notes": "D02 Signal B: locker expiry within 48 hours reduces effective_safe_pct below threshold. LP tokens locked via Streamflow locker, expiry in 36h. Currently effective_safe=62% but locker_expiry_hours=36 triggers near-expiry penalty. Tests that time-to-unlock is factored into D02 confidence."
+  },
+  "token_meta": {
+    "mint": "SynthRug092PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "LockerExpiry092",
+    "symbol": "RUG092",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevLockerExp092111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 2200,
+    "rugcheck_score_normalised": 48,
+    "risks": [ { "name": "LP lock expiring soon", "level": "warn" } ],
+    "markets": [ { "pool_address": "LockerPool092111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "liquidity_usd": "92000.00", "lp_provider_count": 1 } ],
+    "lockers": {
+      "LockerPool092111111111111111111111111111111": {
+        "provider": "streamflow",
+        "locked_pct": "62.00",
+        "unlock_timestamp": "2026-04-23T08:00:00Z",
+        "locker_expiry_hours": 36
+      }
+    },
+    "creator": "DevLockerExp092111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "92000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 410,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "LockerExp092_011111111111111111111111111": 95000000000000,
+      "LockerExp092_021111111111111111111111111": 62000000000000,
+      "LockerExp092_031111111111111111111111111": 41000000000000,
+      "LockerExp092_041111111111111111111111111": 28000000000000,
+      "LockerExp092_051111111111111111111111111": 19000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 390,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.29",
+    "gini_liquid_after_exclusion": "0.52"
+  },
+  "holder_classifications": [],
+  "pool_rows": [ { "pool_address": "LockerPool092111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "lp_locked_pct": "62.00", "effective_safe_pct": "62.00", "lp_provider_count": 1, "liquidity_usd": "92000.00", "locker_expiry_hours": 36 } ],
+  "swaps_1h": { "volume_usd": "18000.00", "trade_count": 45, "unique_buyers": 38, "price_start": "0.000092", "price_end": "0.000094", "price_change_pct": "0.022" },
+  "swaps_7d_daily_baseline": { "day_count_nonzero": 6, "mean_daily_volume_usd": "22000.00", "std_daily_volume_usd": "4000.00", "volume_multiplier_observed": "0.82", "volume_z_score": "-1.0" },
+  "signal_a_round_trips": [],
+  "pool_total_volume_1h_usd": "18000.00",
+  "expected": {
+    "d01_honeypot": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No static honeypot signals. No freeze_authority, no transfer_fee, no permanent_delegate, no transfer_hook." },
+    "d02_rug_pull": {
+      "verdict": "FIRES",
+      "confidence_band": [0.55, 0.75],
+      "severity": "Medium",
+      "reason": "Signal B: effective_safe_pct=62%. Normally this would produce conf=0.50+(1-0.62)*0.5=0.69 Medium. Near-expiry penalty: locker_expiry_hours=36<48 applies; treat locked portion as at-risk for near-term withdrawal. Adjusted effective_safe treated as 0 for forward-looking risk: conf=min(0.75, 0.50+(1.0-0.0)*0.5)=0.75 Medium-High. Single LP provider: no bonus applied (bonus only for fully-locked configs). Output: 0.65-0.75 High boundary. Flag: spec does not explicitly define the near-expiry downgrade formula — calibration needed.",
+      "calibration_flag": true,
+      "calibration_note": "The near-expiry locker treatment is not in the current D02 spec. The fixture tests a design gap: locker_expiry_hours should factor into effective_safe_pct downgrade. Sprint 5: add locker_expiry_hours parameter to D02 confidence formula. Until then, report at pre-expiry effective_safe (62%) giving conf=0.69 Medium."
+    },
+    "d03_concentration": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.12], "severity": "Info", "reason": "top10_now=(95+62+41+28+19)e12/1e15=0.245. prior=0.29. Delta=-0.045 (decrease). Signal 3: 0.245<0.80. No concentration signal." },
+    "d04_pump_dump": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "vol_multiplier=0.82 < 5.0. price_change=+2.2% < 30%. D04 Signal A does not fire. Signal B: vol_1h=18k, vol_24h required but burst_ratio < 0.90. D04 BELOW." },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No round-trip events. signal_a_round_trips empty." },
+    "d06_mint_burn_anomaly": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "mint_authority=null. No mint/burn events. D06 does not fire." }
+  }
+}

@@ -1,0 +1,138 @@
+[workspace]
+members = [
+    "crates/common",
+    "crates/chain-adapter",
+    "crates/indexer",
+    "crates/token-registry",
+    "crates/dex-adapter",
+    "crates/graph",
+    "crates/detectors",
+    "crates/scoring",
+    "crates/storage",
+    "crates/gateway",
+    "crates/client-sdk",
+    "crates/server",
+]
+resolver = "3"
+
+[workspace.package]
+version       = "0.1.0"
+edition       = "2024"
+rust-version  = "1.88"
+license       = "UNLICENSED"
+repository    = "https://github.com/meatgrinder/mg-onchain-analysis"
+
+[workspace.dependencies]
+tokio             = { version = "1", features = ["full"] }
+anyhow            = "1"
+tracing           = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+rust_decimal      = { version = "1", features = ["serde-with-str"] }
+serde             = { version = "1", features = ["derive"] }
+serde_json        = "1"
+thiserror         = "2"
+chrono            = { version = "0.4", features = ["serde"] }
+hex               = "0.4"
+futures           = "0.3"
+url               = { version = "2", features = ["serde"] }
+tokio-retry       = "0.3"
+bs58              = "0.5"
+
+# Yellowstone gRPC — Solana Geyser plugin protocol.
+# yellowstone-grpc-client 13.1.0 pins tonic 0.14 and yellowstone-grpc-proto 12.2.0.
+# These three must stay in lock-step; bump all three together.
+yellowstone-grpc-client = "13.1"
+yellowstone-grpc-proto  = "12.2"
+tonic                   = { version = "0.14", features = ["tls-native-roots"] }
+prost                   = "0.14"
+
+# solana-sdk for canonical Pubkey / Signature types at the ingestion boundary only.
+# Used ONLY in crates/chain-adapter — not imported by common or detectors.
+solana-sdk = "4"
+
+# ---- Storage crate workspace deps ----
+
+# sqlx 0.8: Postgres async client with migration runner.
+# runtime-tokio-rustls: async runtime + TLS. postgres: driver. chrono: DateTime.
+# migrate: sqlx migrate runner. macros: query! (unused unless sqlx-check feature enabled).
+sqlx = { version = "0.8", features = [
+    "runtime-tokio-rustls",
+    "postgres",
+    "chrono",
+    "migrate",
+    "macros",
+] }
+
+# UUID for deployer_clusters cluster_id generation.
+uuid = { version = "1", features = ["v4", "serde"] }
+
+# async-trait: required for async methods in dyn-safe trait impls (CheckpointStore).
+async-trait = "0.1"
+
+# HTTP client — used by token-registry for JSON-RPC calls to Solana RPC.
+# rustls-tls: avoids native OpenSSL dep.
+reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+
+# base64 0.22 — decodes account data returned by getAccountInfo (base64-encoded bytes).
+base64 = "0.22"
+
+# toml 0.8 — config file parsing for config/detectors.toml.
+toml = "0.8"
+
+# clap 4 — CLI argument parsing for onchain-service binary.
+# derive feature enables #[derive(Parser)] for declarative arg definitions.
+clap = { version = "4", features = ["derive"] }
+
+# tokio-util — CancellationToken for graceful shutdown (ShutdownSignal).
+# Already a transitive dep via indexer; made explicit here for crates/server.
+tokio-util = { version = "0.7", features = ["rt"] }
+
+# async-channel 2 — MPMC bounded channel for the streaming worker queue.
+# Native MPMC avoids the Arc<Mutex<mpsc::Receiver>> antipattern (design 0014 §4 rev 1).
+async-channel = "2"
+
+# statrs 0.18 — pure Rust statistics library for Student-t log-PDF used by D09 BOCPD.
+# Pure Rust, no sys deps; ADR 0003 compliant. Used for Normal-Gamma posterior predictive.
+# See docs/designs/0016-detector-09-bocpd-deployer-changepoint.md §3.4.
+statrs = "0.18"
+
+# alloy 1.6 — Rust EVM toolkit (Paradigm-maintained; replaces ethers-rs).
+# Bumped from 1.0 → 1.6 in Sprint 24 to satisfy Reth v1.11.3 dependency (which requires
+# alloy 1.6.3). alloy follows semver within the 1.x series; audit confirmed no breaking
+# changes to the API surface we use (WsConnect, RpcClient::connect_pubsub,
+# get_raw_subscription, B256, U256, I256, Address, sol! macro, SIGNATURE_HASH,
+# SolEvent::decode_log, Uint::to::<T>()). See Sprint 24 S24-2 audit notes.
+# MSRV bump: alloy 1.6.3 requires rust-version = "1.88" (workspace bumped above).
+#
+# Features chosen for WebSocket JSON-RPC + ABI decoding only:
+#   rpc-client-ws  — WsConnect + alloy_rpc_client::RpcClient WebSocket
+#   pubsub         — alloy_pubsub subscription support for eth_subscribe
+#   sol-types      — sol! macro for type-safe ABI event decoding
+#   json-rpc       — alloy_json_rpc request/response types
+# DELIBERATELY EXCLUDED: `providers`, `provider-ws`, `rpc-types-eth`, `consensus`,
+#   `network`, `eips`, `rlp`.
+#   `rpc-types-eth` and `providers` transitively pull in `alloy-consensus` which
+#   has a serde 1.0.228 (serde_core split) incompatibility — the TransactionEnvelope
+#   proc-macro generates `serde::__private` paths that don't resolve in the new
+#   serde_core architecture. We avoid consensus entirely.
+#   Instead, WsRpcClient uses alloy_rpc_client::RpcClient directly with raw
+#   serde_json::Value responses, then deserializes only the fields we need.
+# Chosen at Sprint 16 (2026-04-24); bumped Sprint 24. See crates/chain-adapter/src/ethereum/rpc.rs.
+alloy = { version = "1.6", default-features = false, features = [
+    "rpc-client-ws",
+    "pubsub",
+    "sol-types",
+    "json-rpc",
+] }
+
+# Reth ExEx integration — compiled ONLY when --features exex is active.
+# Pin to exact version (=1.11.3) to enforce node/plugin binary version parity (Sprint 24, ADR 0004).
+# NOTE: Reth crates are NOT published to crates.io as versioned packages (only placeholder 0.0.0
+# exists). They must be consumed via git dependency with an exact tag ref.
+# alloy must be ≥1.6 first (bumped above) to satisfy reth-primitives' transitive alloy-primitives dep.
+# Sprint 24 scope: ExExRpcClient skeleton + EthereumRpcExEx trait + feature gate compile.
+# Sprint 25: onchain-reth binary entry (Reth NodeBuilder + install_exex).
+reth-exex         = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.3", default-features = false }
+reth-primitives   = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.3", default-features = false }
+reth-node-builder = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.3", default-features = false }
+reth-tracing      = { git = "https://github.com/paradigmxyz/reth", tag = "v1.11.3", default-features = false }

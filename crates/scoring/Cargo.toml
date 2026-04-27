@@ -1,0 +1,25 @@
+[package]
+name        = "mg-onchain-scoring"
+version.workspace     = true
+edition.workspace     = true
+rust-version.workspace = true
+license.workspace     = true
+repository.workspace  = true
+description = "Token risk score aggregation: combines detector AnomalyEvent outputs into a TokenRiskReport"
+
+[dependencies]
+anyhow.workspace        = true
+tracing.workspace       = true
+serde.workspace         = true
+serde_json.workspace    = true
+rust_decimal.workspace  = true
+chrono.workspace        = true
+thiserror.workspace     = true
+toml                    = "0.8"
+
+mg-onchain-common          = { path = "../common" }
+mg-onchain-detectors       = { path = "../detectors" }
+mg-onchain-token-registry  = { path = "../token-registry" }
+
+[dev-dependencies]
+rust_decimal_macros = "1"

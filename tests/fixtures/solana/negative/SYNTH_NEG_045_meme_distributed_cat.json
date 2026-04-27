@@ -1,0 +1,73 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthNeg045CatMemeDDDDDDDDDDDDDDDDDDDDDDDDDD",
+    "symbol": "CAT045",
+    "label": "negative",
+    "category": "meme_distributed",
+    "source_url": "synthetic/meme_distributed/cat_meme_healthy",
+    "fetched_at": "2026-04-21T21:00:00Z",
+    "synthetic": true,
+    "notes": "Cat meme token. LP 100% burned. 1200 holders, top10=28% (healthy for meme). No mint authority. Normal trading volume with no spikes. Tests clean meme token: LP burned, distributed, no anomalies."
+  },
+  "token_meta": {
+    "mint": "SynthNeg045CatMemeDDDDDDDDDDDDDDDDDDDDDDDDDD",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "CatMeme045",
+    "symbol": "CAT045",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevCat045111111111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 800,
+    "rugcheck_score_normalised": 22,
+    "risks": [],
+    "markets": [ { "pool_address": "CatPool04511111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "100.00", "liquidity_usd": "48000.00", "lp_provider_count": 1 } ],
+    "lockers": {},
+    "creator": "DevCat045111111111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "48000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 1200,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "CatHolder045_011111111111111111111111111": 48000000000000,
+      "CatHolder045_021111111111111111111111111": 38000000000000,
+      "CatHolder045_031111111111111111111111111": 30000000000000,
+      "CatHolder045_041111111111111111111111111": 24000000000000,
+      "CatHolder045_051111111111111111111111111": 19000000000000,
+      "CatHolder045_061111111111111111111111111": 15000000000000,
+      "CatHolder045_071111111111111111111111111": 12000000000000,
+      "CatHolder045_081111111111111111111111111": 9500000000000,
+      "CatHolder045_091111111111111111111111111": 7500000000000,
+      "CatHolder045_101111111111111111111111111": 6200000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 1180,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.26",
+    "gini_liquid_after_exclusion": "0.62"
+  },
+  "holder_classifications": [],
+  "pool_rows": [ { "pool_address": "CatPool04511111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "100.00", "lp_locked_pct": "0.00", "effective_safe_pct": "100.00", "lp_provider_count": 1, "liquidity_usd": "48000.00" } ],
+  "swaps_1h": { "volume_usd": "22000.00", "trade_count": 88, "unique_buyers": 72, "price_start": "0.000048", "price_end": "0.000049", "price_change_pct": "0.021" },
+  "swaps_7d_daily_baseline": { "day_count_nonzero": 6, "mean_daily_volume_usd": "24000.00", "std_daily_volume_usd": "4500.00", "volume_multiplier_observed": "0.92", "volume_z_score": "-0.4" },
+  "signal_a_round_trips": [],
+  "pool_total_volume_1h_usd": "22000.00",
+  "expected": {
+    "d01_honeypot": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No static honeypot signals." },
+    "d02_rug_pull": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "LP 100% burned. effective_safe=100%." },
+    "d03_concentration": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "top10_now=(48+38+30+24+19+15+12+9.5+7.5+6.2)e12/1e15=0.209. prior=0.26. Slight decrease. All signals below threshold." },
+    "d04_pump_dump": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "vol_multiplier=0.92 < 5.0. price_change=+2.1% < 30%." },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No round-trip events. 72 unique buyers organic." },
+    "d06_mint_burn_anomaly": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "mint_authority=null." }
+  }
+}

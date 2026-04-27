@@ -1,0 +1,148 @@
+# known_bridges.toml — Known Bridge Custody Address Seed List
+#
+# Sprint 26 D14 initial seed.
+# Used by D14 BridgeDrainDetector for balance-decrease anomaly detection.
+# Loaded at startup via `init::known_bridges::load_known_bridges`.
+#
+# Per ADR 0003: NO runtime API calls. This file is the static seed.
+# Sprint 26 verified attempts via rekt.news leaderboard and public disclosures.
+#
+# Address format: 0x-prefixed lowercase hex (42 chars) for EVM.
+#                 Base58 for Solana (not applicable yet — bridges on EVM chains).
+# All addresses normalized to lowercase at load time.
+#
+# tvl_tier = "Tier1"   → $100M+ historical TVL or known major incident
+# tvl_tier = "Tier2"   → smaller bridges, emerging cross-chain protocols
+#
+# Verification status:
+#   "verified"   — address confirmed on-chain via public explorer
+#   "unverified" — cited in public disclosure but not individually on-chain-confirmed;
+#                  verify Sprint 27+ fixture capture
+#
+# Sources:
+#   - rekt.news leaderboard: https://rekt.news/leaderboard
+#   - Ronin Bridge incident:  https://rekt.news/ronin-rekt ($625M March 2022)
+#   - Wormhole incident:      https://rekt.news/wormhole-rekt ($320M Feb 2022)
+#   - Poly Network incident:  https://rekt.news/polynetwork-rekt ($611M Aug 2021)
+#   - Nomad incident:         https://rekt.news/nomad-rekt ($190M Aug 2022)
+#   - BNB Bridge incident:    https://rekt.news/bnb-bridge-rekt ($586M Oct 2022)
+#   - Multichain shutdown:    https://multichain.org (July 2023 shutdown; ~$126M lost)
+#
+# WebFetch attempts during Sprint 26:
+#   - https://rekt.news/leaderboard — 200 OK, confirmed incident rankings and amounts.
+#     Top 5 bridge exploits: Ronin #1 ($625M), Poly Network #4 ($611M),
+#     BNB Bridge #5 ($586M), Wormhole #7 ($320M), Nomad #8 ($190M),
+#     Multichain #9 (~$126M — admin key misuse, not exploit per se).
+#   - On-chain address verification requires Etherscan/BSCscan API (auth-gated in CI).
+#     SPEC-NOTE: Specific custody addresses are sourced from public post-mortems.
+#     Treat as strong signal (cited in post-mortems) but verify via Sprint 27.
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# Tier 1 — major bridges with $100M+ historical TVL or confirmed exploits
+# ---------------------------------------------------------------------------
+
+[[bridges]]
+name = "Ronin Bridge"
+chains = ["ethereum"]
+tvl_tier = "Tier1"
+source = "https://rekt.news/ronin-rekt — $625M drain March 2022; Sky Mavis / Axie Infinity bridge"
+notes = """
+$625M exploit March 2022 (#1 on rekt.news leaderboard as of 2026-04-24).
+Attacker compromised 5 of 9 validator keys + 1 Axie DAO key → forged withdrawals.
+Custody contract holds USDC and ETH for Ronin sidechain backing.
+SPEC-NOTE: custody address sourced from post-mortem on-chain trace
+(https://etherscan.io/address/0x1a2a1c938ce3ec39b6d47113c7955baa9dd454f2)
+— UNVERIFIED in CI; verify Sprint 27.
+"""
+[bridges.addresses]
+ethereum = ["0x1a2a1c938ce3ec39b6d47113c7955baa9dd454f2"]
+
+[[bridges]]
+name = "Wormhole"
+chains = ["ethereum"]
+tvl_tier = "Tier1"
+source = "https://rekt.news/wormhole-rekt — $320M drain Feb 2022; Solana bridge guardian exploit"
+notes = """
+$320M exploit February 2022 (#7 on rekt.news leaderboard).
+Attacker exploited guardian signature verification bug → minted 120,000 wETH on Solana
+without depositing ETH on Ethereum side. Ethereum custody is the token bridge portal.
+SPEC-NOTE: 0x3ee18B2214AFF97000D974cf647E54f7F3B16cd5 is the official Wormhole token bridge
+portal on Ethereum (public on wormhole.com and confirmed in GitHub wormhole-foundation/wormhole).
+Unverified against live Etherscan in CI.
+"""
+[bridges.addresses]
+ethereum = ["0x3ee18b2214aff97000d974cf647e54f7f3b16cd5"]
+
+[[bridges]]
+name = "Poly Network"
+chains = ["ethereum", "bsc", "polygon"]
+tvl_tier = "Tier1"
+source = "https://rekt.news/polynetwork-rekt — $611M drain Aug 2021; largest exploit before Ronin"
+notes = """
+$611M exploit August 2021 (#4 on rekt.news leaderboard, formerly #1).
+Attacker exploited cross-chain message relay: passed crafted tx data to call
+EthCrossChainData contract with attacker as the 'keeper'.
+SPEC-NOTE: Custody addresses per poly.network post-mortem.
+Unverified against live explorer in CI.
+"""
+[bridges.addresses]
+ethereum = ["0x250e76987d838a75310c34bf422ea9f1ac4cc906"]
+bsc     = ["0x1c3b9f434157a8f5fd6ef19f9b2aadf7db63f4a8"]
+polygon = ["0x42d61d766b85431666b39b89c43011f24451bff6"]
+
+[[bridges]]
+name = "Nomad Bridge"
+chains = ["ethereum"]
+tvl_tier = "Tier1"
+source = "https://rekt.news/nomad-rekt — $190M drain Aug 2022; broken message verification"
+notes = """
+$190M exploit August 2022 (#8 on rekt.news leaderboard).
+Mass exploit: flawed root initialization allowed any user to replay messages
+to drain the bridge. Hundreds of copycats drained within hours.
+SPEC-NOTE: 0x88A69B4E698A4B090DF6CF5Bd7B2D47325Ad30A3 is the Nomad bridge replica contract
+on Ethereum, cited in Nomad's own post-mortem GitHub issue and Chainalysis report.
+Unverified in CI.
+"""
+[bridges.addresses]
+ethereum = ["0x88a69b4e698a4b090df6cf5bd7b2d47325ad30a3"]
+
+[[bridges]]
+name = "BNB Chain Bridge"
+chains = ["bsc"]
+tvl_tier = "Tier1"
+source = "https://rekt.news/bnb-bridge-rekt — $586M Oct 2022; BSC token hub exploit"
+notes = """
+$586M exploit October 2022 (#5 on rekt.news leaderboard).
+Attacker forged IAVL proof to mint 2M BNB from BSC cross-chain bridge.
+Token hub address holds BSC-native assets bridged from other chains.
+SPEC-NOTE: 0x533e3c0e6b48010873B947bddC4721b1bDFF9648 is the BSC Token Hub contract,
+publicly documented in BNB Chain docs and referenced in post-mortems.
+Unverified in CI; normalized to lowercase.
+"""
+[bridges.addresses]
+bsc = ["0x533e3c0e6b48010873b947bddc4721b1bdff9648"]
+
+# ---------------------------------------------------------------------------
+# Tier 2 — smaller bridges or incomplete-incident bridges
+# ---------------------------------------------------------------------------
+
+[[bridges]]
+name = "Multichain (Anyswap)"
+chains = ["ethereum", "bsc", "polygon", "arbitrum"]
+tvl_tier = "Tier2"
+source = "https://multichain.org — July 2023 shutdown; ~$126M user funds stranded; admin key misuse"
+notes = """
+Multichain (formerly Anyswap) shut down operations July 2023. CEO arrested in China.
+Approximately $126M in user assets became inaccessible due to admin-key-controlled
+bridge contracts. Multiple anomalous outflows occurred July 2023 from bridge custody
+addresses to unrelated wallets — consistent with admin key drain.
+SPEC-NOTE: 0xC564EE9f21Ed8A2d8E7e76c085740d5e4c5FaFbE is the Multichain V6 router on
+Ethereum cited in Chainalysis 2023 bridge incident report.
+Unverified in CI.
+"""
+[bridges.addresses]
+ethereum = ["0xc564ee9f21ed8a2d8e7e76c085740d5e4c5fafbe"]
+bsc      = ["0xd1c5966f9f5ee6881ff6b261bbeda45972b1b5f3"]
+polygon  = ["0x4f3aff3a747fcade12598081e80c6605a8be192f"]
+arbitrum = ["0x82af49447d8a07e3bd95bd0d56f35241523fbab1"]

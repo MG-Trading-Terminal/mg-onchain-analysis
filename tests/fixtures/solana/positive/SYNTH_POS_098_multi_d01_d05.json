@@ -1,0 +1,103 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthMulti098VVVVVVVVVVVVVVVVVVVVVVVVVVVVVV",
+    "symbol": "MULTI098",
+    "label": "positive",
+    "category": "multi_signal",
+    "source_url": "synthetic/multi_signal/d01_honeypot_plus_d05_wash_volume_inflation",
+    "fetched_at": "2026-04-21T20:47:00Z",
+    "synthetic": true,
+    "notes": "D01 S5 (buy/sell ratio) + D05 Signal A co-fire. Token is a honeypot (sells revert) but wash bot creates artificial sell-side volume to mask the asymmetry. The wash volume is from a controlled wallet that bypasses the fee/sell-block — insider exemption in the contract. Tests the adversarial pattern: wash trading used to defeat buy-ratio honeypot detection."
+  },
+  "token_meta": {
+    "mint": "SynthMulti098VVVVVVVVVVVVVVVVVVVVVVVVVVVVVV",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "HoneypotWash098",
+    "symbol": "MULTI098",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": "DevHoneypot098111111111111111111111111111111",
+    "mutable": true,
+    "update_authority": "DevHoneypot098111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 4200,
+    "rugcheck_score_normalised": 72,
+    "risks": [ { "name": "Freeze authority active", "level": "danger" } ],
+    "markets": [ { "pool_address": "HoneyWashPool098111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "85.00", "liquidity_usd": "38000.00", "lp_provider_count": 1 } ],
+    "lockers": {},
+    "creator": "DevHoneypot098111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "38000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 285,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "WashBot098_0111111111111111111111111111111": 195000000000000,
+      "HWHolder098_0211111111111111111111111111111": 52000000000000,
+      "HWHolder098_0311111111111111111111111111111": 34000000000000,
+      "HWHolder098_0411111111111111111111111111111": 22000000000000,
+      "HWHolder098_0511111111111111111111111111111": 14000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 260,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.35",
+    "gini_liquid_after_exclusion": "0.60"
+  },
+  "holder_classifications": [],
+  "pool_rows": [ { "pool_address": "HoneyWashPool098111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "85.00", "lp_locked_pct": "0.00", "effective_safe_pct": "85.00", "lp_provider_count": 1, "liquidity_usd": "38000.00" } ],
+  "swaps_1h": {
+    "volume_usd": "95000.00",
+    "trade_count": 148,
+    "unique_buyers": 62,
+    "unique_sellers": 18,
+    "buy_count": 130,
+    "sell_count": 18,
+    "price_start": "0.000038",
+    "price_end": "0.000041",
+    "price_change_pct": "0.079"
+  },
+  "swaps_7d_daily_baseline": { "day_count_nonzero": 5, "mean_daily_volume_usd": "28000.00", "std_daily_volume_usd": "6000.00", "volume_multiplier_observed": "3.39", "volume_z_score": "11.2" },
+  "signal_a_round_trips": [
+    { "sender": "WashBot098_0111111111111111111111111111111", "pool": "HoneyWashPool098111111111111111111111111111", "round_trip_count": 9, "avg_volume_diff_pct": "0.019", "first_seen_block": 285400000, "last_seen_block": 285401800, "wash_volume_usd": "52000.00", "direction": "sell_first" }
+  ],
+  "pool_total_volume_1h_usd": "95000.00",
+  "sell_simulation_result": {
+    "simulated": true,
+    "sell_reverts": true,
+    "revert_reason": "custom_program_error: 0x1774",
+    "note": "Non-wash-bot wallets cannot sell. WashBot098 is allowlisted in the token contract."
+  },
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "FIRES",
+      "confidence_band": [0.55, 0.80],
+      "severity": "Medium",
+      "reason": "Signal 1 (freeze_authority): raw_s1=0.40. Signal 5 (buy/sell ratio): buy_count=130, sell_count=18, ratio=7.2. The wash bot's 18 sells are from an allowlisted wallet; real-user sells=0, but the detector sees 18 sells -> ratio appears 7.2 not infinite. This is the evasion: wash sells mask the asymmetry. D01 Signal 5 fires at reduced confidence: ratio=7.2 -> conf_s5=min(0.40,0.10+(7.2-3)/3*0.10)=min(0.40,0.10+0.14)=0.24. Combined raw=0.40+0.24=0.64. sigmoid(0.64)=0.655. Actually ratio=buy/sell=130/18=7.2, above threshold 3.0. Signal 5 fires. sell_simulation: sell_reverts=true -> strong honeypot confirm if simulation available. conf boost: +0.20 for simulation-confirmed -> 0.655+0.20=0.855 capped at 0.90? Per D01 spec simulation is highest-priority signal. Final with simulation: 0.90 Critical. Without simulation (static only): 0.655 Medium-High.",
+      "calibration_flag": true,
+      "calibration_note": "The fixture includes sell_simulation_result. D01 spec priority order: simulation > static. If simulation runs and confirms revert, confidence should be 0.90+ Critical. The static-only path gives 0.655 Medium. This tests that simulation path is correctly implemented vs fallback to static. Sprint 5: verify simulation path override in D01 implementation."
+    },
+    "d02_rug_pull": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "LP 85% burned. effective_safe=85%>=70%. D02 BELOW." },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.15],
+      "severity": "Info",
+      "reason": "top10_now=(195+52+34+22+14)e12/1e15=0.317. prior=0.35. Slight decrease. No D03 signal."
+    },
+    "d04_pump_dump": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.15], "severity": "Info", "reason": "vol_multiplier=3.39 < 5.0. price_change=+7.9% < 30%. D04 Signal A does not fire. Signal B: insufficient burst ratio." },
+    "d05_wash_trading_h1": {
+      "verdict": "FIRES",
+      "confidence_band": [0.65, 0.80],
+      "severity": "High",
+      "reason": "Signal A: WashBot098 9 sell-first round-trips, avg_vol_diff=1.9%<5%, count=9>=3. conf=0.60+(9-3)/3*0.10+(0.05-0.019)/0.05*0.15=0.60+0.20+0.093=0.893. Cap at wash_vol/pool: 52k/95k=54.7%>=30% -> Signal C amplifies. Severity bump: Medium->High (already High at 0.893). Final: 0.893 High. wash_vol=55% of pool confirms significant inflation of apparent sell volume."
+    },
+    "d06_mint_burn_anomaly": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "mint_authority=null. No mint events." }
+  }
+}

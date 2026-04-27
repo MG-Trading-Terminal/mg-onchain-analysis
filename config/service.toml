@@ -1,0 +1,251 @@
+# =============================================================================
+# config/service.toml — mg-onchain-server configuration
+# =============================================================================
+# Loaded at startup by crates/server.  All thresholds have a justified default;
+# see design 0014 §4 and design 0020 for derivation notes.
+#
+# S19-2: Added [shutdown], [observability], [postgres], [chains], [gateway]
+# sections per design 0020 §7.
+#
+# To disable the streaming subsystem entirely (e.g. in CI environments that
+# don't have the full Postgres stack running), set streaming.enabled = false.
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# Graceful shutdown drain (D-D)
+# ---------------------------------------------------------------------------
+
+[shutdown]
+
+# Seconds to wait for the coordinator + streaming scheduler to drain
+# in-flight work before the process exits.
+# 30s fits within the standard Kubernetes SIGKILL grace period.
+# Decision D-D (design 0020 §3).
+drain_timeout_seconds = 30
+
+# ---------------------------------------------------------------------------
+# Observability
+# ---------------------------------------------------------------------------
+
+[observability]
+
+# Default EnvFilter string. Overridden at runtime by RUST_LOG env var.
+log_filter = "info"
+
+# Optional OTLP gRPC collector endpoint.
+# When absent or commented out, no OTLP exporter is constructed.
+# Sprint 20 will wire OpenTelemetry traces (design 0020 §8).
+# otlp_endpoint = "http://localhost:4317"
+
+# ---------------------------------------------------------------------------
+# PostgreSQL connection (D-A)
+# ---------------------------------------------------------------------------
+
+[postgres]
+
+# PostgreSQL connection URL.
+# Format: postgres://user:password@host:port/database
+# NEVER commit credentials here — use env var override in production.
+url = "postgres://onchain:onchain@localhost/onchain"
+
+# Maximum pool connections.
+# 32 provides headroom for 11 streaming detectors × N workers + anomaly inserts.
+max_connections = 32
+
+# Maximum startup connection retry attempts (2s exponential backoff between each).
+connect_retries = 5
+
+# ---------------------------------------------------------------------------
+# Chain adapters (D-E)
+# ---------------------------------------------------------------------------
+
+[chains.solana]
+
+# Solana is the primary chain for shitcoin detection (Decision D-E).
+# Set to false to disable Solana ingestion in read-only / CI environments.
+enabled = true
+
+# Yellowstone gRPC endpoint (self-hosted per ADR 0003).
+# Production: your Triton / Shyft / self-hosted validator gRPC address.
+rpc_url = "http://localhost:10000"
+
+# Checkpoint file path (persists last seen slot for clean restarts).
+checkpoint_path = "./checkpoints/solana.json"
+
+[chains.ethereum]
+
+# Ethereum is disabled by default until the self-hosted Reth node is
+# confirmed operational (ADR 0003 + ADR 0004). Set to true to enable.
+# Decision D-E (design 0020 §3).
+enabled = false
+
+# Reth WebSocket RPC endpoint (self-hosted per ADR 0003 + ADR 0004).
+# Production: replace placeholder ws://127.0.0.1:854X with real self-hosted
+# Reth-equivalent endpoint per ADR 0003. The binary will REFUSE TO START if
+# a chain is enabled but ws_url is still a placeholder (ws://127.0.0.1:8546-8549).
+ws_url = "ws://127.0.0.1:8546"
+
+# Block confirmation depth before events are emitted.
+# 12 blocks ≈ 2.4 minutes on mainnet (ADR 0004 §Finality).
+reorg_depth = 12
+
+# Checkpoint file path (persists last seen block for clean restarts).
+checkpoint_path = "./checkpoints/ethereum.json"
+
+[chains.bsc]
+
+# BSC (BNB Smart Chain) — disabled by default.
+# Enable when a self-hosted BSC node is ready (bnbchain/bsc or Reth fork per ADR 0003).
+# Production: operator MUST replace ws_url with self-hosted endpoint.
+enabled = false
+
+# BSC node WebSocket endpoint (self-hosted per ADR 0003).
+# Production: replace with your self-hosted BSC node ws:// address.
+# Example: ws://127.0.0.1:8546 if running on a separate node port.
+ws_url = "ws://127.0.0.1:8547"
+
+# BSC has ~3 second block times — 15 blocks ≈ 45 seconds confirmation.
+# Parlia PoA consensus (21 validators, BFT-style); short reorgs (1-2 blocks)
+# occur occasionally due to fast block cadence. 15 provides a conservative
+# safety buffer above the minimum. Operators may increase for higher confidence.
+# ref: bnbchain.org/docs/bnbSmartChain/concepts/consensus/
+# Code default: EvmChainConfig::default_reorg_depth_for_chain(Chain::Bsc) == 15
+reorg_depth = 15
+
+checkpoint_path = "./checkpoints/bsc.json"
+
+[chains.base]
+
+# Base (OP Stack L2) — disabled by default.
+# Enable when a self-hosted Base node is ready (base-reth or op-reth per ADR 0003).
+# Production: operator MUST replace ws_url with self-hosted endpoint.
+enabled = false
+
+# Base node WebSocket endpoint (self-hosted per ADR 0003).
+ws_url = "ws://127.0.0.1:8548"
+
+# Base inherits Ethereum's 12-second block time — 12 blocks ≈ 2.4 minutes.
+reorg_depth = 12
+
+checkpoint_path = "./checkpoints/base.json"
+
+[chains.arbitrum]
+
+# Arbitrum One (Nitro rollup) — disabled by default.
+# Enable when a self-hosted Arbitrum Nitro node is ready per ADR 0003.
+# Production: operator MUST replace ws_url with self-hosted endpoint.
+enabled = false
+
+# Arbitrum Nitro WebSocket endpoint (self-hosted per ADR 0003).
+ws_url = "ws://127.0.0.1:8549"
+
+# Arbitrum Nitro: ~0.25 second block times — 12 blocks ≈ 3 seconds.
+# Operator may increase substantially (e.g. 64) for higher confidence.
+reorg_depth = 12
+
+checkpoint_path = "./checkpoints/arbitrum.json"
+
+[chains.polygon]
+
+# Polygon PoS — disabled by default.
+# Enable when a self-hosted Bor node is ready per ADR 0003.
+# Production: operator MUST replace ws_url with self-hosted endpoint.
+enabled = false
+
+# Polygon Bor WebSocket endpoint (self-hosted per ADR 0003).
+ws_url = "ws://127.0.0.1:8550"
+
+# Polygon PoS produces blocks every ~2 seconds via Bor. The Heimdall consensus
+# layer checkpoints every 256 blocks (~8.5 min). 64-block depth provides a
+# safety buffer above the staking-layer soft-finality recommendation for exchange
+# confirmations and covers the most common observed reorg window.
+# ref: docs.polygon.technology/pos/architecture/heimdall/
+# Code default: EvmChainConfig::default_reorg_depth_for_chain(Chain::Polygon) == 64
+reorg_depth = 64
+
+checkpoint_path = "./checkpoints/polygon.json"
+
+# ---------------------------------------------------------------------------
+# Gateway
+# ---------------------------------------------------------------------------
+
+[gateway]
+
+# TCP bind address for the REST + WebSocket gateway.
+bind_addr = "127.0.0.1:8080"
+
+# Path to the gateway-specific TOML config file.
+# Contains auth, rate-limit, cache, WS, and telemetry settings.
+gateway_toml = "config/gateway.toml"
+
+[streaming]
+
+# Whether to spawn the streaming detector scheduler and worker pool.
+# false → server boots normally; no scheduler task is spawned.
+# Gate: used by spawn_streaming_subsystem() in crates/server/src/lib.rs.
+enabled = true
+
+# Debounce window: events for the same (chain, mint) that arrive within this
+# window are merged into one SchedulerJob.
+# 500ms balances freshness vs. evaluation cost.
+# Source: design 0014 §2.2 "Debounce layer".
+debounce_window_ms = 500
+
+# Bounded job queue capacity.
+# When full, new jobs are dropped (streaming_queue_overflow_total counter fires).
+# 4096 chosen to absorb short bursts (200 hot tokens × ~20 ticks each).
+# Source: design 0014 §2.2 + §4.
+queue_capacity = 4096
+
+# Number of detector worker tasks.
+# 0 = tokio::available_parallelism() * 2 (resolved at runtime).
+# Typical dev machine (8 cores) → 16 workers.
+# Source: design 0014 §2.2 "Worker pool".
+worker_count = 0
+
+# DetectorContext window per streaming tick, in minutes.
+# 60 minutes covers the relevant trade history for D04/D05.
+# Source: design 0014 §4 SchedulerConfig.
+window_minutes = 60
+
+# Garbage-collection interval for StreamingRegistry, in seconds.
+# GC evicts tokens that are idle and have no active WS subscribers.
+gc_interval_seconds = 120
+
+# Hard cap on registered tokens.  LRU eviction when cap is reached.
+# 5000 covers peak pump.fun activity (1000 new tokens/day × 4–5 active days).
+# Source: design 0014 §2.3.
+max_streaming_tokens = 5000
+
+# Idle timeout for tokens with no active WS subscribers, in minutes.
+# A token silent for this long is evicted on the next GC cycle.
+# 60 minutes is a conservative default; calibrate from production data.
+# Source: design 0014 §9.3.
+streaming_idle_timeout_minutes = 60
+
+# Per-detector evaluation timeout, in milliseconds.
+# A detector exceeding this is cancelled; outcome = "timeout".
+# 3000ms provides headroom for D01 simulation (3 paths × ~500ms each) while
+# bounding the worst-case worker stall from a stuck Postgres query.
+# Source: design 0014 §4 rev 1.
+per_detector_timeout_ms = 3000
+
+# Score-write skip threshold.
+# When max(|new_score[i] - prev_score[i]|) < threshold, the ScoringEngine
+# write + risk_cache.insert + upsert_token_risk_report are elided.
+# 0.05 = 5 percentage-point change; below this the consumer UI difference
+# is imperceptible and write load dominates.
+# Source: design 0014 §2.4 rev 1 "Inter-tick scoring optimization".
+scoring_skip_delta_threshold = 0.05
+
+# D01 cadence: run the honeypot simulation (D01) every Nth streaming tick.
+# Default 10: fires once per 10 evaluations per token (~30s at 3s debounce).
+# Source: design 0014 §8 Phase 3 note.
+streaming_d01_cadence_n = 10
+
+# Whether to persist TokenRiskReport rows to the token_risk_reports table (V00012).
+# Default false — opt-in. Set to true after V00012 migration has been applied.
+# The in-memory RiskCache (gateway) remains the hot cache in both modes.
+# Durable persistence enables crash-recovery, audit trail, and backfill queries.
+# [streaming.persistence]
+token_risk_reports_enabled = false

@@ -1,0 +1,67 @@
+{
+  "_fixture_meta": {
+    "label": "negative",
+    "detector": "withdraw_withheld_drain",
+    "expected_signals": [],
+    "expected_result": "InsufficientBaseline",
+    "synthetic": false,
+    "source": "RugCheck API + Solana mainnet live state, verified 2026-04-21",
+    "rationale": "PYUSD is a Token-2022 mint (token_program = TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb) but its transfer_fee.feeBps = 0 as of 2026-04-21. With a zero fee rate, no withheld balances accumulate and there is nothing meaningful for an attacker to extract via WithdrawWithheld*. D07 returns Err(InsufficientBaseline) immediately without querying token2022_instructions. The established-protocol suppression path (is_established_protocol=true via jup_strict=true) is also relevant but secondary to the zero-fee early exit. This fixture tests both: (1) zero-fee early exit, and (2) the established-protocol suppression path for tokens that do have a non-zero fee.",
+    "note_on_zero_fee": "PYUSD feeBps=0 means D07 should emit Err(InsufficientBaseline) with reason 'transfer_fee_bps=0; no meaningful withheld balance accumulates'. Alternatively the developer may use a threshold: if feeBps < MIN_FEE_BPS_FOR_MEANINGFUL_ACCUMULATION (e.g. 10 bps), treat as insufficient baseline. The spec does not set this secondary threshold explicitly; the developer may add it as an implementation detail.",
+    "captured_at": "2026-04-21T00:00:00Z"
+  },
+  "mint": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+  "chain": "solana",
+  "symbol": "PYUSD",
+  "name": "PayPal USD",
+  "decimals": 6,
+  "token_program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+  "total_supply_raw": "250000000000000",
+  "circulating_supply_raw": "250000000000000",
+  "mint_authority": "2wmVCSfPxGPjrnMMn7rchp4uaeoTqN39GT1UATJ8SM5Q",
+  "freeze_authority": "2wmVCSfPxGPjrnMMn7rchp4uaeoTqN39GT1UATJ8SM5Q",
+  "creator": "2wmVCSfPxGPjrnMMn7rchp4uaeoTqN39GT1UATJ8SM5Q",
+  "creator_balance_raw": "0",
+  "transfer_fee": {
+    "feeBps": 0,
+    "maxFeeRaw": "0",
+    "authority": "2wmVCSfPxGPjrnMMn7rchp4uaeoTqN39GT1UATJ8SM5Q"
+  },
+  "permanent_delegate": null,
+  "transfer_hook_program": null,
+  "top_holders": [
+    {
+      "address": "2wmVCSfPxGPjrnMMn7rchp4uaeoTqN39GT1UATJ8SM5Q",
+      "pct": "98.50",
+      "amount_raw": "246250000000000",
+      "is_insider": false
+    }
+  ],
+  "total_holders": 12450,
+  "markets": [
+    {
+      "pool_address": "5h6ssFpeVbKSFDEFyhREMnBVPeJtiBW2LtRnmmTbitSo",
+      "dex": "orca_whirlpool",
+      "lp_burned_pct": "0.00",
+      "liquidity_usd": "2500000.00",
+      "lp_provider_count": 48
+    }
+  ],
+  "total_market_liquidity_usd": "2500000.00",
+  "lockers": [],
+  "graph_insiders_detected": false,
+  "insider_networks": [],
+  "launchpad": null,
+  "deploy_platform": null,
+  "detected_at": "2023-09-01T00:00:00Z",
+  "rugged": false,
+  "verification": { "jup_verified": true, "jup_strict": true },
+  "rugcheck_score": 10,
+  "_d07_expected_output": {
+    "result": "Err(InsufficientBaseline)",
+    "reason": "transfer_fee_bps = 0; no meaningful withheld balance accumulates",
+    "is_established_protocol": true,
+    "signal_a": { "fires": false },
+    "signal_b": { "fires": false }
+  }
+}

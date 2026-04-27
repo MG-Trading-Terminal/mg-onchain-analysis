@@ -1,0 +1,107 @@
+{
+  "_comment": "Negative Fixture #3 — dogwifhat ($WIF). Established mid-cap meme token with stable, well-distributed holder base.",
+  "_fixture_type": "negative",
+  "_signals_expected": [],
+  "_info_events_expected": [],
+  "_source": "dogwifhat ($WIF) Solana SPL token. Large liquid holder base, low Gini, minimal 24h delta. Used as D02 negative fixture; reused here with concentration-specific data.",
+  "_detector_requirement": "D03 MUST NOT fire any signal event. Tests that an actively-traded well-distributed meme token does not trigger concentration signals.",
+
+  "snapshot_now": {
+    "chain": "solana",
+    "token": "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm",
+    "snapshot_id": 4450,
+    "slot": 310442050,
+    "block_time": "2026-04-21T17:59:00Z",
+    "total_holders": 54832,
+    "top_holders_raw": [
+      {
+        "address": "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
+        "balance_raw": 890000000000000,
+        "balance_pct": "0.0594",
+        "_note": "Raydium AMM pool. DexPool."
+      },
+      {
+        "address": "HWHvQhFmJB6gPtqXAFf3WCsqDxRGd42MFaKbDXSKLuRM",
+        "balance_raw": 620000000000000,
+        "balance_pct": "0.0413",
+        "_note": "Binance WIF hot wallet. CexHotWallet."
+      },
+      {
+        "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJe8bv",
+        "balance_raw": 510000000000000,
+        "balance_pct": "0.0340",
+        "_note": "Orca Whirlpool pool. DexPool."
+      },
+      { "address": "3YFmkMesRCFrA7DMGsM4ZrEqPzCGQiZiMqV9TkFxVkHe", "balance_raw": 180000000000000, "balance_pct": "0.0120" },
+      { "address": "4ZFmkMesRCFrA7DMGsM4ZrEqPzCGQiZiMqV9TkFxVkHf", "balance_raw": 160000000000000, "balance_pct": "0.0107" },
+      { "address": "5ZFmkMesRCFrA7DMGsM4ZrEqPzCGQiZiMqV9TkFxVkHg", "balance_raw": 140000000000000, "balance_pct": "0.0093" },
+      { "address": "6ZFmkMesRCFrA7DMGsM4ZrEqPzCGQiZiMqV9TkFxVkHh", "balance_raw": 125000000000000, "balance_pct": "0.0083" },
+      { "address": "7ZFmkMesRCFrA7DMGsM4ZrEqPzCGQiZiMqV9TkFxVkHi", "balance_raw": 110000000000000, "balance_pct": "0.0073" },
+      { "address": "8ZFmkMesRCFrA7DMGsM4ZrEqPzCGQiZiMqV9TkFxVkHj", "balance_raw": 98000000000000,  "balance_pct": "0.0065" },
+      { "address": "9ZFmkMesRCFrA7DMGsM4ZrEqPzCGQiZiMqV9TkFxVkHk", "balance_raw": 87000000000000,  "balance_pct": "0.0058" }
+    ],
+    "total_supply_raw": 15000000000000000,
+    "_supply_note": "15B WIF tokens (6 decimals). Approximate.",
+    "liquid_supply_raw_after_exclusion": 13980000000000000,
+    "_liquid_note": "After excluding Raydium pool + Orca pool + Binance wallet (3 non-liquid holders totaling ~2020M WIF). Remaining 93.2% is liquid.",
+    "liquid_count_after_exclusion": 54829,
+    "excluded_count": 3,
+    "needs_classification_count": 0,
+    "_computed_after_exclusion": {
+      "top10_liquid_raw_approx": 900000000000000,
+      "top10_pct_liquid": "0.0644",
+      "_top10_note": "Top 7 liquid holders (rows 4-10 from raw list) hold ~900B WIF out of 13980B liquid supply = 6.44%",
+      "gini_liquid": "0.5520",
+      "_gini_note": "Mid-range Gini for an active meme token with heterogeneous holder sizes"
+    }
+  },
+
+  "snapshot_prior": {
+    "chain": "solana",
+    "token": "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm",
+    "snapshot_id": 4310,
+    "slot": 303442050,
+    "block_time": "2026-04-20T18:03:00Z",
+    "liquid_count_after_exclusion": 54601,
+    "excluded_count": 3,
+    "_computed_after_exclusion": {
+      "top10_pct_liquid": "0.0638",
+      "gini_liquid": "0.5510"
+    }
+  },
+
+  "sidecar_rows": [
+    {
+      "chain": "solana",
+      "address": "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1",
+      "kind": "DexPool",
+      "subkind": "raydium_amm_v4",
+      "confidence": 0.95,
+      "expires_at": null
+    },
+    {
+      "chain": "solana",
+      "address": "HWHvQhFmJB6gPtqXAFf3WCsqDxRGd42MFaKbDXSKLuRM",
+      "kind": "CexHotWallet",
+      "subkind": "binance",
+      "confidence": 0.85,
+      "expires_at": null
+    },
+    {
+      "chain": "solana",
+      "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJe8bv",
+      "kind": "DexPool",
+      "subkind": "orca_whirlpool",
+      "confidence": 0.95,
+      "expires_at": null
+    }
+  ],
+
+  "expected": {
+    "_note": "After exclusion: top10_pct_liquid=0.0644 << 0.80 (no Signal 3). gini_delta=0.0010 << 0.05 (no Signal 1). top10_delta=0.0006 << 0.10 (no Signal 2). liquid_count=54829 >> 50. No signals fire.",
+    "signals_fired": [],
+    "info_events": [],
+    "max_confidence": "0.0",
+    "assert": "evaluate(ctx) must return Ok([]) — no AnomalyEvents"
+  }
+}

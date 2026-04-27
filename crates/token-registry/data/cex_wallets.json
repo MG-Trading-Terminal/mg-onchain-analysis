@@ -1,0 +1,103 @@
+{
+  "_comment": "Known CEX hot-wallet and deposit addresses on Solana (Base58). Sources:",
+  "_sources": [
+    "Arkham Intelligence public address labels: https://platform.arkhamintelligence.com/explorer",
+    "Dune Analytics Solana CEX wallet list: https://dune.com/queries/1499680 (public dashboard)",
+    "Nansen public labels (Solana chain): https://pro.nansen.ai/",
+    "Community-maintained list: https://github.com/nicholasgasior/solana-labeled-wallets"
+  ],
+  "_verified_date": "2026-04-21",
+  "_note": "This is a seed list for MVP. Phase 3 should integrate a maintained address-label feed.",
+  "wallets": [
+    {
+      "address": "5tzFkiKscXHK5ZXCGbCAbZxLKQAFqobMVBkn5cCgPKEu",
+      "exchange": "binance",
+      "label": "Binance hot wallet 1",
+      "source": "Arkham Intelligence / Dune public labels"
+    },
+    {
+      "address": "2ojv9BAiHUrvsm9gxDe7fJSzbNZSJcxZvf8dqmWGHG8S",
+      "exchange": "binance",
+      "label": "Binance deposit wallet",
+      "source": "Arkham Intelligence / Dune public labels"
+    },
+    {
+      "address": "AC5RDfQFmDS1deWZos921JfqscXdByf8BKHs5ACWjtW2",
+      "exchange": "coinbase",
+      "label": "Coinbase hot wallet",
+      "source": "Arkham Intelligence public labels"
+    },
+    {
+      "address": "H8sMJSCQxfKiFTCfDR3DUMLPwcRbM61LGFJ8N4dK3WjS",
+      "exchange": "coinbase",
+      "label": "Coinbase Prime custody",
+      "source": "Arkham Intelligence public labels"
+    },
+    {
+      "address": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+      "exchange": "bybit",
+      "label": "Bybit hot wallet 1",
+      "source": "Arkham Intelligence / Nansen labels"
+    },
+    {
+      "address": "HXqobMLnV8L5RgqXUHc6DHQgxnuqCWqnDVBnqJa8yDpN",
+      "exchange": "bybit",
+      "label": "Bybit hot wallet 2",
+      "source": "Arkham Intelligence / Nansen labels"
+    },
+    {
+      "address": "GJRs4FwHtemZ5ZE9x3FNvJ8TMwitKTh21yxdRPqn7npE",
+      "exchange": "okx",
+      "label": "OKX hot wallet",
+      "source": "Arkham Intelligence public labels"
+    },
+    {
+      "address": "FWznbcNXWQuHTawe9RxvQ2LdCENssh12dsznf4RiouN5",
+      "exchange": "okx",
+      "label": "OKX deposit address",
+      "source": "Community labels / Dune"
+    },
+    {
+      "address": "CRY2cBL3MXNPgBBLAm6fJ5FGRK2YEvGBf3ZhxSVFXdCj",
+      "exchange": "kraken",
+      "label": "Kraken hot wallet",
+      "source": "Arkham Intelligence public labels"
+    },
+    {
+      "address": "2AQdpHJ2JpcEgPiATUXjQxA8QmafFegfQwSLWSprPicm",
+      "exchange": "kucoin",
+      "label": "KuCoin hot wallet",
+      "source": "Arkham Intelligence / community labels"
+    },
+    {
+      "address": "BmFdpraQhkiDnChLkR5h9pjxo7L7QyfGzf47gcJoZrqr",
+      "exchange": "gate_io",
+      "label": "Gate.io hot wallet",
+      "source": "Arkham Intelligence public labels"
+    },
+    {
+      "address": "GUfCR9mK6azb9vcpsxgXyj7XRPAoYqNEFpJuDsNhv2TP",
+      "exchange": "huobi",
+      "label": "Huobi hot wallet",
+      "source": "Arkham Intelligence public labels"
+    },
+    {
+      "address": "5VCwKtCXgCJ6kit5FybXjvriW3xELsFDhx5Lt2eh9Sm5",
+      "exchange": "mexc",
+      "label": "MEXC hot wallet",
+      "source": "Community labels / Dune"
+    },
+    {
+      "address": "8UviNr47S8eL6J3WfDxMRa3hvLta1VDJwNAqci1eWXLJ",
+      "exchange": "upbit",
+      "label": "Upbit hot wallet",
+      "source": "Arkham Intelligence public labels"
+    },
+    {
+      "address": "4b5r3a8Bx8BCyTiX2RK8kRR7jRMmXXhqTi5ZaXiTbMXc",
+      "exchange": "bithumb",
+      "label": "Bithumb hot wallet",
+      "source": "Community labels"
+    }
+  ]
+}

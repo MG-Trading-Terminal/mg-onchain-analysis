@@ -1,0 +1,107 @@
+{
+  "_comment": "Negative Fixture #2 — USDC (USD Coin). High-volume stablecoin with deeply diversified holder distribution.",
+  "_fixture_type": "negative",
+  "_signals_expected": [],
+  "_info_events_expected": [],
+  "_source": "Solana SPL USDC mint. Reserve addresses classified as CexHotWallet or BurnAddress. Tens of thousands of liquid holders. No concentration shift.",
+  "_detector_requirement": "D03 MUST NOT fire any signal event. No AnomalyEvent with severity >= Low. Tests that a legitimate high-volume stablecoin suppresses all signals.",
+
+  "snapshot_now": {
+    "chain": "solana",
+    "token": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    "snapshot_id": 3310,
+    "slot": 310441900,
+    "block_time": "2026-04-21T17:57:30Z",
+    "total_holders": 87423,
+    "_total_holders_note": "Approximate. USDC Solana has tens of thousands of holders.",
+    "top_holders_raw": [
+      {
+        "address": "FWznbcNXWQuHTawe9RxvQ37LyqZJMqRfhcgvELMJcm8j",
+        "balance_raw": 25000000000000000,
+        "balance_pct": "0.1250",
+        "_note": "Circle reserve/custody address. CexHotWallet."
+      },
+      {
+        "address": "H8sMJSCQxfKiFTCfDR3DUMLPwcRbM61LGFJ8N7B2JGZL",
+        "balance_raw": 18000000000000000,
+        "balance_pct": "0.0900",
+        "_note": "Coinbase USDC custody. CexHotWallet."
+      },
+      {
+        "address": "2ojv9BAiHUrvsm9gxDe7fJSzbNZSJcxZvf8dqmWGHG8S",
+        "balance_raw": 12000000000000000,
+        "balance_pct": "0.0600",
+        "_note": "Binance USDC reserve. CexHotWallet."
+      },
+      { "address": "HN7cABqLq46Es1jh92dQQisAq662SmxELLLsHHe4YWrH", "balance_raw": 1400000000000000, "balance_pct": "0.0070" },
+      { "address": "3H5XKkE9uVvxsdrFeN4BLLGCmohiQN6aZJVVcJiXQ47Q", "balance_raw": 1200000000000000, "balance_pct": "0.0060" },
+      { "address": "5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1", "balance_raw": 980000000000000,  "balance_pct": "0.0049" },
+      { "address": "AZENjmMnRS2w9T3JnLPSCrCvJBCmrAHjQ7kYxWQT8gYp", "balance_raw": 870000000000000,  "balance_pct": "0.0044" },
+      { "address": "BQ72nSv9f3PRyEjq3zg57GHk7ouqdvyd3STKhbFG9pAL", "balance_raw": 760000000000000,  "balance_pct": "0.0038" },
+      { "address": "CqNiNLo5bm2YSCV8bX9hkJ7s3U7XmV9ZGRmLJYSv7kTs", "balance_raw": 650000000000000,  "balance_pct": "0.0033" },
+      { "address": "DzwrQbHCi7e73B1vKTwwwqNE7jGGhbhUSVyN7GYM8BKm", "balance_raw": 540000000000000,  "balance_pct": "0.0027" }
+    ],
+    "total_supply_raw": 200000000000000000,
+    "_supply_note": "200B USDC (6 decimals). Simplified for fixture; actual supply varies.",
+    "liquid_supply_raw_after_exclusion": 164000000000000000,
+    "_liquid_note": "After excluding Circle/Coinbase/Binance reserve addresses as CexHotWallet (55B excluded). Remaining 82% is liquid.",
+    "liquid_count_after_exclusion": 87420,
+    "excluded_count": 3,
+    "needs_classification_count": 0,
+    "_computed_after_exclusion": {
+      "top10_liquid_raw_approx": 5400000000000000,
+      "top10_pct_liquid": "0.0329",
+      "gini_liquid": "0.3100",
+      "_comment": "Top-10 liquid holders control ~3.3% of liquid supply. Gini 0.31 is low (healthy distribution). No signals fire."
+    }
+  },
+
+  "snapshot_prior": {
+    "chain": "solana",
+    "token": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    "snapshot_id": 3180,
+    "slot": 303421900,
+    "block_time": "2026-04-20T18:01:00Z",
+    "liquid_count_after_exclusion": 87180,
+    "excluded_count": 3,
+    "_computed_after_exclusion": {
+      "top10_pct_liquid": "0.0331",
+      "gini_liquid": "0.3095"
+    }
+  },
+
+  "sidecar_rows": [
+    {
+      "chain": "solana",
+      "address": "FWznbcNXWQuHTawe9RxvQ37LyqZJMqRfhcgvELMJcm8j",
+      "kind": "CexHotWallet",
+      "subkind": "circle_reserve",
+      "confidence": 0.85,
+      "expires_at": null
+    },
+    {
+      "chain": "solana",
+      "address": "H8sMJSCQxfKiFTCfDR3DUMLPwcRbM61LGFJ8N7B2JGZL",
+      "kind": "CexHotWallet",
+      "subkind": "coinbase",
+      "confidence": 0.85,
+      "expires_at": null
+    },
+    {
+      "chain": "solana",
+      "address": "2ojv9BAiHUrvsm9gxDe7fJSzbNZSJcxZvf8dqmWGHG8S",
+      "kind": "CexHotWallet",
+      "subkind": "binance",
+      "confidence": 0.85,
+      "expires_at": null
+    }
+  ],
+
+  "expected": {
+    "_note": "After CexHotWallet exclusion: top10_pct_liquid=0.0329 << 0.80. gini_delta=0.0005 << 0.05. top10_delta=-0.0002 (negative, no increase). liquid_count=87420 >> 50. No signals fire.",
+    "signals_fired": [],
+    "info_events": [],
+    "max_confidence": "0.0",
+    "assert": "evaluate(ctx) must return Ok([]) — no AnomalyEvents of any severity"
+  }
+}

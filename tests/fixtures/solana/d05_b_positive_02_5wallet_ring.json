@@ -1,0 +1,59 @@
+{
+  "_fixture": "d05_b_positive_02_5wallet_ring",
+  "_detector": "wash_trading_h1 / Signal B (graph cycles)",
+  "_signal": "5-wallet elementary ring A→B→C→D→E→A spanning 45 minutes. Max cycle length = 5 (boundary case). Expected: Signal B fires at confidence ≈ 0.60.",
+  "_design": "docs/designs/0017-d05-signal-b-graph-cycles.md §6.3",
+  "chain": "solana",
+  "token": "WASHToken2BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+  "transfers": [
+    {
+      "from_address": "WALLET_A_1111111111111111111111111111111111111",
+      "to_address":   "WALLET_B_2222222222222222222222222222222222222",
+      "amount_raw": "5000000000",
+      "block_time": "2024-01-15T09:00:00Z",
+      "block_height": 249000
+    },
+    {
+      "from_address": "WALLET_B_2222222222222222222222222222222222222",
+      "to_address":   "WALLET_C_3333333333333333333333333333333333333",
+      "amount_raw": "4980000000",
+      "block_time": "2024-01-15T09:10:00Z",
+      "block_height": 249100
+    },
+    {
+      "from_address": "WALLET_C_3333333333333333333333333333333333333",
+      "to_address":   "WALLET_D_4444444444444444444444444444444444444",
+      "amount_raw": "4960000000",
+      "block_time": "2024-01-15T09:22:00Z",
+      "block_height": 249200
+    },
+    {
+      "from_address": "WALLET_D_4444444444444444444444444444444444444",
+      "to_address":   "WALLET_E_5555555555555555555555555555555555555",
+      "amount_raw": "4940000000",
+      "block_time": "2024-01-15T09:35:00Z",
+      "block_height": 249300
+    },
+    {
+      "from_address": "WALLET_E_5555555555555555555555555555555555555",
+      "to_address":   "WALLET_A_1111111111111111111111111111111111111",
+      "amount_raw": "4920000000",
+      "block_time": "2024-01-15T09:44:00Z",
+      "block_height": 249400
+    }
+  ],
+  "expected": {
+    "signal_b_fires": true,
+    "cycle_count_min": 1,
+    "cycle_length": 5,
+    "confidence_min": 0.40,
+    "confidence_max": 0.85,
+    "rationale": "5-hop ring at max_cycle_length boundary. ~$4 price, 9 decimals. avg_edge_raw=4960000000/5=992000000 tokens per edge → $3968 avg edge volume. ramp=min(1,3968/10000)=0.397 → conf≈0.559."
+  },
+  "token_meta": {
+    "decimals": 9,
+    "price_usd_proxy": 4.0,
+    "total_market_liquidity_usd": "1000000",
+    "circulating_supply_raw": "250000000000000000"
+  }
+}

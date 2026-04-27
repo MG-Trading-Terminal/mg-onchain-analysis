@@ -1,0 +1,150 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthRug022aaa1111111111111111111111111111",
+    "symbol": "RUG022",
+    "label": "positive",
+    "category": "rug_latent",
+    "source_url": "synthetic/rug_latent/variant_022",
+    "fetched_at": "2026-04-21T19:00:00Z",
+    "synthetic": true,
+    "notes": "Synthetic rug_latent: 10% locked, single LP. D02 Signal B fires. D01 clean."
+  },
+  "token_meta": {
+    "mint": "SynthRug022aaa1111111111111111111111111111",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "RugToken022",
+    "symbol": "RUG022",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevWallet02211111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": {
+      "jup_verified": false,
+      "jup_strict": false
+    },
+    "rugcheck_score": 25000,
+    "rugcheck_score_normalised": 65,
+    "risks": [
+      {
+        "name": "Large Amount of LP Unlocked",
+        "value": "90%",
+        "level": "danger"
+      }
+    ],
+    "markets": [
+      {
+        "pool_address": "SynthPool022111111111111111111111111111111",
+        "dex": "raydium",
+        "lp_burned_pct": "0.00",
+        "liquidity_usd": "31000.00",
+        "lp_provider_count": 1
+      }
+    ],
+    "lockers": {},
+    "creator": "DevWallet02211111111111111111111111111111",
+    "creator_balance_raw": "0"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 88,
+    "balances": {
+      "PoolAcc0221111111111111111111111111111111": 600000000000000,
+      "Holder022_00111111111111111111111111111": 44444444444444,
+      "Holder022_01111111111111111111111111111": 44444444444444,
+      "Holder022_02111111111111111111111111111": 44444444444444,
+      "Holder022_03111111111111111111111111111": 44444444444444,
+      "Holder022_04111111111111111111111111111": 44444444444444,
+      "Holder022_05111111111111111111111111111": 44444444444444,
+      "Holder022_06111111111111111111111111111": 44444444444444,
+      "Holder022_07111111111111111111111111111": 44444444444444,
+      "Holder022_08111111111111111111111111111": 44444444444444
+    },
+    "total_supply_raw": 1000000000000000
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 83,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.4",
+    "gini_liquid_after_exclusion": "0.45"
+  },
+  "holder_classifications": [
+    {
+      "address": "PoolAcc0221111111111111111111111111111111",
+      "kind": "DexPool",
+      "subkind": "raydium_amm",
+      "confidence": 0.95
+    }
+  ],
+  "pool_rows": [
+    {
+      "pool_address": "SynthPool022111111111111111111111111111111",
+      "dex": "raydium",
+      "lp_burned_pct": "0.00",
+      "lp_locked_pct": "10.00",
+      "effective_safe_pct": "10.00",
+      "lp_provider_count": 1,
+      "liquidity_usd": "31000.00"
+    }
+  ],
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No freeze authority, transfer_fee, permanent_delegate, or transfer_hook. D01 does not fire."
+    },
+    "d02_rug_pull": {
+      "verdict": "FIRES",
+      "confidence_band": [
+        0.7,
+        0.75
+      ],
+      "severity": "High",
+      "reason": "Signal B fires: lp_burned_pct=0.00%, lp_locked_pct=10.00% \u2192 effective_safe_pct=10%. lp_provider_count=1. Confidence = 0.50 + (70-10)/70*0.25 + 0.15_single_provider_bonus = 0.75."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.15
+      ],
+      "severity": "Info",
+      "reason": "After DexPool exclusion of pool account: liquid top-10 pct = 0.40 < 0.80 ceiling. gini_delta minimal. No concentration signals fire."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No swaps_1h data in fixture (Phase 1 fixture predates D04). No volume spike detectable. D04 INCONCLUSIVE \u2014 treated as BELOW for calibration."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No signal_a_round_trips data in fixture (Phase 1 fixture predates D05). D05 INCONCLUSIVE \u2014 treated as BELOW for calibration."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "mint_authority=null. No mint/burn events in fixture (Phase 1 fixture predates D06)."
+    }
+  }
+}

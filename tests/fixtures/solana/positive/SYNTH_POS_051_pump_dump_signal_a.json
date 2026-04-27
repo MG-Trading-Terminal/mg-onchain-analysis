@@ -1,0 +1,134 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthPumpD051aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "symbol": "PUMP051",
+    "label": "positive",
+    "category": "pump_dump",
+    "source_url": "synthetic/pump_dump/signal_a_baseline_spike",
+    "fetched_at": "2026-04-21T20:00:00Z",
+    "synthetic": true,
+    "notes": "D04 Signal A: 1h volume = 12x 7d median, price +55%. Baseline of 5 days present. No insider sell data (Signal C absent). Karbalaii 2025 archetype."
+  },
+  "token_meta": {
+    "mint": "SynthPumpD051aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "PumpToken051",
+    "symbol": "PUMP051",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevPump051111111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 2800,
+    "rugcheck_score_normalised": 58,
+    "risks": [],
+    "markets": [
+      {
+        "pool_address": "PumpPool05111111111111111111111111111111111",
+        "dex": "raydium",
+        "lp_burned_pct": "85.00",
+        "liquidity_usd": "42000.00",
+        "lp_provider_count": 1
+      }
+    ],
+    "lockers": {},
+    "creator": "DevPump051111111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "42000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 420,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "PumpHolder051_00111111111111111111111111111": 85000000000000,
+      "PumpHolder051_01111111111111111111111111111": 62000000000000,
+      "PumpHolder051_02111111111111111111111111111": 44000000000000,
+      "PumpHolder051_03111111111111111111111111111": 31000000000000,
+      "PumpHolder051_04111111111111111111111111111": 22000000000000,
+      "PumpHolder051_05111111111111111111111111111": 18000000000000,
+      "PumpHolder051_06111111111111111111111111111": 14000000000000,
+      "PumpHolder051_07111111111111111111111111111": 11000000000000,
+      "PumpHolder051_08111111111111111111111111111": 8000000000000,
+      "PumpHolder051_09111111111111111111111111111": 6000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 95,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.41",
+    "gini_liquid_after_exclusion": "0.61"
+  },
+  "holder_classifications": [
+    { "address": "PumpHolder051_00111111111111111111111111111", "kind": "deployer" }
+  ],
+  "pool_rows": [
+    {
+      "pool_address": "PumpPool05111111111111111111111111111111111",
+      "dex": "raydium",
+      "lp_burned_pct": "85.00",
+      "lp_locked_pct": "0.00",
+      "effective_safe_pct": "85.00",
+      "lp_provider_count": 1,
+      "liquidity_usd": "42000.00"
+    }
+  ],
+  "swaps_1h": {
+    "volume_usd": "504000.00",
+    "trade_count": 312,
+    "unique_buyers": 287,
+    "price_start": "0.000052",
+    "price_end": "0.000081",
+    "price_change_pct": "0.558"
+  },
+  "swaps_7d_daily_baseline": {
+    "day_count_nonzero": 5,
+    "mean_daily_volume_usd": "42000.00",
+    "std_daily_volume_usd": "9800.00",
+    "volume_multiplier_observed": "12.0",
+    "volume_z_score": "47.1"
+  },
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.15],
+      "severity": "Info",
+      "reason": "No freeze, no transfer_fee, no permanent_delegate, no transfer_hook. No honeypot signals present."
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.10],
+      "severity": "Info",
+      "reason": "LP 85% burned; effective_safe_pct=85%. D02 Signal B does not fire (threshold requires effective_safe_pct < 70%)."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.15],
+      "severity": "Info",
+      "reason": "top10_pct prior=0.41, now computed ~0.30 (top 10 sum / supply). No gini_delta or top10_delta crossing threshold. Holder count expanded 95->420."
+    },
+    "d04_pump_dump": {
+      "verdict": "FIRES",
+      "confidence_band": [0.68, 0.82],
+      "severity": "High",
+      "reason": "Signal A fires: volume_1h=504k vs 7d_median=42k, multiplier=12x (>= 5x threshold). price_change=55.8% >= 30% threshold. baseline_days=5 >= 3. raw=(12/5-1)*0.5+(0.558/0.30-1)*0.3 = 0.55+0.258=0.808; sigmoid(0.808)=0.692 -> clamped to [0.60,0.95] -> 0.692. No Signal C (insider_source=unavailable). Confidence band [0.68,0.82]."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.10],
+      "severity": "Info",
+      "reason": "287 unique buyers with high trade count — normal organic volume spike. No self-dealing round-trips indicated. Pool liquidity $42k > min_pool threshold."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.05],
+      "severity": "Info",
+      "reason": "mint_authority=null (revoked). No supply change events. Signal A, B, C all inactive."
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthHonP071uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu",
+    "symbol": "HON071",
+    "label": "positive",
+    "category": "honeypot_active",
+    "source_url": "synthetic/honeypot/s1_freeze_with_active_mint_authority",
+    "fetched_at": "2026-04-21T20:20:00Z",
+    "synthetic": true,
+    "notes": "D01 S1 freeze_authority. D06 Signal A mint_authority (separate). Both detectors fire on different signals. Multi-detector: D01 Low + D06 Info. Tests orthogonal authority risk."
+  },
+  "token_meta": {
+    "mint": "SynthHonP071uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "FreezeAndMint071",
+    "symbol": "HON071",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": "DevMintFreeze071111111111111111111111111111",
+    "freeze_authority": "DevMintFreeze071111111111111111111111111111",
+    "mutable": true,
+    "update_authority": "DevMintFreeze071111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 4900,
+    "rugcheck_score_normalised": 78,
+    "risks": [
+      { "name": "Freeze authority enabled", "level": "danger" },
+      { "name": "Mint Authority still enabled", "level": "danger" }
+    ],
+    "markets": [
+      { "pool_address": "FreezeMintPool071111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "70.00", "liquidity_usd": "31000.00", "lp_provider_count": 1 }
+    ],
+    "lockers": {},
+    "creator": "DevMintFreeze071111111111111111111111111111",
+    "creator_balance_raw": "20000000000000",
+    "total_market_liquidity_usd": "31000.00",
+    "detected_at": "2026-03-25T10:00:00Z"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 280,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "FreezeMintHolder071_0111111111111111111111": 72000000000000,
+      "FreezeMintHolder071_0211111111111111111111": 51000000000000,
+      "FreezeMintHolder071_0311111111111111111111": 36000000000000,
+      "FreezeMintHolder071_0411111111111111111111": 24000000000000,
+      "FreezeMintHolder071_0511111111111111111111": 16000000000000,
+      "FreezeMintHolder071_0611111111111111111111": 10500000000000,
+      "FreezeMintHolder071_0711111111111111111111": 7000000000000,
+      "FreezeMintHolder071_0811111111111111111111": 4500000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 275,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.22",
+    "gini_liquid_after_exclusion": "0.53"
+  },
+  "holder_classifications": [{ "address": "DevMintFreeze071111111111111111111111111111", "kind": "deployer" }],
+  "pool_rows": [
+    { "pool_address": "FreezeMintPool071111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "70.00", "lp_locked_pct": "0.00", "effective_safe_pct": "70.00", "lp_provider_count": 1, "liquidity_usd": "31000.00" }
+  ],
+  "mint_events_30d": [],
+  "signal_c_data": { "cumulative_supply_change_30d_pct": "0.00", "mint_event_count_30d": 0, "token_age_days": 27, "mint_authority": "DevMintFreeze071111111111111111111111111111", "supply_base": "circulating" },
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "FIRES",
+      "confidence_band": [0.30, 0.45],
+      "severity": "Low",
+      "reason": "S1 freeze_authority=live. raw=0.25. sigmoid(0.25/0.55-1.0)=sigmoid(-0.545)=0.367. Low severity."
+    },
+    "d02_rug_pull": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "LP 70% burned; effective_safe_pct=70%. At boundary; D02 Signal B fires when effective_safe_pct < 70%. Exactly 70% -> BELOW (strict less-than)." },
+    "d03_concentration": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.15], "severity": "Info", "reason": "top10=0.22; no D03 signals." },
+    "d04_pump_dump": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No volume spike." },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No self-dealing." },
+    "d06_mint_burn_anomaly": {
+      "verdict": "FIRES",
+      "confidence_band": [0.17, 0.23],
+      "severity": "Info",
+      "reason": "Signal A fires: mint_authority active, token_age=27d > 7d grace. No mint events in 30d -> Signal B/C inactive. conf=0.20. Demonstrates D01+D06 orthogonal co-fire on same token (freeze vs mint authority are separate fields)."
+    }
+  }
+}

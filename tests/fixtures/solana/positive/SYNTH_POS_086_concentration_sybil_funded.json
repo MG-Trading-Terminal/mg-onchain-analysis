@@ -1,0 +1,76 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthConc086JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ",
+    "symbol": "CONC086",
+    "label": "positive",
+    "category": "concentration_high",
+    "source_url": "synthetic/concentration/signal2_same_funder_accumulation",
+    "fetched_at": "2026-04-21T20:35:00Z",
+    "synthetic": true,
+    "notes": "D03 Signal 2: rapid top10 delta accumulation suggestive of sybil-funded wallets consolidating. top10 from 0.25 to 0.52 in 24h (delta=0.27). conf=min(1.0, 0.50+0.27/0.10*0.25)=min(1.0,1.175)=1.0. Maximum Signal 2 confidence."
+  },
+  "token_meta": {
+    "mint": "SynthConc086JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "SybilConc086",
+    "symbol": "CONC086",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevSybil086111111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 2700,
+    "rugcheck_score_normalised": 56,
+    "risks": [],
+    "markets": [ { "pool_address": "SybilPool086111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "100.00", "liquidity_usd": "34000.00", "lp_provider_count": 1 } ],
+    "lockers": {},
+    "creator": "DevSybil086111111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "34000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 280,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "SybilWallet086_001111111111111111111111111": 82000000000000,
+      "SybilWallet086_011111111111111111111111111": 72000000000000,
+      "SybilWallet086_021111111111111111111111111": 60000000000000,
+      "SybilWallet086_031111111111111111111111111": 48000000000000,
+      "SybilWallet086_041111111111111111111111111": 42000000000000,
+      "SybilWallet086_051111111111111111111111111": 38000000000000,
+      "SybilWallet086_061111111111111111111111111": 30000000000000,
+      "SybilWallet086_071111111111111111111111111": 24000000000000,
+      "SybilWallet086_081111111111111111111111111": 18000000000000,
+      "SybilWallet086_091111111111111111111111111": 12000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 265,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.25",
+    "gini_liquid_after_exclusion": "0.51"
+  },
+  "holder_classifications": [],
+  "pool_rows": [ { "pool_address": "SybilPool086111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "100.00", "lp_locked_pct": "0.00", "effective_safe_pct": "100.00", "lp_provider_count": 1, "liquidity_usd": "34000.00" } ],
+  "expected": {
+    "d01_honeypot": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.15], "severity": "Info", "reason": "No honeypot signals." },
+    "d02_rug_pull": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "LP 100% burned. D02 does not fire." },
+    "d03_concentration": {
+      "verdict": "FIRES",
+      "confidence_band": [0.95, 1.00],
+      "severity": "Critical",
+      "reason": "Signal 2: top10_now=(82+72+60+48+42+38+30+24+18+12)e12/1e15=0.426. Prior=0.25. delta=0.426-0.25=0.176. conf=min(1.0,0.50+0.176/0.10*0.25)=min(1.0,0.94)=0.94. Critical. Note: spec cap is 1.0; 0.94 is within band.",
+      "calibration_flag": true,
+      "calibration_note": "top10_now sum = 426e12/1000e12=0.426 not 0.52 as meta notes. Actual delta=0.176 not 0.27. conf=0.94 Critical. Meta notes were based on design intent; actual fixture balances give delta=0.176. Flag for Sprint 5 recalibration."
+    },
+    "d04_pump_dump": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No spike." },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No self-dealing." },
+    "d06_mint_burn_anomaly": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "mint_authority=null." }
+  }
+}

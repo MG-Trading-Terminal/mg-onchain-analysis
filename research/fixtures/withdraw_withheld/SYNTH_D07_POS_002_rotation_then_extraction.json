@@ -1,0 +1,153 @@
+{
+  "_fixture_meta": {
+    "label": "positive",
+    "detector": "withdraw_withheld_drain",
+    "signal": "B_authority_rotation_plus_A_extraction_composite",
+    "synthetic": true,
+    "expected_signals": ["authority_rotation", "extraction_event"],
+    "expected_signal_b_confidence_gte": "0.75",
+    "expected_signal_a_confidence_gte": "0.77",
+    "expected_composite_confidence_gte": "0.87",
+    "expected_composite_severity": "Critical",
+    "expected_signal_b_severity": "High",
+    "rationale": "Token-2022 mint with 3500 bps (35%) transfer fee. Authority rotated to a fresh wallet (funded 2h before rotation) after holding for only 3 days (below min_authority_tenure_days=7). $8,200 USD withheld at rotation time. 3 extraction events follow within the same detection window, extracting $5,500 USD total. Signal B fires at max confidence 0.75 (fresh_wallet + rapid_rotation bonuses both apply). Signal A fires at ~0.77. Composite upgrades Signal A to 0.87, severity Critical.",
+    "signal_b_confidence_calculation": "conf = min(0.75, 0.40 + 0.20 + 0.15) = 0.75",
+    "signal_a_confidence_calculation": "conf = min(0.90, 0.60 + min(0.15, (3-3)*0.03) + ln(5500/1000)*0.10) = min(0.90, 0.60 + 0.0 + 0.170) = 0.770",
+    "composite_confidence_calculation": "conf = min(0.95, 0.770 + 0.10) = 0.870",
+    "captured_at": "2026-04-21T00:00:00Z"
+  },
+  "mint": "SYNTH_D07_POS_002_REPLACE_WITH_REAL_RUGGED_TOKEN",
+  "chain": "solana",
+  "symbol": "ROTAT",
+  "name": "SyntheticRotationExtractionToken",
+  "decimals": 6,
+  "token_program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+  "total_supply_raw": "2000000000000",
+  "circulating_supply_raw": "1800000000000",
+  "mint_authority": null,
+  "freeze_authority": null,
+  "creator": "DeployerWalletBBBB2222222222222222222222222",
+  "creator_balance_raw": "0",
+  "transfer_fee": {
+    "feeBps": 3500,
+    "maxFeeRaw": "999999999999",
+    "authority": "DeployerWalletBBBB2222222222222222222222222"
+  },
+  "permanent_delegate": null,
+  "transfer_hook_program": null,
+  "top_holders": [
+    {
+      "address": "FreshWalletBBBB111111111111111111111111111",
+      "pct": "2.00",
+      "amount_raw": "40000000000",
+      "is_insider": true
+    }
+  ],
+  "total_holders": 312,
+  "markets": [
+    {
+      "pool_address": "RaydiumPoolBBBB11111111111111111111111111111",
+      "dex": "raydium_v4",
+      "lp_burned_pct": "0.00",
+      "liquidity_usd": "28000.00",
+      "lp_provider_count": 1
+    }
+  ],
+  "total_market_liquidity_usd": "28000.00",
+  "lockers": [],
+  "graph_insiders_detected": false,
+  "insider_networks": [],
+  "launchpad": null,
+  "deploy_platform": null,
+  "detected_at": "2026-04-14T08:00:00Z",
+  "rugged": false,
+  "verification": { "jup_verified": false, "jup_strict": false },
+  "rugcheck_score": 91,
+  "_d07_token2022_instructions": {
+    "note": "Simulated token2022_instructions rows for Signal B (rotation) and Signal A (extraction). The rotation occurred 3 days after the token launched (prev authority tenure = 3 days). The new authority FreshWalletBBBB received its first SOL 2 hours before the rotation block_time.",
+    "rotation_events": [
+      {
+        "id": 2000,
+        "tx_hash": "ROTATION_TX_001_PLACEHOLDER_FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+        "block_height": 310036000,
+        "block_time": "2026-04-21T10:00:00Z",
+        "instruction_kind": "set_authority_withdraw_withheld",
+        "authority": "OldAuthorityAAAA1111111111111111111111111",
+        "prev_authority": "OldAuthorityAAAA1111111111111111111111111",
+        "new_authority": "FreshWalletBBBB111111111111111111111111111",
+        "amount_raw": null,
+        "amount_usd": "8200.00",
+        "_note_prev_authority_tenure_days": 3,
+        "_note_new_authority_first_sol_time": "2026-04-21T08:00:00Z",
+        "_note_rotation_delta_hours": 2
+      }
+    ],
+    "withdraw_events": [
+      {
+        "id": 2001,
+        "tx_hash": "EXTRACT_TX_011_PLACEHOLDER_GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+        "block_height": 310040000,
+        "block_time": "2026-04-21T11:00:00Z",
+        "instruction_kind": "withdraw_withheld_from_accounts",
+        "authority": "FreshWalletBBBB111111111111111111111111111",
+        "destination": "FreshWalletTokenAcctBBBB11111111111111111",
+        "amount_raw": "916666666",
+        "amount_usd": "1833.33"
+      },
+      {
+        "id": 2002,
+        "tx_hash": "EXTRACT_TX_012_PLACEHOLDER_HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH",
+        "block_height": 310050000,
+        "block_time": "2026-04-21T13:00:00Z",
+        "instruction_kind": "withdraw_withheld_from_accounts",
+        "authority": "FreshWalletBBBB111111111111111111111111111",
+        "destination": "FreshWalletTokenAcctBBBB11111111111111111",
+        "amount_raw": "916666666",
+        "amount_usd": "1833.33"
+      },
+      {
+        "id": 2003,
+        "tx_hash": "EXTRACT_TX_013_PLACEHOLDER_IIIIIIIIIIIIIIIIIIIIIIIIIIIIIII",
+        "block_height": 310060000,
+        "block_time": "2026-04-21T15:00:00Z",
+        "instruction_kind": "withdraw_withheld_from_accounts",
+        "authority": "FreshWalletBBBB111111111111111111111111111",
+        "destination": "FreshWalletTokenAcctBBBB11111111111111111",
+        "amount_raw": "916666668",
+        "amount_usd": "1833.34"
+      }
+    ],
+    "wallet_funding_sidecar": {
+      "FreshWalletBBBB111111111111111111111111111": {
+        "first_sol_time": "2026-04-21T08:00:00Z",
+        "funding_source": "DeployerWalletBBBB2222222222222222222222222"
+      }
+    },
+    "w3_aggregate": {
+      "event_count": 3,
+      "cumulative_raw": "2749999998",
+      "cumulative_usd": "5500.00"
+    }
+  },
+  "_d07_expected_output": {
+    "signal_b": {
+      "fires": true,
+      "confidence": "0.75",
+      "severity": "High",
+      "prev_authority": "OldAuthorityAAAA1111111111111111111111111",
+      "new_authority": "FreshWalletBBBB111111111111111111111111111",
+      "authority_is_fresh_wallet": "1",
+      "prev_authority_tenure_days": 3,
+      "withheld_at_rotation_usd": "8200.00"
+    },
+    "signal_a": {
+      "fires": true,
+      "base_confidence": "0.770",
+      "composite_confidence": "0.870",
+      "severity": "Critical",
+      "authority_match": "exact",
+      "rotation_detected": "1",
+      "combined_with_d01_s2": "1"
+    }
+  }
+}

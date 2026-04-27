@@ -1,0 +1,86 @@
+{
+  "_fixture_meta": {
+    "label": "negative",
+    "detector": "honeypot_sim",
+    "expected_confidence_max": 0.10,
+    "expected_severity": "Info",
+    "capture_date": "2026-04-21",
+    "notes": "RAVE copycat meme token. All honeypot signals absent: mint_authority null, freeze_authority null, standard SPL token program (no Token-2022 extensions), 4663 successful sell transactions in 24h window. D01 fires at 0.03 confidence (below any threshold) on this token. Used as negative fixture for D01 and D06.",
+    "signals_expected": {
+      "freeze_authority_active": false,
+      "transfer_fee_bps": 0,
+      "permanent_delegate_active": false,
+      "transfer_hook_present": false,
+      "buy_sell_ratio_above_sentinel": false,
+      "simulation_fail": false
+    }
+  },
+  "mint": "FeqiF7TEVmpYuuj4goD8WgmgyhFgFnZiWtw226wF4hNm",
+  "tokenProgram": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  "creator": "E2TmNvtbTXc1rU37wZqKeNr5kLXsWUQbv7n6ww22RvAe",
+  "creatorBalance": 0,
+  "token": {
+    "mintAuthority": null,
+    "supply": 999999366096876,
+    "decimals": 6,
+    "isInitialized": true,
+    "freezeAuthority": null
+  },
+  "tokenMeta": {
+    "name": "RaveDAO",
+    "symbol": "RAVE",
+    "mutable": false
+  },
+  "topHolders": [
+    {
+      "address": "TD8eiyUN771wsGzt6oNh7qLh8zUzsC8ZLf8WJfRVDuu",
+      "amount": 1000000001000000,
+      "pct": 100.00006349035264
+    },
+    {
+      "address": "9CbNrmTyc4o3rBrfKMZHRs7qHaaqDG2edFhH2adccMKt",
+      "amount": 865910962040016,
+      "pct": 86.59115109440279
+    }
+  ],
+  "freezeAuthority": null,
+  "mintAuthority": null,
+  "transferFee": {
+    "pct": 0,
+    "maxAmount": 0
+  },
+  "permanentDelegate": null,
+  "transferHook": null,
+  "risks": [
+    {
+      "name": "Top 10 holders high ownership",
+      "description": "The top 10 users hold more than 70% token supply",
+      "level": "danger"
+    },
+    {
+      "name": "Large Amount of LP Unlocked",
+      "value": "100.00%",
+      "description": "A large amount of LP tokens are unlocked, allowing the owner to remove liquidity at any point.",
+      "level": "danger"
+    },
+    {
+      "name": "Single holder ownership",
+      "value": "100.00%",
+      "description": "One user holds a large amount of the token supply",
+      "level": "danger"
+    }
+  ],
+  "score": 34340,
+  "score_normalised": 67,
+  "markets": [
+    {
+      "pubkey": "9QSvQXBqNJR2pmnDCHcnr81HyzZmQrDuvhQRHe6gE9Xv",
+      "marketType": "pump_fun_amm"
+    }
+  ],
+  "rugged": false,
+  "verification": null,
+  "observed_sells_24h": 4663,
+  "observed_buys_24h": 5670,
+  "buy_sell_ratio_24h": 0.82
+}

@@ -1,0 +1,98 @@
+{
+  "_comment": "Positive Fixture #3 — all three signals fire simultaneously: gini_delta, top10_delta, and absolute ceiling.",
+  "_fixture_type": "positive",
+  "_signals_expected": [1, 2, 3],
+  "_source": "Synthetic fixture representing rapid insider accumulation preceding a dump event. Developer MUST replace with a real confirmed token before Phase 3 ships.",
+  "_collector_note": "Prior snapshot 24h ago shows moderate concentration. Current snapshot shows severe liquid concentration. 80 liquid holders provides reliable Gini computation.",
+
+  "snapshot_now": {
+    "chain": "solana",
+    "token": "SYNTHETIC_absolute_ceiling_90pct",
+    "snapshot_id": 7200,
+    "slot": 311000000,
+    "block_time": "2026-04-21T20:00:00Z",
+    "total_holders": 95,
+    "top_holders_raw": [
+      { "address": "TA11aaBBccDDeeFF00112233445566778899AABBCCDD", "balance_raw": 1800000000000, "balance_pct": "0.1800" },
+      { "address": "TA22aaBBccDDeeFF00112233445566778899AABBCCDE", "balance_raw": 1650000000000, "balance_pct": "0.1650" },
+      { "address": "TA33aaBBccDDeeFF00112233445566778899AABBCCDF", "balance_raw": 1400000000000, "balance_pct": "0.1400" },
+      { "address": "TA44aaBBccDDeeFF00112233445566778899AABBCCDG", "balance_raw": 1200000000000, "balance_pct": "0.1200" },
+      { "address": "TA55aaBBccDDeeFF00112233445566778899AABBCCDH", "balance_raw": 950000000000,  "balance_pct": "0.0950" },
+      { "address": "TA66aaBBccDDeeFF00112233445566778899AABBCCDI", "balance_raw": 700000000000,  "balance_pct": "0.0700" },
+      { "address": "TA77aaBBccDDeeFF00112233445566778899AABBCCDJ", "balance_raw": 500000000000,  "balance_pct": "0.0500" },
+      { "address": "TA88aaBBccDDeeFF00112233445566778899AABBCCDK", "balance_raw": 350000000000,  "balance_pct": "0.0350" },
+      { "address": "TA99aaBBccDDeeFF00112233445566778899AABBCCDL", "balance_raw": 250000000000,  "balance_pct": "0.0250" },
+      { "address": "TA10aaBBccDDeeFF00112233445566778899AABBCCDM", "balance_raw": 200000000000,  "balance_pct": "0.0200" }
+    ],
+    "total_supply_raw": 10000000000000,
+    "liquid_supply_raw": 10000000000000,
+    "liquid_count": 80,
+    "excluded_count": 15,
+    "needs_classification_count": 0,
+    "_excluded_note": "15 holders are DexPool or VestingContract per sidecar; excluded from liquid metrics.",
+    "_computed": {
+      "top10_liquid_raw": 9000000000000,
+      "top10_pct_liquid": "0.9000",
+      "gini_liquid": "0.7300"
+    }
+  },
+
+  "snapshot_prior": {
+    "chain": "solana",
+    "token": "SYNTHETIC_absolute_ceiling_90pct",
+    "snapshot_id": 6100,
+    "slot": 303920000,
+    "block_time": "2026-04-20T19:55:00Z",
+    "total_holders": 102,
+    "top_holders_raw": [
+      { "address": "TA11aaBBccDDeeFF00112233445566778899AABBCCDD", "balance_raw": 900000000000,  "balance_pct": "0.0900" },
+      { "address": "TA22aaBBccDDeeFF00112233445566778899AABBCCDE", "balance_raw": 780000000000,  "balance_pct": "0.0780" },
+      { "address": "TA33aaBBccDDeeFF00112233445566778899AABBCCDF", "balance_raw": 720000000000,  "balance_pct": "0.0720" },
+      { "address": "TA44aaBBccDDeeFF00112233445566778899AABBCCDG", "balance_raw": 620000000000,  "balance_pct": "0.0620" },
+      { "address": "TA55aaBBccDDeeFF00112233445566778899AABBCCDH", "balance_raw": 540000000000,  "balance_pct": "0.0540" },
+      { "address": "TA66aaBBccDDeeFF00112233445566778899AABBCCDI", "balance_raw": 480000000000,  "balance_pct": "0.0480" },
+      { "address": "TA77aaBBccDDeeFF00112233445566778899AABBCCDJ", "balance_raw": 420000000000,  "balance_pct": "0.0420" },
+      { "address": "TA88aaBBccDDeeFF00112233445566778899AABBCCDK", "balance_raw": 360000000000,  "balance_pct": "0.0360" },
+      { "address": "TA99aaBBccDDeeFF00112233445566778899AABBCCDL", "balance_raw": 300000000000,  "balance_pct": "0.0300" },
+      { "address": "TA10aaBBccDDeeFF00112233445566778899AABBCCDM", "balance_raw": 280000000000,  "balance_pct": "0.0280" }
+    ],
+    "total_supply_raw": 10000000000000,
+    "liquid_supply_raw": 10000000000000,
+    "liquid_count": 85,
+    "excluded_count": 17,
+    "needs_classification_count": 0,
+    "_computed": {
+      "top10_liquid_raw": 5400000000000,
+      "top10_pct_liquid": "0.6500",
+      "gini_liquid": "0.5800"
+    }
+  },
+
+  "sidecar_rows": [
+    { "chain": "solana", "address": "POOL_RAYDIUM_SYNTHETIC_001", "kind": "DexPool",        "subkind": "raydium_amm_v4", "confidence": 0.95 },
+    { "chain": "solana", "address": "POOL_ORCA_SYNTHETIC_001",    "kind": "DexPool",        "subkind": "orca_whirlpool", "confidence": 0.95 },
+    { "chain": "solana", "address": "VEST_TEAM_SYNTHETIC_001",    "kind": "VestingContract","subkind": "jupiter_lock",   "confidence": 0.90 }
+  ],
+
+  "expected": {
+    "_note": "gini_delta = 0.7300 - 0.5800 = 0.1500 >= 0.05 → Signal 1. top10_delta = 0.9000 - 0.6500 = 0.2500 >= 0.10 → Signal 2. top10_pct_now = 0.90 >= 0.80 → Signal 3.",
+    "signals_fired": [1, 2, 3],
+    "signal_1": {
+      "_recalc": "raw_excess=0.15-0.05=0.10, conf=min(1.0, 0.50+0.10/0.10*0.30)=min(1.0,0.80)=0.80",
+      "confidence": "0.80",
+      "severity": "Critical"
+    },
+    "signal_2": {
+      "_recalc": "raw_excess=0.25-0.10=0.15, conf=min(1.0, 0.50+0.15/0.10*0.25)=min(1.0,0.50+0.375)=0.875",
+      "confidence": "0.875",
+      "_note": "Exceeds 0.80 → Critical",
+      "severity": "Critical"
+    },
+    "signal_3": {
+      "_recalc": "raw_excess=0.90-0.80=0.10, conf=min(0.85, 0.65+0.10/0.20*0.20)=min(0.85,0.75)=0.75",
+      "confidence": "0.75",
+      "severity": "High"
+    },
+    "max_confidence": "0.875"
+  }
+}

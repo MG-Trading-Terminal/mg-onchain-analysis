@@ -1,0 +1,144 @@
+# Ethereum node stack: Reth (EL) + Lighthouse (CL)
+#
+# ADR 0004: Reth selected as the execution client (snap sync, pruned mode, Docker deployment).
+# ADR 0003: No Alchemy/Infura/QuickNode in production. This stack is fully self-hosted.
+#
+# Image digests: REPLACE_WITH_CURRENT_DIGEST placeholders must be updated before production.
+# How to get the digest:
+#   docker pull ghcr.io/paradigmxyz/reth:v1.3.0
+#   docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/paradigmxyz/reth:v1.3.0
+#
+# Ports exposed (all on 127.0.0.1 except P2P):
+#   8545  HTTP RPC    — chain-adapter backfill queries
+#   8546  WS RPC      — chain-adapter subscribe stream (eth_subscribe)
+#   8551  Engine API  — Reth ↔ Lighthouse JWT-authenticated channel
+#   30303 P2P         — must be reachable from internet (discv4/discv5)
+#   9001  Metrics     — Reth Prometheus scrape endpoint
+#   5052  Beacon API  — Lighthouse beacon HTTP API (internal)
+#   9000  CL P2P      — Lighthouse P2P (must be reachable from internet)
+
+services:
+  reth:
+    # Pin to a specific digest — tags are mutable, digests are immutable.
+    # Replace REPLACE_WITH_CURRENT_DIGEST with the output of:
+    #   docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/paradigmxyz/reth:v1.3.0
+    image: ghcr.io/paradigmxyz/reth:v1.3.0@sha256:REPLACE_WITH_CURRENT_DIGEST
+
+    container_name: reth
+    restart: unless-stopped
+
+    volumes:
+      - ${RETH_DATA_DIR:-/data/reth}:/data/reth
+      - ${JWT_SECRET_PATH:-./jwt.hex}:/jwt.hex:ro
+
+    ports:
+      # HTTP RPC — loopback only
+      - "127.0.0.1:${RETH_HTTP_PORT:-8545}:8545"
+      # WebSocket RPC — loopback only
+      - "127.0.0.1:${RETH_WS_PORT:-8546}:8546"
+      # Engine API — loopback only (Reth ↔ Lighthouse, JWT-authenticated)
+      - "127.0.0.1:8551:8551"
+      # P2P — public (discv4 + discv5 peer discovery)
+      - "0.0.0.0:30303:30303/tcp"
+      - "0.0.0.0:30303:30303/udp"
+      # Prometheus metrics — loopback only
+      - "127.0.0.1:${RETH_METRICS_PORT:-9001}:9001"
+
+    command:
+      - node
+      # Network: Ethereum mainnet
+      - --chain=mainnet
+      # Data directory inside the container
+      - --datadir=/data/reth
+      # Sync mode: full (pruned state, full tx/log history) — ADR 0004 Decision 3
+      # Reth default is already pruned; explicit --full would enable archive mode. Do NOT add --full.
+      # HTTP JSON-RPC
+      - --http
+      - --http.addr=0.0.0.0
+      - --http.port=8545
+      - --http.api=eth,net,web3,debug
+      # WebSocket JSON-RPC
+      - --ws
+      - --ws.addr=0.0.0.0
+      - --ws.port=8546
+      - --ws.api=eth,net,web3
+      # Engine API (for Lighthouse CL)
+      - --authrpc.addr=0.0.0.0
+      - --authrpc.port=8551
+      - --authrpc.jwtsecret=/jwt.hex
+      # Prometheus metrics
+      - --metrics=0.0.0.0:9001
+      # Log level
+      - --log.level=${RETH_LOG_LEVEL:-info}
+      # Peer discovery
+      - --discovery.port=30303
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >
+          curl -sf -X POST http://localhost:8545
+          -H 'Content-Type: application/json'
+          -d '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}'
+          | grep -q 'result'
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  lighthouse:
+    # Lighthouse consensus client — required post-Merge (Reth needs a CL to advance).
+    # Replace REPLACE_WITH_CURRENT_DIGEST with the digest of the pinned tag.
+    # Check: https://github.com/sigp/lighthouse/releases
+    image: sigp/lighthouse:v6.0.1@sha256:REPLACE_WITH_CURRENT_DIGEST
+
+    container_name: lighthouse
+    restart: unless-stopped
+    depends_on:
+      reth:
+        condition: service_healthy
+
+    volumes:
+      - ${LIGHTHOUSE_DATA_DIR:-/data/lighthouse}:/data/lighthouse
+      - ${JWT_SECRET_PATH:-./jwt.hex}:/jwt.hex:ro
+
+    ports:
+      # Lighthouse beacon HTTP API — loopback only
+      - "127.0.0.1:5052:5052"
+      # Lighthouse P2P — public
+      - "0.0.0.0:9000:9000/tcp"
+      - "0.0.0.0:9000:9000/udp"
+
+    command:
+      - lighthouse
+      - beacon_node
+      - --network=mainnet
+      - --datadir=/data/lighthouse
+      # Connect to Reth Engine API (JWT-authenticated)
+      - --execution-endpoint=http://reth:8551
+      - --execution-jwt=/jwt.hex
+      # Beacon HTTP API (for monitoring and status checks)
+      - --http
+      - --http-address=0.0.0.0
+      - --http-port=5052
+      # Checkpoint sync from a well-known public endpoint (initial sync only).
+      # This is NOT a production data dependency — it is used once to bootstrap the
+      # beacon chain state. After bootstrap, Lighthouse syncs from peers.
+      # Replace with your preferred checkpoint sync endpoint or remove for full sync.
+      - --checkpoint-sync-url=https://beaconstate.ethstaker.cc
+      # Disable Slasher (not needed for an analytics node, saves disk)
+      - --slasher=false
+      # Disable doppelganger protection (not a validator node)
+      - --allow-insecure-genesis-sync
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "5"

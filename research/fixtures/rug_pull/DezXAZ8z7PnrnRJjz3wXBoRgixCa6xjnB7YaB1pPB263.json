@@ -1,0 +1,73 @@
+{
+  "_fixture_meta": {
+    "label": "negative",
+    "detector": "rug_pull_lp_drain",
+    "signal": "none",
+    "expected_signal_a": false,
+    "expected_signal_b": false,
+    "expected_confidence_max": 0.30,
+    "expected_severity": "Info",
+    "note": "BONK (Bonk) — community memecoin with broad LP distribution across 35+ pools. Primary Raydium pool has 60.8% LP burned — below lp_safe_floor_pct=70, which means Signal B WOULD fire for the Raydium HVNwzt7P pool. However, the Orca primary pool (3ne4mWqdYuNiYrYZC9TrA3FcfuFdErghH97vNPbjicr1) has lp_burned_pct=0 but multiple providers and lockers. This is a near-threshold negative: developer must verify the per-pool evaluation logic handles multi-pool tokens correctly. The primary pool below threshold combined with multi-provider structure should produce a Low/Medium signal, not Critical. Captured: RugCheck API 2026-04-21.",
+    "expected_signal_b_note": "Signal B MAY fire at Low confidence (0.50-0.55) for the Orca pool with 0% burned. This is an acceptable low-confidence alert. Test verifies confidence < 0.60 for any fired event.",
+    "captured_at": "2026-04-21T00:00:00Z",
+    "source_api": "https://api.rugcheck.xyz/v1/tokens/DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263/report"
+  },
+  "mint": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+  "chain": "solana",
+  "symbol": "Bonk",
+  "name": "Bonk",
+  "decimals": 5,
+  "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  "total_supply_raw": "8799473936550052923",
+  "circulating_supply_raw": null,
+  "mint_authority": null,
+  "freeze_authority": null,
+  "creator": "9AhKqLR67hwapvG8SA2JFXaCshXc9nALJjpKaHZrsbkw",
+  "creator_balance_raw": "14608186413",
+  "transfer_fee": null,
+  "permanent_delegate": null,
+  "transfer_hook_program": null,
+  "top_holders": [
+    { "address": "TOP_HOLDER_1_BONK", "pct": "7.64", "amount_raw": "672539976572084", "is_insider": false }
+  ],
+  "total_holders": 800000,
+  "markets": [
+    {
+      "pool_address": "3ne4mWqdYuNiYrYZC9TrA3FcfuFdErghH97vNPbjicr1",
+      "dex": "orca_whirlpool",
+      "lp_burned_pct": "0.00",
+      "liquidity_usd": "879739.00",
+      "lp_provider_count": 120
+    },
+    {
+      "pool_address": "HVNwzt7Pxfu76KHCMQPTLuTCLTm6WnQ1esLv4eizseSv",
+      "dex": "raydium_amm",
+      "lp_burned_pct": "60.80",
+      "liquidity_usd": "22363.00",
+      "lp_provider_count": 15
+    }
+  ],
+  "total_market_liquidity_usd": "902102.00",
+  "lockers": [
+    {
+      "locker_address": "ALYy1HRt3fsn1S9McLWsXCoq6Ke7bwMiwZ6QYr6HvsYS",
+      "locker_name": "Raydium Locker",
+      "locked_amount_raw": "500000000000000",
+      "unlock_at": null
+    }
+  ],
+  "graph_insiders_detected": false,
+  "insider_networks": [],
+  "launchpad": null,
+  "deploy_platform": null,
+  "rugged": false,
+  "verification": { "jup_verified": true, "jup_strict": false },
+  "rugcheck_score": 101,
+  "_d02_state_at_capture": {
+    "orca_pool_effective_safe_pct": "0.00",
+    "orca_pool_signal_b_note": "0% burned, but 120 LP providers — provider diversity attenuates risk. Confidence from formula: 0.50 + (70-0)/70*0.25 + 0 (no single-provider bonus) = 0.75. However, multi-provider with locker present reduces effective risk. Expected: Low-Medium signal at most.",
+    "raydium_pool_effective_safe_pct": "60.80",
+    "raydium_pool_signal_b_note": "60.8% burned < 70% floor → fires. Confidence: 0.50 + (70-60.8)/70*0.25 + 0 = 0.533. Low severity.",
+    "note": "This fixture tests multi-pool evaluation and that high-provider-count pools get reduced signal weight. Developer should verify evidence bundle lists all pools evaluated."
+  }
+}

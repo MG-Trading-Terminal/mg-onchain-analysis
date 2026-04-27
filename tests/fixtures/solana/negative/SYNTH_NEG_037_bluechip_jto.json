@@ -1,0 +1,83 @@
+{
+  "_fixture_meta": {
+    "mint": "jtojtomepa8beP8AuQc6eXt5FriJwfFMwQx2v2f9mCL",
+    "symbol": "JTO",
+    "label": "negative",
+    "category": "bluechip",
+    "source_url": "synthetic/bluechip/jto_jito_governance",
+    "fetched_at": "2026-04-21T20:51:00Z",
+    "synthetic": true,
+    "notes": "Jito governance token (JTO). jup_verified=true. mint_authority=null. Fixed supply. Large holder concentration in DAO treasury / vesting contracts — all classified as known program PDAs. Tests that large classified holders do not trigger D03. Established governance token with active trading on Raydium, Orca."
+  },
+  "token_meta": {
+    "mint": "jtojtomepa8beP8AuQc6eXt5FriJwfFMwQx2v2f9mCL",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "Jito",
+    "symbol": "JTO",
+    "decimals": 9,
+    "supply_raw": "1000000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": false,
+    "update_authority": null,
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": true, "jup_strict": false },
+    "rugcheck_score": 120,
+    "rugcheck_score_normalised": 5,
+    "risks": [],
+    "markets": [
+      { "pool_address": "JTOPool01111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "liquidity_usd": "4200000.00", "lp_provider_count": 48 },
+      { "pool_address": "JTOPool02111111111111111111111111111111111", "dex": "orca", "lp_burned_pct": "0.00", "liquidity_usd": "2800000.00", "lp_provider_count": 35 }
+    ],
+    "lockers": {},
+    "creator": "JitoFoundation11111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "7000000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 125000,
+    "total_supply_raw": 1000000000000000000,
+    "balances": {
+      "JitoDAOTreasury1111111111111111111111111111": 340000000000000000,
+      "JitoVesting01111111111111111111111111111111": 180000000000000000,
+      "JitoVesting02111111111111111111111111111111": 120000000000000000,
+      "JTOHolder0001111111111111111111111111111111": 28000000000000000,
+      "JTOHolder0011111111111111111111111111111111": 22000000000000000,
+      "JTOHolder0021111111111111111111111111111111": 18000000000000000,
+      "JTOHolder0031111111111111111111111111111111": 15000000000000000,
+      "JTOHolder0041111111111111111111111111111111": 12000000000000000,
+      "JTOHolder0051111111111111111111111111111111": 9000000000000000,
+      "JTOHolder0061111111111111111111111111111111": 7000000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 124500,
+    "total_supply_raw": 1000000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.115",
+    "gini_liquid_after_exclusion": "0.62"
+  },
+  "holder_classifications": [
+    { "address": "JitoDAOTreasury1111111111111111111111111111", "type": "dao_treasury", "label": "Jito DAO Treasury" },
+    { "address": "JitoVesting01111111111111111111111111111111", "type": "vesting_contract", "label": "Jito Vesting Contract A" },
+    { "address": "JitoVesting02111111111111111111111111111111", "type": "vesting_contract", "label": "Jito Vesting Contract B" }
+  ],
+  "pool_rows": [
+    { "pool_address": "JTOPool01111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "lp_locked_pct": "0.00", "effective_safe_pct": "0.00", "lp_provider_count": 48, "liquidity_usd": "4200000.00" },
+    { "pool_address": "JTOPool02111111111111111111111111111111111", "dex": "orca", "lp_burned_pct": "0.00", "lp_locked_pct": "0.00", "effective_safe_pct": "0.00", "lp_provider_count": 35, "liquidity_usd": "2800000.00" }
+  ],
+  "swaps_1h": { "volume_usd": "2100000.00", "trade_count": 8200, "unique_buyers": 4100, "price_start": "2.840", "price_end": "2.845", "price_change_pct": "0.0018" },
+  "swaps_7d_daily_baseline": { "day_count_nonzero": 7, "mean_daily_volume_usd": "1950000.00", "std_daily_volume_usd": "420000.00", "volume_multiplier_observed": "1.08", "volume_z_score": "0.4" },
+  "signal_a_round_trips": [],
+  "pool_total_volume_1h_usd": "2100000.00",
+  "expected": {
+    "d01_honeypot": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "No static honeypot signals. No freeze, no fee, no delegate, no hook." },
+    "d02_rug_pull": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "is_established_protocol=true (jup_verified). D02 suppressed per P4-0 protocol suppression rule. Multi-provider pools (48, 35 LPs) also below single-provider risk threshold." },
+    "d03_concentration": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.08], "severity": "Info", "reason": "After exclusion of DAO treasury and vesting contracts: top10_pct_liquid=0.115. gini_delta ~0 (stable). No D03 signals fire." },
+    "d04_pump_dump": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "vol_multiplier=1.08 << 5.0. price_change=+0.18% << 30%. Normal trading activity." },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "No round-trip events detected in 8200 trades. Organic volume distribution." },
+    "d06_mint_burn_anomaly": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "mint_authority=null. Fixed supply. No mint/burn events possible." }
+  }
+}

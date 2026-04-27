@@ -1,0 +1,181 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthMulti0461111111111111111111111111111",
+    "symbol": "MULTI046",
+    "label": "positive",
+    "category": "multi_signal",
+    "source_url": "synthetic/multi_signal/variant_046",
+    "fetched_at": "2026-04-21T19:00:00Z",
+    "synthetic": true,
+    "notes": "Synthetic multi_signal: D01+D03: fee4500+top10delta."
+  },
+  "token_meta": {
+    "mint": "SynthMulti0461111111111111111111111111111",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "MultiToken046",
+    "symbol": "MULTI046",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevWalletM046111111111111111111111111111",
+    "transfer_fee": {
+      "fee_bps": 4500,
+      "max_amount": 1000000000,
+      "authority": "FeeAuth0461111111111111111111111111111111"
+    },
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": {
+      "jup_verified": false,
+      "jup_strict": false
+    },
+    "rugcheck_score": 30000,
+    "rugcheck_score_normalised": 70,
+    "risks": [],
+    "markets": [
+      {
+        "pool_address": "MultiPool04611111111111111111111111111111",
+        "dex": "raydium",
+        "lp_burned_pct": "0.00",
+        "liquidity_usd": "28000.00",
+        "lp_provider_count": 1
+      }
+    ],
+    "lockers": {},
+    "creator": "DevWalletM046111111111111111111111111111",
+    "creator_balance_raw": "0"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 180,
+    "balances": {
+      "MTopHolder046_00111111111111111111111111": 216000000000000,
+      "MTopHolder046_01111111111111111111111111": 144000000000000,
+      "MTopHolder046_02111111111111111111111111": 100800000000000,
+      "MTopHolder046_03111111111111111111111111": 72000000000000,
+      "MTopHolder046_04111111111111111111111111": 57600000000000,
+      "MTopHolder046_05111111111111111111111111": 43200000000000,
+      "MTopHolder046_06111111111111111111111111": 36000000000000,
+      "MTopHolder046_07111111111111111111111111": 28800000000000,
+      "MTopHolder046_08111111111111111111111111": 14400000000000,
+      "MTopHolder046_09111111111111111111111111": 7200000000000,
+      "MSmallHolder046_1011111111111111111111111": 7000000000000,
+      "MSmallHolder046_1111111111111111111111111": 7000000000000,
+      "MSmallHolder046_1211111111111111111111111": 7000000000000,
+      "MSmallHolder046_1311111111111111111111111": 7000000000000,
+      "MSmallHolder046_1411111111111111111111111": 7000000000000,
+      "MSmallHolder046_1511111111111111111111111": 7000000000000,
+      "MSmallHolder046_1611111111111111111111111": 7000000000000,
+      "MSmallHolder046_1711111111111111111111111": 7000000000000,
+      "MSmallHolder046_1811111111111111111111111": 7000000000000,
+      "MSmallHolder046_1911111111111111111111111": 7000000000000,
+      "MSmallHolder046_2011111111111111111111111": 7000000000000,
+      "MSmallHolder046_2111111111111111111111111": 7000000000000,
+      "MSmallHolder046_2211111111111111111111111": 7000000000000,
+      "MSmallHolder046_2311111111111111111111111": 7000000000000,
+      "MSmallHolder046_2411111111111111111111111": 7000000000000,
+      "MSmallHolder046_2511111111111111111111111": 7000000000000,
+      "MSmallHolder046_2611111111111111111111111": 7000000000000,
+      "MSmallHolder046_2711111111111111111111111": 7000000000000,
+      "MSmallHolder046_2811111111111111111111111": 7000000000000,
+      "MSmallHolder046_2911111111111111111111111": 7000000000000,
+      "MSmallHolder046_3011111111111111111111111": 7000000000000,
+      "MSmallHolder046_3111111111111111111111111": 7000000000000,
+      "MSmallHolder046_3211111111111111111111111": 7000000000000,
+      "MSmallHolder046_3311111111111111111111111": 7000000000000,
+      "MSmallHolder046_3411111111111111111111111": 7000000000000,
+      "MSmallHolder046_3511111111111111111111111": 7000000000000,
+      "MSmallHolder046_3611111111111111111111111": 7000000000000,
+      "MSmallHolder046_3711111111111111111111111": 7000000000000,
+      "MSmallHolder046_3811111111111111111111111": 7000000000000,
+      "MSmallHolder046_3911111111111111111111111": 7000000000000,
+      "MSmallHolder046_4011111111111111111111111": 7000000000000,
+      "MSmallHolder046_4111111111111111111111111": 7000000000000,
+      "MSmallHolder046_4211111111111111111111111": 7000000000000,
+      "MSmallHolder046_4311111111111111111111111": 7000000000000,
+      "MSmallHolder046_4411111111111111111111111": 7000000000000,
+      "MSmallHolder046_4511111111111111111111111": 7000000000000,
+      "MSmallHolder046_4611111111111111111111111": 7000000000000,
+      "MSmallHolder046_4711111111111111111111111": 7000000000000,
+      "MSmallHolder046_4811111111111111111111111": 7000000000000,
+      "MSmallHolder046_4911111111111111111111111": 7000000000000
+    },
+    "total_supply_raw": 1000000000000000
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 165,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.55",
+    "gini_liquid_after_exclusion": "0.75"
+  },
+  "holder_classifications": [],
+  "pool_rows": [
+    {
+      "pool_address": "MultiPool04611111111111111111111111111111",
+      "dex": "raydium",
+      "lp_burned_pct": "0.00",
+      "lp_locked_pct": "100.0",
+      "effective_safe_pct": "100.0",
+      "lp_provider_count": 1,
+      "liquidity_usd": "28000.00"
+    }
+  ],
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "FIRES",
+      "confidence_band": [
+        0.395,
+        0.515
+      ],
+      "severity": "Medium",
+      "reason": "S2 transfer_fee=4500bps. raw_weight=0.45. confidence=0.455."
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.15
+      ],
+      "severity": "Info",
+      "reason": "effective_safe_pct=100.0% >= 70%. Signal B does not fire."
+    },
+    "d03_concentration": {
+      "verdict": "FIRES",
+      "confidence_band": [
+        0.855,
+        0.995
+      ],
+      "severity": "Critical",
+      "reason": "Signal 1 (gini_delta=0.05) conf=0.65. Signal 2 (top10_delta=0.17) conf=0.925. Max confidence=0.925."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No swaps_1h data in fixture (Phase 1 fixture predates D04). No volume spike detectable. D04 INCONCLUSIVE \u2014 treated as BELOW for calibration."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No signal_a_round_trips data in fixture (Phase 1 fixture predates D05). D05 INCONCLUSIVE \u2014 treated as BELOW for calibration."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "mint_authority=null. No mint/burn events in fixture (Phase 1 fixture predates D06)."
+    }
+  }
+}

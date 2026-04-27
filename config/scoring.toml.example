@@ -1,0 +1,196 @@
+# config/scoring.toml
+#
+# Scoring aggregation configuration for crates/scoring (mg-onchain-scoring).
+#
+# Format: every numeric parameter is a TOML table with:
+#   value     — the numeric value
+#   rationale — human-readable justification
+#   refs      — REFERENCES.md entry IDs
+#
+# ADR refs:  ADR 0001 §D4 (confidence+severity contract), ADR 0001 §D8 (delivery modes)
+# Design ref: docs/designs/0010-scoring.md §9
+#
+# VALIDATION: detector_weights MUST sum to 1.0 ± 0.001.
+# Run `cargo test -p mg-onchain-scoring` after any change.
+#
+# Calibrated against:
+#   RAVE probe (research/token-probes/rave-FeqiF7TE.md) — target 0.83/Critical
+#   WET  probe (research/token-probes/wet-WETZjtp.md)   — target 0.31/Medium
+
+# ---------------------------------------------------------------------------
+# Detector importance weights
+# Sum MUST equal 1.0 — validated at load. See design §3 for derivation.
+# Calibrated from RAVE and WET probe aggregation sections (design §10).
+# ---------------------------------------------------------------------------
+
+[detector_weights.holder_concentration]
+value     = 0.32
+rationale = """Strongest pre-collapse signal per TM-RugPull 2026 and Brown 2023.
+RAVE probe fired at 0.95 (Critical); WET at 0.55 (Medium). Empirically the most
+predictive detector in the Phase 2 corpus across positive categories. Equal weight
+with pump_dump per probe calibration derivation. P6-0 rebalance: 0.35→0.32 to
+accommodate D07=0.06 (GAP-SCORE-01 closure). See SESSION-KICKOFF.md §P6-0."""
+refs      = ["SCORING/detector_weights"]
+
+[detector_weights.pump_dump]
+value     = 0.32
+rationale = """Highest-frequency fraud category (Chainalysis 2025: 3.59% of tokens).
+Fires at high confidence when activated (RAVE: 0.92 Critical). Equal weight with
+holder_concentration per probe calibration. Together these two dominate the score
+because they represent the two most financially costly false-negative modes for
+the trading consumer. P6-0 rebalance: 0.35→0.32 to accommodate D07=0.06
+(GAP-SCORE-01 closure). See SESSION-KICKOFF.md §P6-0."""
+refs      = ["SCORING/detector_weights"]
+
+[detector_weights.rug_pull_lp_drain]
+value     = 0.20
+rationale = """Structural precursor for the most costly consumer outcome (LP drain).
+Lower weight than D03/D04 because latent Signal B fires at moderate confidence
+(RAVE: 0.72; WET: 0.28); the 0.20 weight reflects this middle-tier importance.
+Source: RAVE probe §3 weighting derivation."""
+refs      = ["SCORING/detector_weights"]
+
+[detector_weights.wash_trading_h1]
+value     = 0.07
+rationale = """Supportive signal; frequently inconclusive without tx-level data
+(RAVE: 0.45; WET: 0.25). Critical for market-maker consumer but lower base-rate
+importance for overall risk scoring. Source: RAVE probe §3 weighting derivation."""
+refs      = ["SCORING/detector_weights"]
+
+[detector_weights.honeypot_sim]
+value     = 0.015
+rationale = """When confirmed, honeypot is Critical severity — consumer action is
+driven by the severity field, not the score contribution. Low weight reflects that
+honeypot fires cleanly (high confidence) or not at all; overall_severity escalation
+is the primary consumer signal for this detector."""
+refs      = ["SCORING/detector_weights"]
+
+[detector_weights.mint_burn_anomaly]
+value     = 0.015
+rationale = """Typically fires at low confidence for latent state (mint authority
+present); high-confidence events are rare but Critical. Same reasoning as
+honeypot_sim: overall_severity escalation is the primary consumer signal."""
+refs      = ["SCORING/detector_weights"]
+
+[detector_weights.withdraw_withheld_drain]
+value     = 0.06
+rationale = """Token-2022 withdraw_withheld drain is a significant latent-to-active
+drain pattern (E-D02-11). 0.06 weight carved from D03+D04 (0.35→0.32 each).
+Calibration: weight reflects that D07 fires only on Token-2022 mints (minority of
+corpus tokens) and at moderate confidence (0.60–0.90 baseline Signal A). Higher
+than honeypot/mint_burn because withdrawal drain is a confirmed active exploit
+(extraction is irreversible once executed). Event-based; decays normally.
+P6-0 (GAP-SCORE-01 closure). See SESSION-KICKOFF.md §P6-0, E-D02-11."""
+refs      = ["SCORING/detector_weights", "D07/withdraw_withheld_drain", "scoring/sprint6-P6-0-calibration"]
+
+# ---------------------------------------------------------------------------
+# Time decay
+# ---------------------------------------------------------------------------
+
+[decay_half_life_hours]
+value     = 72.0
+rationale = """Chainalysis 2025 reports average pump-and-dump cycle duration 6.23 days.
+Half of that (3 days = 72 hours) means an event 3 days old retains 50% weight —
+still meaningful but no longer dominant. LROO 2026 confirms >95% of rugged tokens
+complete the drain within 1–3 days; a drain event at 72h retains 50% weight,
+appropriate for ongoing risk monitoring."""
+refs      = ["SCORING/decay"]
+
+# Detectors whose signals are state-based and NEVER decay.
+# Any detector_id NOT in this list is treated as event-based (decay applies).
+#
+# Detector variant naming convention (see design §4):
+#   honeypot_sim        → event-based (buy/sell simulation, S5/S6) — DECAYS
+#   honeypot_sim_static → state-based (freeze/fee/delegate/hook, S1-S4) — NO DECAY
+#   rug_pull_lp_drain         → event-based (Signal A: actual drain event) — DECAYS
+#   rug_pull_lp_drain_latent  → state-based (Signal B: latent LP state) — NO DECAY
+#   holder_concentration → all signals are snapshot-based — NO DECAY
+#   pump_dump           → event-based (volume/price spike, insider sell) — DECAYS
+#   wash_trading_h1     → event-based (round trips in H1 window) — DECAYS
+#   mint_burn_anomaly        → event-based (mint/burn events, B/C) — DECAYS
+#   mint_burn_anomaly_static → state-based (mint authority present, A) — NO DECAY
+state_based_detectors = [
+    "honeypot_sim_static",
+    "rug_pull_lp_drain_latent",
+    "holder_concentration",
+    "mint_burn_anomaly_static",
+]
+
+# ---------------------------------------------------------------------------
+# Attenuation multipliers (applied after base_score)
+# ---------------------------------------------------------------------------
+
+[jup_strict_multiplier]
+value     = 0.30
+rationale = """Jupiter strict list requires active human curation + social proof.
+A scam token cannot appear before rugging (months of inclusion lag). 0.30 = 70%
+reduction; even if D02/D03 fire on a jup_strict token (e.g. USDC with active freeze
+authority or USDT with managed LP), the overall score stays below 0.30 — below any
+reasonable alert threshold. Derived from DG4 in docs/designs/0004-detector-01-honeypot.md §6."""
+refs      = ["SCORING/attenuation"]
+
+[jup_verified_multiplier]
+value     = 0.60
+rationale = """Jupiter verified (non-strict) is a weaker single signal than strict
+listing. 0.60 = 40% reduction. Calibration: WET is NOT jup_verified in the probe,
+so this factor did not apply to the WET calibration anchor. Value chosen to ensure
+a legitimate verified token with one D03 Medium firing (e.g. wSOL with pool
+concentration) scores < 0.40 — below action thresholds.
+Derived from DG4 in docs/designs/0004-detector-01-honeypot.md §6."""
+refs      = ["SCORING/attenuation"]
+
+[established_protocol_multiplier]
+value     = 0.50
+rationale = """LROO 2026 confirms >95% of rug events are non-established protocols.
+0.50 = 50% reduction. Belt-and-suspenders on top of detector-level
+is_established_protocol suppression (token_status.rs). Established protocols still
+emit event-based signals (D04 can fire on news-driven spikes for RAY); this multiplier
+reduces their score without silencing the signal.
+Source: docs/designs/0005-detector-02-rug-pull.md §14 design rationale."""
+refs      = ["SCORING/attenuation"]
+
+# Token age attenuation — disabled by default (both multipliers = 1.0).
+# Enable by setting mature_multiplier to e.g. 0.75 after corpus ≥ 500 labelled tokens.
+[token_age]
+young_cutoff_days  = 30
+mature_cutoff_days = 365
+
+[token_age.young_multiplier]
+value     = 1.0
+rationale = """Tokens under 30 days are the highest-risk category (new launches are
+the primary scam category in Chainalysis 2025 data). No discount applied to new tokens.
+DO NOT lower this value without corpus evidence — discounting new tokens would be
+dangerous for the bot-trader-2-0 consumer."""
+refs      = ["SCORING/attenuation"]
+
+[token_age.mature_multiplier]
+value     = 1.0
+rationale = """Disabled by default. Set to 0.75 to apply a 25% discount for tokens
+older than 365 days. Disabled because calibration shows WET at 137 days already
+scores correctly at 0.31 without age discount; applying a non-trivial age discount
+would push it to ≈0.27, below the calibrated target range.
+Enable only after corpus reaches ≥500 labelled tokens with age data."""
+refs      = ["SCORING/attenuation"]
+
+# ---------------------------------------------------------------------------
+# Miscellaneous
+# ---------------------------------------------------------------------------
+
+[inconclusive_floor]
+value     = 0.30
+rationale = """Events with confidence < 0.30 are classified as inconclusive in
+SignalCounts and excluded from overall_severity computation (OQ3 resolution).
+0.30 is the midpoint between noise (< 0.20) and a weak positive signal. Calibration:
+RAVE wash_trading (0.45) is above this floor (correctly counted as fired); WET
+wash_trading (0.25) is below (correctly counted as inconclusive). OQ3 resolution:
+excluding sub-floor events from severity prevents spurious Critical escalation from
+0.05-confidence noise events."""
+refs      = ["SCORING/misc"]
+
+[evidence_highlight_count]
+value     = 5
+rationale = """Maximum 5 evidence highlights is consistent with human attention span
+for triage decisions. The top-evidence section is for human review, not machine
+consumption. 5 matches the RugCheck risk display convention (top risks shown in UI).
+Configurable up to 10 for exchange compliance workflows that need a full audit trail."""
+refs      = ["SCORING/misc"]

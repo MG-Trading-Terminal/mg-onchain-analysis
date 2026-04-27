@@ -1,0 +1,104 @@
+{
+  "_fixture_meta": {
+    "mint": "FeqiF7TEVmpYuuj4goD8WgmgyhFgFnZiWtw226wF4hNm",
+    "symbol": "RAVE",
+    "label": "positive",
+    "category": "rug_latent",
+    "source_url": "https://api.rugcheck.xyz/v1/tokens/FeqiF7TEVmpYuuj4goD8WgmgyhFgFnZiWtw226wF4hNm/report",
+    "fetched_at": "2026-04-21T19:45:00Z",
+    "synthetic": false,
+    "notes": "RaveDAO copycat on Solana (pre-drain state). 0% LP burned, 0% LP locked, single LP provider, $110K liquidity. Primary anchor for D02 Signal B latent-risk positive calibration. Also D03 positive: top holder 88.2% of supply (pool account — creator holds virtually all tokens). D01 negative (no honeypot signals)."
+  },
+  "token_meta": {
+    "mint": "FeqiF7TEVmpYuuj4goD8WgmgyhFgFnZiWtw226wF4hNm",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "RaveDAO",
+    "symbol": "RAVE",
+    "decimals": 6,
+    "supply_raw": "999999366096876",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": false,
+    "update_authority": "E2TmNvtbTXc1rU37wZqKeNr5kLXsWUQbv7n6ww22RvAe",
+    "transfer_fee": { "fee_bps": 0, "max_amount": 0, "authority": null },
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 26545,
+    "rugcheck_score_normalised": 64,
+    "risks": [
+      { "name": "Top 10 holders high ownership", "level": "danger" },
+      { "name": "Single holder ownership", "value": "88.20%", "level": "danger" }
+    ],
+    "markets": [
+      {
+        "pool_address": "9QSvQXBqNJR2pmnDCHcnr81HyzZmQrDuvhQRHe6gE9Xv",
+        "dex": "pump_fun_amm",
+        "lp_burned_pct": "0.00",
+        "liquidity_usd": "110232.00",
+        "lp_provider_count": 1
+      }
+    ],
+    "lockers": {},
+    "creator": "E2TmNvtbTXc1rU37wZqKeNr5kLXsWUQbv7n6ww22RvAe",
+    "creator_balance_raw": "881977136304248",
+    "top_holders": [
+      { "address": "TD8eiyUN771wsGzt6oNh7qLh8zUzsC8ZLf8WJfRVDuu", "amount_raw": "881977136304248", "pct": "88.20", "owner": "E2TmNvtbTXc1rU37wZqKeNr5kLXsWUQbv7n6ww22RvAe", "insider": false }
+    ]
+  },
+  "holder_snapshot_now": {
+    "total_holders": 1068,
+    "balances": {
+      "TD8eiyUN771wsGzt6oNh7qLh8zUzsC8ZLf8WJfRVDuu": 881977136304248,
+      "9CbNrmTyc4o3rBrfKMZHRs7qHaaqDG2edFhH2adccMKt": 65000000000000,
+      "GVV4BhTMTwrkp4iFGrPmvtHEr1GNiVEPBVkMUx4MpSRJ": 14000000000000,
+      "E2TmNvtbTXc1rU37wZqKeNr5kLXsWUQbv7n6ww22RvAe": 13000000000000,
+      "HolderRave5_111111111111111111111111111111": 5000000000000,
+      "HolderRave6_111111111111111111111111111111": 3500000000000,
+      "HolderRave7_111111111111111111111111111111": 2800000000000,
+      "HolderRave8_111111111111111111111111111111": 2100000000000,
+      "HolderRave9_111111111111111111111111111111": 1700000000000,
+      "HolderRave10_11111111111111111111111111111": 1400000000000
+    },
+    "total_supply_raw": 999999366096876
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 950,
+    "total_supply_raw": 999999366096876,
+    "top10_pct_liquid_after_exclusion": "0.8800",
+    "gini_liquid_after_exclusion": "0.9600"
+  },
+  "holder_classifications": [],
+  "pool_rows": [
+    {
+      "pool_address": "9QSvQXBqNJR2pmnDCHcnr81HyzZmQrDuvhQRHe6gE9Xv",
+      "dex": "pump_fun_amm",
+      "lp_burned_pct": "0.00",
+      "lp_locked_pct": "0.00",
+      "effective_safe_pct": "0.00",
+      "lp_provider_count": 1,
+      "liquidity_usd": "110232.00"
+    }
+  ],
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.15],
+      "severity": "Info",
+      "reason": "All D01 honeypot signals absent: freeze=null, no fee, no delegate, no hook. Buy/sell ratio 0.82 (below sentinel 5.0). D01 does not fire — RAVE is a D01 negative per probe analysis."
+    },
+    "d02_rug_pull": {
+      "verdict": "FIRES",
+      "confidence_band": [0.65, 0.80],
+      "severity": "High",
+      "reason": "Signal B fires: lp_burned_pct=0%, lp_locked_pct=0% → effective_safe_pct=0%. lp_provider_count=1 → single-provider bonus applies. Confidence = 0.50 + (70-0)/70*0.25 + 0.15_single_provider_bonus = 0.50+0.25+0.15 = 0.90 → capped at 0.75 per spec. This is the anchor positive fixture for D02 Signal B."
+    },
+    "d03_concentration": {
+      "verdict": "FIRES",
+      "confidence_band": [0.65, 0.85],
+      "severity": "High",
+      "reason": "Signal 3 fires: top holder 88.2% of supply with no sidecar exclusion (TD8eiy is pump_fun_amm pool account but not classified). Without classification: top-10 pct = 99.9% >> 80% ceiling → Signal 3 fires at confidence 0.65+. Even with DexPool classification of top holder: remaining liquid top-10 pct ≈ 11.8% — Signal 3 suppressed. This is a calibration boundary fixture: result depends on whether pump_fun pool is in sidecar."
+    }
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "_fixture_meta": {
+    "mint": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
+    "symbol": "JUP",
+    "label": "negative",
+    "category": "bluechip",
+    "source_url": "synthetic/bluechip/jup_jupiter_aggregator",
+    "fetched_at": "2026-04-21T20:58:00Z",
+    "synthetic": true,
+    "notes": "Jupiter aggregator governance token (JUP). jup_strict=true (of course). mint_authority=null. Very high volume from Jupiter's own aggregator routing through JUP pools. High trade count but organic — no wash trading signal. Tests that the largest DEX aggregator's own token passes all detectors cleanly."
+  },
+  "token_meta": {
+    "mint": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "Jupiter",
+    "symbol": "JUP",
+    "decimals": 6,
+    "supply_raw": "10000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": false,
+    "update_authority": null,
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": true, "jup_strict": true },
+    "rugcheck_score": 100,
+    "rugcheck_score_normalised": 4,
+    "risks": [],
+    "markets": [
+      { "pool_address": "JUPPool01111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "liquidity_usd": "22000000.00", "lp_provider_count": 820 },
+      { "pool_address": "JUPPool02111111111111111111111111111111111", "dex": "orca", "lp_burned_pct": "0.00", "liquidity_usd": "14000000.00", "lp_provider_count": 560 }
+    ],
+    "lockers": {},
+    "creator": "JupiterAG11111111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "36000000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 380000,
+    "total_supply_raw": 10000000000000000,
+    "balances": {
+      "JUPDAOTreasury11111111111111111111111111111": 3000000000000000,
+      "JUPCommunityFund111111111111111111111111111": 2000000000000000,
+      "JUPTeamVesting11111111111111111111111111111": 1500000000000000,
+      "JUPHolder0111111111111111111111111111111": 38000000000000,
+      "JUPHolder0211111111111111111111111111111": 28000000000000,
+      "JUPHolder0311111111111111111111111111111": 22000000000000,
+      "JUPHolder0411111111111111111111111111111": 18000000000000,
+      "JUPHolder0511111111111111111111111111111": 14000000000000,
+      "JUPHolder0611111111111111111111111111111": 11000000000000,
+      "JUPHolder0711111111111111111111111111111": 8500000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 379000,
+    "total_supply_raw": 10000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.14",
+    "gini_liquid_after_exclusion": "0.64"
+  },
+  "holder_classifications": [
+    { "address": "JUPDAOTreasury11111111111111111111111111111", "type": "dao_treasury", "label": "Jupiter DAO Treasury" },
+    { "address": "JUPCommunityFund111111111111111111111111111", "type": "ecosystem_fund", "label": "Jupiter Community Fund" },
+    { "address": "JUPTeamVesting11111111111111111111111111111", "type": "vesting_contract", "label": "Jupiter Team Vesting" }
+  ],
+  "pool_rows": [
+    { "pool_address": "JUPPool01111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "lp_locked_pct": "0.00", "effective_safe_pct": "0.00", "lp_provider_count": 820, "liquidity_usd": "22000000.00" },
+    { "pool_address": "JUPPool02111111111111111111111111111111111", "dex": "orca", "lp_burned_pct": "0.00", "lp_locked_pct": "0.00", "effective_safe_pct": "0.00", "lp_provider_count": 560, "liquidity_usd": "14000000.00" }
+  ],
+  "swaps_1h": { "volume_usd": "88000000.00", "trade_count": 125000, "unique_buyers": 62000, "price_start": "0.620", "price_end": "0.622", "price_change_pct": "0.003" },
+  "swaps_7d_daily_baseline": { "day_count_nonzero": 7, "mean_daily_volume_usd": "82000000.00", "std_daily_volume_usd": "14000000.00", "volume_multiplier_observed": "1.07", "volume_z_score": "0.4" },
+  "signal_a_round_trips": [],
+  "pool_total_volume_1h_usd": "88000000.00",
+  "expected": {
+    "d01_honeypot": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "No static honeypot signals. jup_strict=true." },
+    "d02_rug_pull": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "is_established_protocol=true (jup_strict). D02 suppressed." },
+    "d03_concentration": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "After DAO/fund/vesting exclusion: top10_pct_liquid=0.14. gini_delta~0." },
+    "d04_pump_dump": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "vol_multiplier=1.07. price_change=+0.3%. Organic aggregator volume." },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "No round-trip events in 125k trades. 62k unique buyers confirms organic." },
+    "d06_mint_burn_anomaly": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "mint_authority=null." }
+  }
+}

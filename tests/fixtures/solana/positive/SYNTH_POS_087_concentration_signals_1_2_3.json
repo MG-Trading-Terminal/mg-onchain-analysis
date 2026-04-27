@@ -1,0 +1,74 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthConc087KKKKKKKKKKKKKKKKKKKKKKKKKKKKKK",
+    "symbol": "CONC087",
+    "label": "positive",
+    "category": "concentration_high",
+    "source_url": "synthetic/concentration/all_three_signals",
+    "fetched_at": "2026-04-21T20:36:00Z",
+    "synthetic": true,
+    "notes": "D03 all three signals fire: gini_delta=0.09, top10_delta=0.15, top10_abs=0.91. Highest-signal fixture for D03."
+  },
+  "token_meta": {
+    "mint": "SynthConc087KKKKKKKKKKKKKKKKKKKKKKKKKKKKKK",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "TripleConc087",
+    "symbol": "CONC087",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevTriple087111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 3600,
+    "rugcheck_score_normalised": 65,
+    "risks": [ { "name": "High holder concentration", "level": "danger" } ],
+    "markets": [ { "pool_address": "TriplePool087111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "100.00", "liquidity_usd": "52000.00", "lp_provider_count": 1 } ],
+    "lockers": {},
+    "creator": "DevTriple087111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "52000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 92,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "TripleHolder087_001111111111111111111111111": 240000000000000,
+      "TripleHolder087_011111111111111111111111111": 192000000000000,
+      "TripleHolder087_021111111111111111111111111": 155000000000000,
+      "TripleHolder087_031111111111111111111111111": 120000000000000,
+      "TripleHolder087_041111111111111111111111111": 88000000000000,
+      "TripleHolder087_051111111111111111111111111": 52000000000000,
+      "TripleHolder087_061111111111111111111111111": 28000000000000,
+      "TripleHolder087_071111111111111111111111111": 16000000000000,
+      "TripleHolder087_081111111111111111111111111": 9000000000000,
+      "TripleHolder087_091111111111111111111111111": 5000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 88,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.76",
+    "gini_liquid_after_exclusion": "0.82"
+  },
+  "holder_classifications": [],
+  "pool_rows": [ { "pool_address": "TriplePool087111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "100.00", "lp_locked_pct": "0.00", "effective_safe_pct": "100.00", "lp_provider_count": 1, "liquidity_usd": "52000.00" } ],
+  "expected": {
+    "d01_honeypot": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.15], "severity": "Info", "reason": "No honeypot signals." },
+    "d02_rug_pull": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "LP 100% burned. D02 does not fire." },
+    "d03_concentration": {
+      "verdict": "FIRES",
+      "confidence_band": [0.85, 0.95],
+      "severity": "Critical",
+      "reason": "top10_now=(240+192+155+120+88+52+28+16+9+5)e12/1e15=0.905. Signal 3: 0.905>=0.80. Signal 2: delta=0.905-0.76=0.145>=0.10. Signal 1: gini_now~0.91 (high concentration), prior=0.82, delta=0.09>=0.05. All three signals fire. Max signal: Signal 2 conf=min(1.0,0.50+0.145/0.10*0.25)=0.863. Signal 3 conf=min(0.85,0.65+(0.905-0.80)/0.20*0.20)=0.755. Output: max(0.863,0.755)=0.863. Critical."
+    },
+    "d04_pump_dump": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No spike." },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No self-dealing." },
+    "d06_mint_burn_anomaly": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "mint_authority=null." }
+  }
+}

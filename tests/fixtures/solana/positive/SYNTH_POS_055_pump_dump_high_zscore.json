@@ -1,0 +1,132 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthPumpD055eeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "symbol": "PUMP055",
+    "label": "positive",
+    "category": "pump_dump",
+    "source_url": "synthetic/pump_dump/signal_a_extreme_spike",
+    "fetched_at": "2026-04-21T20:04:00Z",
+    "synthetic": true,
+    "notes": "D04 Signal A extreme: vol_ratio=20x, price+88%. z-score=62. Max confidence. La Morgia 2021 extreme pump archetype. Confidence clamped at 0.95."
+  },
+  "token_meta": {
+    "mint": "SynthPumpD055eeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "MegaPump055",
+    "symbol": "PUMP055",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevMega055111111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 4100,
+    "rugcheck_score_normalised": 72,
+    "risks": [],
+    "markets": [
+      {
+        "pool_address": "MegaPool055111111111111111111111111111111111",
+        "dex": "raydium",
+        "lp_burned_pct": "100.00",
+        "liquidity_usd": "155000.00",
+        "lp_provider_count": 1
+      }
+    ],
+    "lockers": {},
+    "creator": "DevMega055111111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "155000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 2100,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "MegaHolder055_0011111111111111111111111111": 42000000000000,
+      "MegaHolder055_0111111111111111111111111111": 31000000000000,
+      "MegaHolder055_0211111111111111111111111111": 22000000000000,
+      "MegaHolder055_0311111111111111111111111111": 16000000000000,
+      "MegaHolder055_0411111111111111111111111111": 11000000000000,
+      "MegaHolder055_0511111111111111111111111111": 8000000000000,
+      "MegaHolder055_0611111111111111111111111111": 6000000000000,
+      "MegaHolder055_0711111111111111111111111111": 4200000000000,
+      "MegaHolder055_0811111111111111111111111111": 2800000000000,
+      "MegaHolder055_0911111111111111111111111111": 1900000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 380,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.39",
+    "gini_liquid_after_exclusion": "0.58"
+  },
+  "holder_classifications": [],
+  "pool_rows": [
+    {
+      "pool_address": "MegaPool055111111111111111111111111111111111",
+      "dex": "raydium",
+      "lp_burned_pct": "100.00",
+      "lp_locked_pct": "0.00",
+      "effective_safe_pct": "100.00",
+      "lp_provider_count": 1,
+      "liquidity_usd": "155000.00"
+    }
+  ],
+  "swaps_1h": {
+    "volume_usd": "1680000.00",
+    "trade_count": 1420,
+    "unique_buyers": 1287,
+    "price_start": "0.000155",
+    "price_end": "0.000292",
+    "price_change_pct": "0.884"
+  },
+  "swaps_7d_daily_baseline": {
+    "day_count_nonzero": 7,
+    "mean_daily_volume_usd": "84000.00",
+    "std_daily_volume_usd": "18200.00",
+    "volume_multiplier_observed": "20.0",
+    "volume_z_score": "87.4"
+  },
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.15],
+      "severity": "Info",
+      "reason": "No honeypot signals. LP 100% burned; D01 buy/sell ratio signal requires simulation — no sell-block evidence."
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.10],
+      "severity": "Info",
+      "reason": "LP 100% burned; effective_safe=100%. D02 Signal B does not fire."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.15],
+      "severity": "Info",
+      "reason": "top10 now=0.145 (sum/supply), prior=0.39. Concentration decreased (distribution to 2100 holders). No concentration increase signals."
+    },
+    "d04_pump_dump": {
+      "verdict": "FIRES",
+      "confidence_band": [0.88, 0.95],
+      "severity": "Critical",
+      "reason": "Signal A: vol_1h=1.68M, baseline=84k, multiplier=20x. price=+88.4%. raw=(20/5-1)*0.5+(0.884/0.30-1)*0.3=1.5+0.884=2.384; sigmoid(2.384)=0.916; clamped to 0.916 -> confidence=0.916. No Signal C data (no insider sell events in window). Final confidence 0.916, severity Critical (>0.80)."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.10],
+      "severity": "Info",
+      "reason": "1287 unique buyers. Organic viral pump. High trade count across diverse wallets. No round-trip self-dealing pattern at this scale."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.05],
+      "severity": "Info",
+      "reason": "mint_authority=null. No supply events."
+    }
+  }
+}

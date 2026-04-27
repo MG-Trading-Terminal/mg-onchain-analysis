@@ -1,0 +1,113 @@
+{
+  "_fixture_meta": {
+    "mint": "FKXSS4N2HFpTw5wr2xyJBKAWRiWb4kpfGSYpK5aCRqyG",
+    "symbol": "SCAM1",
+    "label": "positive",
+    "category": "concentration_high",
+    "source_url": "research/fixtures/concentration/FKXSS4N2HFpTw5wr2xyJBKAWRiWb4kpfGSYpK5aCRqyG.json (Phase 0 corpus)",
+    "fetched_at": "2026-04-21T18:00:00Z",
+    "synthetic": false,
+    "notes": "RugCheck rugged=true corpus token. Pre-drain state: top-10 liquid pct jumped from 40.6% to 66.4% over 24h (rapid accumulation pattern). D03 Signals 1 and 2 both fire. D02 latent risk. D01 clean."
+  },
+  "token_meta": {
+    "mint": "FKXSS4N2HFpTw5wr2xyJBKAWRiWb4kpfGSYpK5aCRqyG",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "SCAM1",
+    "symbol": "SCAM1",
+    "decimals": 9,
+    "supply_raw": "25000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "ScamDev1111111111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 28500,
+    "rugcheck_score_normalised": 68,
+    "risks": [
+      { "name": "Top 10 holders high ownership", "level": "danger" },
+      { "name": "Large Amount of LP Unlocked", "value": "100.00%", "level": "danger" }
+    ],
+    "markets": [
+      {
+        "pool_address": "ScamPool1_11111111111111111111111111111111111",
+        "dex": "raydium",
+        "lp_burned_pct": "0.00",
+        "liquidity_usd": "45000.00",
+        "lp_provider_count": 1
+      }
+    ],
+    "lockers": {},
+    "creator": "ScamDev1111111111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "top_holders": [
+      { "address": "7rMaV3zH9aQ4JtKpNf8vXcYdRW5bZeGqLmCxPsyUBuT", "amount_raw": "4180000000000", "pct": "16.72", "insider": false },
+      { "address": "3nKsW2eP7vLqM5cFdXjRtZ8aGbCmYhNpQxVuBsTgEiy", "amount_raw": "3320000000000", "pct": "13.28", "insider": false },
+      { "address": "9vHdL4fRwNkPaB6cEzXqM3JsYtGmCuWpQiZoVyRbTex", "amount_raw": "2750000000000", "pct": "11.00", "insider": false },
+      { "address": "5cQpZk8eMvFnR2wJbXdNaL7tGhWYyUqCsTmBxPiRzAe", "amount_raw": "1600000000000", "pct": "6.40", "insider": false },
+      { "address": "BwVdR4pLmCsJkXa7nZeN2fQtGhMuPyWbTxCqYsEiRzo", "amount_raw": "1340000000000", "pct": "5.36", "insider": false },
+      { "address": "DhKqRnPjW3YzXfV9cMsLtBe5gNmCuQwZpAyGbTxEiRo", "amount_raw": "970000000000", "pct": "3.88", "insider": false },
+      { "address": "FpMbTsZ4vRwNqJkXeL7dYcGhWaCuPnQiZmBxEyRzVoe", "amount_raw": "810000000000", "pct": "3.24", "insider": false },
+      { "address": "HxKdP3rLmCsJbNa8zXeW2tGqMuQpZwYvCnTyBiRzAoe", "amount_raw": "680000000000", "pct": "2.72", "insider": false },
+      { "address": "JqZbV5wPnRmCsKdXeL4fGhNuMtQyWaBxTzCpYiRoEve", "amount_raw": "550000000000", "pct": "2.20", "insider": false },
+      { "address": "LmQxT6sPwRnCbNkXdV3aYeGhMuZtQiWpCnBxTzEyRoe", "amount_raw": "390000000000", "pct": "1.56", "insider": false }
+    ]
+  },
+  "holder_snapshot_now": {
+    "total_holders": 312,
+    "balances": {
+      "7rMaV3zH9aQ4JtKpNf8vXcYdRW5bZeGqLmCxPsyUBuT": 4180000000000,
+      "3nKsW2eP7vLqM5cFdXjRtZ8aGbCmYhNpQxVuBsTgEiy": 3320000000000,
+      "9vHdL4fRwNkPaB6cEzXqM3JsYtGmCuWpQiZoVyRbTex": 2750000000000,
+      "5cQpZk8eMvFnR2wJbXdNaL7tGhWYyUqCsTmBxPiRzAe": 1600000000000,
+      "BwVdR4pLmCsJkXa7nZeN2fQtGhMuPyWbTxCqYsEiRzo": 1340000000000,
+      "DhKqRnPjW3YzXfV9cMsLtBe5gNmCuQwZpAyGbTxEiRo": 970000000000,
+      "FpMbTsZ4vRwNqJkXeL7dYcGhWaCuPnQiZmBxEyRzVoe": 810000000000,
+      "HxKdP3rLmCsJbNa8zXeW2tGqMuQpZwYvCnTyBiRzAoe": 680000000000,
+      "JqZbV5wPnRmCsKdXeL4fGhNuMtQyWaBxTzCpYiRoEve": 550000000000,
+      "LmQxT6sPwRnCbNkXdV3aYeGhMuZtQiWpCnBxTzEyRoe": 390000000000
+    },
+    "total_supply_raw": 25000000000000
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 389,
+    "total_supply_raw": 25000000000000,
+    "top10_pct_liquid_after_exclusion": "0.4056",
+    "gini_liquid_after_exclusion": "0.6050"
+  },
+  "holder_classifications": [],
+  "pool_rows": [
+    {
+      "pool_address": "ScamPool1_11111111111111111111111111111111111",
+      "dex": "raydium",
+      "lp_burned_pct": "0.00",
+      "lp_locked_pct": "0.00",
+      "effective_safe_pct": "0.00",
+      "lp_provider_count": 1,
+      "liquidity_usd": "45000.00"
+    }
+  ],
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.15],
+      "severity": "Info",
+      "reason": "All D01 signals absent."
+    },
+    "d02_rug_pull": {
+      "verdict": "FIRES",
+      "confidence_band": [0.65, 0.80],
+      "severity": "High",
+      "reason": "Signal B fires: effective_safe_pct=0%, lp_provider_count=1. Confidence ≈ 0.75 per spec formula with single-provider bonus."
+    },
+    "d03_concentration": {
+      "verdict": "FIRES",
+      "confidence_band": [0.55, 0.90],
+      "severity": "High",
+      "reason": "Signal 1 (Gini delta): gini_delta=0.082 >= 0.05 → confidence=0.596/Medium. Signal 2 (top10 delta): top10_delta=0.258 >= 0.10 → confidence=0.895/High (via concentration fixtures existing formula: min(1.0, 0.50+0.158/0.10*0.25)=0.895). Both Signals 1 and 2 fire. Max confidence=0.895. Severity=High/Critical."
+    }
+  }
+}

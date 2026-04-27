@@ -1,0 +1,50 @@
+[package]
+name        = "mg-onchain-token-registry"
+version.workspace     = true
+edition.workspace     = true
+rust-version.workspace = true
+license.workspace     = true
+repository.workspace  = true
+description = "Token metadata enrichment: SPL mint decode, holder snapshots, holder classification, LP-lock state"
+
+[dependencies]
+anyhow.workspace       = true
+tokio.workspace        = true
+tracing.workspace      = true
+serde.workspace        = true
+serde_json.workspace   = true
+thiserror.workspace    = true
+chrono.workspace       = true
+rust_decimal.workspace = true
+async-trait            = "0.1"
+
+mg-onchain-common  = { path = "../common" }
+mg-onchain-storage = { path = "../storage" }
+
+# HTTP JSON-RPC to Solana RPC nodes (Helius / public). No native TLS.
+reqwest.workspace = true
+
+# Account data from getAccountInfo is base64-encoded.
+base64.workspace = true
+
+# Exponential backoff + jitter for RPC retries (429 / transient errors).
+tokio-retry = "0.3"
+
+# sqlx — needed for upsert_classification direct PgPool access.
+sqlx.workspace = true
+
+# bs58 — encode Solana public keys from raw bytes in rpc.rs.
+bs58.workspace = true
+
+# solana-sdk — needed for RawAccount.owner field (Pubkey type) in B1.1.
+solana-sdk.workspace = true
+
+[features]
+# Enable test mock types for use in integration tests and sibling crates.
+# Add `mg-onchain-token-registry = { ..., features = ["test-utils"] }` in
+# dev-dependencies of consumers that need MockSolanaRpc.
+test-utils = []
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full", "test-util"] }
+mg-onchain-token-registry = { path = ".", features = ["test-utils"] }

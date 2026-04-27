@@ -1,0 +1,1753 @@
+openapi: "3.1.0"
+
+info:
+  title: MG Onchain Analysis API
+  version: "1.0.0"
+  description: |
+    On-chain anomaly detection and token risk scoring service.
+
+    Detects rug pulls, honeypots, holder concentration shifts, pump-and-dump patterns,
+    wash trading, and mint/burn anomalies for Solana tokens (Phase 2). EVM chains
+    are Phase 4.
+
+    ## Authentication
+
+    All endpoints (except `/health`, `/metrics`, `/v1/.well-known/jwks.json`, and
+    `POST /v1/auth/token`) require a Bearer JWT in the `Authorization` header.
+
+    JWTs are issued by `POST /v1/auth/token`. The gateway signs tokens with Ed25519
+    (IANA algorithm name: `EdDSA`). The public key is available at
+    `GET /v1/.well-known/jwks.json`.
+
+    ## Scopes
+
+    | Scope | Grants access to |
+    |-------|-----------------|
+    | `read:events` | `GET /v1/anomaly_events`, `GET /v1/detectors`, WS stream |
+    | `read:risk` | `GET /v1/tokens/{chain}/{mint}/risk` |
+    | `write:analyze` | `POST /v1/tokens/analyze` |
+    | `admin` | Admin endpoints |
+
+    ## Amounts and Decimals
+
+    All token amount fields in JSON are **string-encoded integers** (raw units).
+    All ratio / percentage / score fields use **JSON numbers** (f64 for probabilities,
+    string-encoded `Decimal` for monetary amounts).
+
+    ## Self-Sovereign Infrastructure
+
+    Per ADR 0003: no third-party SaaS dependencies. All infrastructure is
+    operator-provided (self-hosted Solana node, Postgres, optional Prometheus/Jaeger).
+
+  contact:
+    name: MG Onchain Analysis
+  license:
+    name: Proprietary
+
+servers:
+  - url: "http://localhost:8080"
+    description: Local development
+  - url: "https://onchain.mg-internal"
+    description: Production (operator-configured)
+
+tags:
+  - name: analysis
+    description: On-demand token risk analysis
+  - name: risk
+    description: Cached token risk reports
+  - name: events
+    description: Historical anomaly event feed
+  - name: introspection
+    description: Detector configuration introspection
+  - name: auth
+    description: JWT authentication
+  - name: ops
+    description: Health, metrics, operational endpoints
+  - name: admin
+    description: Administrative operations (requires admin scope)
+  - name: streaming
+    description: WebSocket streaming
+
+paths:
+
+  # ---------------------------------------------------------------------------
+  # POST /v1/tokens/analyze
+  # ---------------------------------------------------------------------------
+  /v1/tokens/analyze:
+    post:
+      operationId: analyzeToken
+      summary: On-demand full detector run + risk scoring
+      description: |
+        Runs all six MVP detectors (D01–D06) concurrently for the given
+        `(chain, mint)` pair, aggregates results via the scoring engine,
+        and returns a `TokenRiskReport`.
+
+        **Latency target:** p99 < 500ms (Solana Phase 2).
+
+        **Cache behavior:** If a fresh `TokenRiskReport` exists in the
+        gateway cache (age < `token_risk_ttl_seconds`, default 60s), it
+        is returned immediately without running detectors. The
+        `cache_age_seconds` field in the response indicates how old the
+        cached result is (0 = freshly computed).
+
+        **Conflict:** If an analyze is already in flight for the same
+        `(chain, mint)`, returns 409 rather than launching a duplicate
+        detector run.
+      tags: [analysis]
+      security:
+        - bearerAuth: [write:analyze]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalyzeRequest"
+            examples:
+              solana_token:
+                summary: Solana RAVE token (known high-risk fixture)
+                value:
+                  chain: "solana"
+                  mint: "FeqiF7TEVmpYuuj4goD8WgmgyhFgFnZiWtw226wF4hNm"
+                  window_hours: 24
+      responses:
+        "200":
+          description: |
+            Analysis complete. Returns the `TokenRiskReport` and how many
+            milliseconds the analysis took.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyzeResponse"
+        "400":
+          $ref: "#/components/responses/InvalidInput"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          description: |
+            An analyze for this `(chain, mint)` is already in flight.
+            Retry after the in-flight request completes (typically < 500ms).
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+              example:
+                type: "https://mg-onchain/errors/analyze-in-flight"
+                title: "Analyze already in flight"
+                status: 409
+                detail: "An analyze for solana/FeqiF7TE... is already running. Retry in ~500ms."
+                instance: "/v1/tokens/analyze"
+                trace_id: "5e3a1f8c9b2d4a07"
+        "422":
+          $ref: "#/components/responses/SemanticError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/InternalError"
+        "503":
+          $ref: "#/components/responses/ComponentUnhealthy"
+
+  # ---------------------------------------------------------------------------
+  # GET /v1/tokens/{chain}/{mint}/risk
+  # ---------------------------------------------------------------------------
+  /v1/tokens/{chain}/{mint}/risk:
+    get:
+      operationId: getTokenRisk
+      summary: Get cached or freshly-scored token risk report
+      description: |
+        Returns a `TokenRiskReport` for the given token. Faster than
+        `POST /v1/tokens/analyze` when the cache is warm (typical latency < 5ms
+        on cache hit, < 100ms on cache miss with Postgres query + scoring).
+
+        **On cache miss:** Queries `anomaly_events` (last 24h) from Postgres
+        and runs `ScoringEngine::score()` synchronously. Result is cached for
+        subsequent calls.
+
+        **No automatic analyze trigger:** This endpoint does NOT run detectors
+        on a cache miss. Use `POST /v1/tokens/analyze` to trigger a fresh
+        detector run.
+      tags: [risk]
+      security:
+        - bearerAuth: [read:risk]
+      parameters:
+        - $ref: "#/components/parameters/PathChain"
+        - $ref: "#/components/parameters/PathMint"
+      responses:
+        "200":
+          description: Risk report (cached or freshly computed).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RiskResponse"
+        "400":
+          $ref: "#/components/responses/InvalidInput"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          description: |
+            No risk report available for this token. The token is not in
+            the registry and has no cached anomaly events. Use
+            `POST /v1/tokens/analyze` to create a report.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+              example:
+                type: "https://mg-onchain/errors/token-not-found"
+                title: "Token not found"
+                status: 404
+                detail: "No risk data for solana/UnknownMint..."
+                instance: "/v1/tokens/solana/UnknownMint..."
+                trace_id: "5e3a1f8c9b2d4a07"
+        "422":
+          $ref: "#/components/responses/SemanticError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  # ---------------------------------------------------------------------------
+  # GET /v1/anomaly_events
+  # ---------------------------------------------------------------------------
+  /v1/anomaly_events:
+    get:
+      operationId: listAnomalyEvents
+      summary: Paginated historical anomaly event feed
+      description: |
+        Returns a cursor-paginated list of `AnomalyEvent` records from Postgres,
+        ordered by `observed_at DESC`.
+
+        **Cursor pagination:** Use the `next_cursor` value from a previous response
+        as the `cursor` parameter of the next request. The cursor encodes
+        `(observed_at, id)` and is stable under concurrent inserts (unlike OFFSET).
+
+        Iterate until `next_cursor` is `null`.
+
+        **No total count field:** `SELECT COUNT(*)` over partitioned event tables
+        is expensive. Consumers should iterate via cursor.
+      tags: [events]
+      security:
+        - bearerAuth: [read:events]
+      parameters:
+        - name: chain
+          in: query
+          description: |
+            Filter by chain. Required if `token` is specified.
+            Supported values: `"solana"` (Phase 2). `"ethereum"`, `"bsc"`,
+            `"base"` are Phase 4.
+          required: false
+          schema:
+            $ref: "#/components/schemas/Chain"
+        - name: token
+          in: query
+          description: Filter by token address (chain-canonical form).
+          required: false
+          schema:
+            type: string
+            description: Chain-canonical token address.
+            examples:
+              - "FeqiF7TEVmpYuuj4goD8WgmgyhFgFnZiWtw226wF4hNm"
+        - name: detector_id
+          in: query
+          description: |
+            Filter by detector ID. Must match a detector's stable
+            `snake_case` identifier (e.g. `"rug_pull_lp_drain"`).
+          required: false
+          schema:
+            type: string
+            enum:
+              - honeypot_sim
+              - rug_pull_lp_drain
+              - holder_concentration
+              - pump_dump
+              - wash_trading_h1
+              - mint_burn_anomaly
+        - name: severity_min
+          in: query
+          description: |
+            Minimum severity (inclusive). Returns only events at this
+            severity or above. Default `"info"` (all events).
+          required: false
+          schema:
+            $ref: "#/components/schemas/Severity"
+          example: "medium"
+        - name: from
+          in: query
+          description: |
+            Inclusive lower bound on `observed_at` (block time).
+            ISO 8601 format with timezone offset, e.g. `"2026-04-01T00:00:00Z"`.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          description: |
+            Exclusive upper bound on `observed_at`. Defaults to current time.
+            ISO 8601 format.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: limit
+          in: query
+          description: Maximum number of events per page. Default 50, max 500.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 50
+        - name: cursor
+          in: query
+          description: |
+            Opaque pagination cursor from `next_cursor` in the previous response.
+            Do not construct manually; treat as an opaque string.
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Paginated event list.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnomalyEventPage"
+        "400":
+          $ref: "#/components/responses/InvalidInput"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  # ---------------------------------------------------------------------------
+  # GET /v1/detectors
+  # ---------------------------------------------------------------------------
+  /v1/detectors:
+    get:
+      operationId: listDetectors
+      summary: List configured detectors and their thresholds
+      description: |
+        Returns the in-memory detector configuration loaded from
+        `config/detectors.toml` at startup. Includes each detector's
+        threshold values, rationale strings, and REFERENCES.md citation IDs.
+
+        Useful for consumer audit (verify the thresholds the service is
+        using), CI verification (assert thresholds match expected values),
+        and compliance documentation.
+
+        This endpoint reads only in-memory config — no database query.
+      tags: [introspection]
+      security:
+        - bearerAuth: [read:events]
+      responses:
+        "200":
+          description: List of configured detectors.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DetectorListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  # ---------------------------------------------------------------------------
+  # GET /health
+  # ---------------------------------------------------------------------------
+  /health:
+    get:
+      operationId: healthCheck
+      summary: Liveness and readiness probe
+      description: |
+        Returns 200 when all components are healthy. Returns 503 when any
+        component is degraded.
+
+        **No authentication required.**
+
+        Used by Docker healthcheck (`HEALTHCHECK CMD curl -f /health`) and
+        orchestrator readiness probes.
+      tags: [ops]
+      security: []
+      responses:
+        "200":
+          description: All components healthy.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+              example:
+                status: "ok"
+                storage: "ok"
+                scoring: "ok"
+                detectors: "ok"
+                registry: "ok"
+                uptime_seconds: 3712
+        "503":
+          description: One or more components are unhealthy.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+              example:
+                status: "degraded"
+                storage: "error"
+                storage_detail: "pool timeout after 500ms"
+                scoring: "ok"
+                detectors: "ok"
+                registry: "ok"
+                uptime_seconds: 47
+
+  # ---------------------------------------------------------------------------
+  # GET /metrics
+  # ---------------------------------------------------------------------------
+  /metrics:
+    get:
+      operationId: prometheusMetrics
+      summary: Prometheus metrics scrape endpoint
+      description: |
+        Returns Prometheus text-format metrics (version 0.0.4).
+
+        **No authentication required by default** (operator may enable
+        auth via `gateway.metrics.require_auth = true` in config).
+
+        Core metrics:
+        - `http_requests_total{path,method,status}` — request counter
+        - `http_request_duration_seconds{path,method}` — latency histogram
+        - `ws_active_connections` — current WebSocket connection count
+        - `ws_subscriptions_active{chain}` — active WS subscription count
+        - `scoring_cache_hits_total` / `scoring_cache_misses_total`
+        - `detector_invocations_total{detector_id,outcome}`
+        - `analyze_in_flight` — active concurrent analyze operations
+      tags: [ops]
+      security: []
+      responses:
+        "200":
+          description: Prometheus text format metrics.
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  # ---------------------------------------------------------------------------
+  # POST /v1/auth/token
+  # ---------------------------------------------------------------------------
+  /v1/auth/token:
+    post:
+      operationId: issueToken
+      summary: Exchange credentials for a JWT
+      description: |
+        Verifies username + password against the `auth_users` Postgres table
+        (Argon2id hash comparison) and mints a signed Ed25519 JWT.
+
+        The token is valid for `jwt_expiry_hours` (default 24 hours, configurable).
+
+        **Service-to-service consumers** should call this once at startup and
+        cache the token, re-authenticating before expiry.
+
+        **No authentication required** (this IS the authentication endpoint).
+      tags: [auth]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthRequest"
+      responses:
+        "200":
+          description: JWT issued successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          $ref: "#/components/responses/InvalidInput"
+        "401":
+          description: Invalid username or password.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+              example:
+                type: "https://mg-onchain/errors/unauthenticated"
+                title: "Invalid credentials"
+                status: 401
+                detail: "Username or password is incorrect."
+                instance: "/v1/auth/token"
+                trace_id: "5e3a1f8c9b2d4a07"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  # ---------------------------------------------------------------------------
+  # GET /v1/.well-known/jwks.json
+  # ---------------------------------------------------------------------------
+  /v1/.well-known/jwks.json:
+    get:
+      operationId: getJwks
+      summary: Ed25519 public key set for JWT verification
+      description: |
+        Returns the RFC 7517 JSON Web Key Set containing the gateway's
+        Ed25519 public key. Consumers can use this to verify JWTs locally
+        without calling back to the gateway.
+
+        **No authentication required.**
+
+        Key type: `OKP`, curve: `Ed25519`, algorithm: `EdDSA`.
+      tags: [auth]
+      security: []
+      responses:
+        "200":
+          description: JWKS with Ed25519 public key.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JwksResponse"
+
+  # ---------------------------------------------------------------------------
+  # WebSocket: GET /v1/ws/stream
+  # ---------------------------------------------------------------------------
+  /v1/ws/stream:
+    get:
+      operationId: wsStream
+      summary: WebSocket real-time anomaly event and risk report stream
+      description: |
+        HTTP Upgrade to WebSocket. After connecting, the client sends a
+        `subscribe` message to specify filters. The server pushes
+        `AnomalyEvent` frames and `TokenRiskReport` updates in real time.
+
+        **Authentication:** Send the JWT in the `Authorization: Bearer <token>`
+        header during the HTTP Upgrade request, or as `?token=<jwt>` query
+        parameter if header-based auth is not available.
+
+        **Required scope:** `read:events`
+
+        ### Message flow
+
+        ```
+        Client → Server: {"action":"subscribe","chain":"solana","severity_min":"medium"}
+        Server → Client: {"type":"subscribed","subscription_id":"sub_7f3a9c",...}
+        Server → Client: {"type":"event","subscription_id":"sub_7f3a9c","event":{...}}
+        Server → Client: {"type":"report","subscription_id":"sub_7f3a9c","report":{...},"delta":0.52}
+        Server → Client: {"type":"ping"}
+        Client → Server: {"type":"pong"}
+        Server → Client: {"type":"lag_notice","dropped":23}  (if buffer full)
+        ```
+
+        ### Backpressure
+
+        Each connection has a bounded per-subscriber send buffer (default 1000 messages).
+        When full, the **oldest** events are dropped and a `lag_notice` frame is sent.
+        The connection is NOT closed on lag; the client may reconnect with `resume_from`
+        to replay missed events (up to 5 minutes lookback).
+
+        ### Reconnect
+
+        On reconnect, send `resume_from: <last_event_id>` in the subscribe message.
+        The gateway replays events from Postgres since that ID.
+      tags: [streaming]
+      security:
+        - bearerAuth: [read:events]
+        - tokenParam: []
+      parameters:
+        - name: token
+          in: query
+          description: |
+            JWT bearer token. Alternative to `Authorization` header for
+            WebSocket clients that cannot set headers.
+          required: false
+          schema:
+            type: string
+      responses:
+        "101":
+          description: WebSocket upgrade successful.
+        "400":
+          $ref: "#/components/responses/InvalidInput"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          description: |
+            Too many WebSocket connections from this subject
+            (`ws_connections_per_subject` limit reached).
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+
+  # ---------------------------------------------------------------------------
+  # Admin endpoints
+  # ---------------------------------------------------------------------------
+  /v1/admin/cache/{chain}/{mint}:
+    delete:
+      operationId: invalidateCache
+      summary: Manually invalidate the cache entry for a token
+      description: |
+        Removes the `TokenRiskReport` cache entry for the given `(chain, mint)`.
+        The next request for this token will recompute from Postgres.
+
+        **Required scope:** `admin`
+      tags: [admin]
+      security:
+        - bearerAuth: [admin]
+      parameters:
+        - $ref: "#/components/parameters/PathChain"
+        - $ref: "#/components/parameters/PathMint"
+      responses:
+        "200":
+          description: Cache entry invalidated (or was already absent).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  invalidated:
+                    type: boolean
+                required: [invalidated]
+              example:
+                invalidated: true
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/SemanticError"
+
+  /v1/admin/users:
+    post:
+      operationId: createUser
+      summary: Create a new API user
+      description: |
+        Creates a new entry in the `auth_users` Postgres table. The password
+        is hashed with Argon2id before storage.
+
+        Intended for operator use via CLI (`onchain-service admin create-user`),
+        not for consumer-facing use.
+
+        **Required scope:** `admin`
+      tags: [admin]
+      security:
+        - bearerAuth: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserRequest"
+      responses:
+        "201":
+          description: User created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateUserResponse"
+        "400":
+          $ref: "#/components/responses/InvalidInput"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          description: Username already exists.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+
+# =============================================================================
+# Components
+# =============================================================================
+components:
+
+  # ---------------------------------------------------------------------------
+  # Security schemes
+  # ---------------------------------------------------------------------------
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Ed25519-signed JWT (algorithm: EdDSA). Obtain via `POST /v1/auth/token`.
+        Public key available at `GET /v1/.well-known/jwks.json`.
+    tokenParam:
+      type: apiKey
+      in: query
+      name: token
+      description: |
+        JWT passed as `?token=<jwt>` query parameter. For WebSocket clients
+        that cannot set HTTP headers during upgrade.
+    mutualTLS:
+      type: mutualTLS
+      description: |
+        Client certificate authentication. Required for `admin` scope when
+        `mtls_required_scopes = ["admin"]` is set in gateway config.
+
+  # ---------------------------------------------------------------------------
+  # Reusable parameters
+  # ---------------------------------------------------------------------------
+  parameters:
+    PathChain:
+      name: chain
+      in: path
+      required: true
+      description: |
+        Chain identifier. Lowercase. Phase 2 supports `"solana"` only.
+        Phase 4 adds `"ethereum"`, `"bsc"`, `"base"`.
+      schema:
+        $ref: "#/components/schemas/Chain"
+
+    PathMint:
+      name: mint
+      in: path
+      required: true
+      description: |
+        Token address in chain-canonical form.
+        Solana: Base58-encoded public key (32–44 characters).
+        EVM (Phase 4): EIP-55 checksummed hex address (`0x...`, 42 characters).
+      schema:
+        type: string
+        examples:
+          - "FeqiF7TEVmpYuuj4goD8WgmgyhFgFnZiWtw226wF4hNm"
+
+  # ---------------------------------------------------------------------------
+  # Reusable responses
+  # ---------------------------------------------------------------------------
+  responses:
+    InvalidInput:
+      description: Request is syntactically or semantically malformed.
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
+          example:
+            type: "https://mg-onchain/errors/invalid-input"
+            title: "Invalid input"
+            status: 400
+            detail: "mint must be Base58-encoded, 32–44 characters"
+            instance: "/v1/tokens/analyze"
+            trace_id: "5e3a1f8c9b2d4a07"
+
+    Unauthenticated:
+      description: Missing, expired, or unparseable JWT.
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
+          example:
+            type: "https://mg-onchain/errors/unauthenticated"
+            title: "Authentication required"
+            status: 401
+            detail: "JWT has expired. Re-authenticate via POST /v1/auth/token."
+            instance: "/v1/tokens/analyze"
+            trace_id: "5e3a1f8c9b2d4a07"
+
+    Unauthorized:
+      description: Valid JWT but missing required scope.
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
+          example:
+            type: "https://mg-onchain/errors/unauthorized"
+            title: "Insufficient scope"
+            status: 403
+            detail: "Scope 'write:analyze' is required for this endpoint."
+            instance: "/v1/tokens/analyze"
+            trace_id: "5e3a1f8c9b2d4a07"
+
+    SemanticError:
+      description: |
+        Request is well-formed but semantically invalid (e.g. unsupported chain,
+        window_hours out of range).
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
+          example:
+            type: "https://mg-onchain/errors/semantic-error"
+            title: "Semantic error"
+            status: 422
+            detail: "Chain 'tron' is not supported in Phase 2. Supported: solana."
+            instance: "/v1/tokens/analyze"
+            trace_id: "5e3a1f8c9b2d4a07"
+
+    RateLimited:
+      description: Rate limit exceeded. `Retry-After` header contains seconds to wait.
+      headers:
+        Retry-After:
+          description: Seconds until the rate limit resets.
+          schema:
+            type: integer
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
+          example:
+            type: "https://mg-onchain/errors/rate-limited"
+            title: "Rate limit exceeded"
+            status: 429
+            detail: "write:analyze allows 10 requests per minute. Retry after 23 seconds."
+            instance: "/v1/tokens/analyze"
+            trace_id: "5e3a1f8c9b2d4a07"
+
+    InternalError:
+      description: |
+        Unexpected server error. `trace_id` can be used to correlate with
+        server-side logs.
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
+          example:
+            type: "https://mg-onchain/errors/internal-error"
+            title: "Internal server error"
+            status: 500
+            detail: "An unexpected error occurred. Please contact support with the trace_id."
+            instance: "/v1/tokens/analyze"
+            trace_id: "5e3a1f8c9b2d4a07"
+
+    ComponentUnhealthy:
+      description: |
+        A required backend component (storage, registry) is unhealthy.
+        Retry after the component recovers (see `GET /health` for status).
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
+          example:
+            type: "https://mg-onchain/errors/component-unhealthy"
+            title: "Component unhealthy"
+            status: 503
+            detail: "Storage (Postgres) is unavailable. Retry after recovery."
+            instance: "/v1/tokens/analyze"
+            trace_id: "5e3a1f8c9b2d4a07"
+
+  # ---------------------------------------------------------------------------
+  # Schemas
+  # ---------------------------------------------------------------------------
+  schemas:
+
+    # ---- Primitive / shared ----
+
+    Chain:
+      type: string
+      description: Blockchain identifier (lowercase).
+      enum: [solana, ethereum, bsc, base]
+      examples:
+        - "solana"
+
+    Severity:
+      type: string
+      description: |
+        Alert severity level, ordered ascending: `info < low < medium < high < critical`.
+      enum: [info, low, medium, high, critical]
+
+    ProblemDetail:
+      type: object
+      description: RFC 7807 problem detail object.
+      required: [type, title, status, detail, instance, trace_id]
+      properties:
+        type:
+          type: string
+          format: uri
+          description: |
+            URI reference identifying the problem type.
+            Example: `"https://mg-onchain/errors/invalid-input"`
+        title:
+          type: string
+          description: Short, human-readable summary of the problem.
+        status:
+          type: integer
+          description: HTTP status code.
+          minimum: 100
+          maximum: 599
+        detail:
+          type: string
+          description: Human-readable explanation specific to this occurrence.
+        instance:
+          type: string
+          description: URI of the endpoint that generated the error.
+        trace_id:
+          type: string
+          description: |
+            Request trace ID for log correlation. Echo the `x-request-id` response header.
+
+    # ---- Request bodies ----
+
+    AnalyzeRequest:
+      type: object
+      required: [chain, mint]
+      properties:
+        chain:
+          $ref: "#/components/schemas/Chain"
+        mint:
+          type: string
+          description: |
+            Token address in chain-canonical form.
+            Solana: Base58-encoded (32–44 chars).
+            EVM (Phase 4): EIP-55 checksummed hex (`0x...`).
+          examples:
+            - "FeqiF7TEVmpYuuj4goD8WgmgyhFgFnZiWtw226wF4hNm"
+        window_hours:
+          type: integer
+          description: |
+            Observation window in hours. Detectors evaluate events in the range
+            `[now - window_hours, now]`. Default 24, max 168 (7 days).
+          minimum: 1
+          maximum: 168
+          default: 24
+
+    AuthRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          description: API user name (as registered via `POST /v1/admin/users`).
+          minLength: 1
+          maxLength: 128
+        password:
+          type: string
+          description: |
+            Plaintext password. **Transmitted over TLS only.** Never logged.
+          minLength: 1
+          writeOnly: true
+
+    CreateUserRequest:
+      type: object
+      required: [username, password, scopes]
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 128
+        password:
+          type: string
+          minLength: 12
+          description: Minimum 12 characters. Hashed with Argon2id before storage.
+          writeOnly: true
+        scopes:
+          type: array
+          items:
+            type: string
+            enum: [read:events, read:risk, write:analyze, admin]
+          minItems: 1
+
+    # ---- Response bodies ----
+
+    AnalyzeResponse:
+      type: object
+      required: [report, analysis_duration_ms]
+      properties:
+        report:
+          $ref: "#/components/schemas/TokenRiskReport"
+        analysis_duration_ms:
+          type: integer
+          description: |
+            Total analysis time in milliseconds. 0 if the result was served
+            from cache (no detector run occurred).
+        cache_age_seconds:
+          type: integer
+          description: |
+            Age of the cached report in seconds. 0 means the report was
+            freshly computed in this request. Present only when the result
+            came from cache.
+
+    RiskResponse:
+      type: object
+      required: [report, cached]
+      properties:
+        report:
+          $ref: "#/components/schemas/TokenRiskReport"
+        cached:
+          type: boolean
+          description: True if the report was served from the in-memory cache.
+        cache_age_seconds:
+          type: integer
+          description: |
+            Age of the cached report in seconds. Present when `cached = true`.
+
+    AnomalyEventPage:
+      type: object
+      required: [events, total_in_page]
+      properties:
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnomalyEvent"
+        next_cursor:
+          type: string
+          nullable: true
+          description: |
+            Opaque cursor for the next page. Pass as `?cursor=<value>` in
+            the next request. `null` when there are no more results.
+        total_in_page:
+          type: integer
+          description: Number of events in this page.
+
+    DetectorListResponse:
+      type: object
+      required: [detectors]
+      properties:
+        detectors:
+          type: array
+          items:
+            $ref: "#/components/schemas/DetectorInfo"
+
+    HealthResponse:
+      type: object
+      required: [status, storage, scoring, detectors, registry, uptime_seconds]
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded]
+        storage:
+          type: string
+          enum: [ok, error, degraded]
+        storage_detail:
+          type: string
+          description: Error detail if storage is not ok.
+        scoring:
+          type: string
+          enum: [ok, error]
+        detectors:
+          type: string
+          enum: [ok, error]
+        registry:
+          type: string
+          enum: [ok, error, degraded]
+        registry_detail:
+          type: string
+          description: Error detail if registry is not ok.
+        uptime_seconds:
+          type: integer
+          description: Seconds since the service started.
+
+    AuthResponse:
+      type: object
+      required: [access_token, token_type, expires_in, scopes]
+      properties:
+        access_token:
+          type: string
+          description: Signed Ed25519 JWT (EdDSA algorithm).
+        token_type:
+          type: string
+          enum: [Bearer]
+        expires_in:
+          type: integer
+          description: Token lifetime in seconds (default 86400 = 24h).
+        scopes:
+          type: array
+          items:
+            type: string
+          description: Scopes granted to this token.
+          examples:
+            - [read:events, read:risk, write:analyze]
+
+    CreateUserResponse:
+      type: object
+      required: [username, scopes, created_at]
+      properties:
+        username:
+          type: string
+        scopes:
+          type: array
+          items:
+            type: string
+        created_at:
+          type: string
+          format: date-time
+
+    JwksResponse:
+      type: object
+      required: [keys]
+      properties:
+        keys:
+          type: array
+          items:
+            $ref: "#/components/schemas/Jwk"
+
+    Jwk:
+      type: object
+      required: [kty, crv, x, kid, use, alg]
+      properties:
+        kty:
+          type: string
+          enum: [OKP]
+          description: Key type. `OKP` = Octet Key Pair (Ed25519).
+        crv:
+          type: string
+          enum: [Ed25519]
+          description: Elliptic curve.
+        x:
+          type: string
+          description: Base64url-encoded Ed25519 public key bytes (32 bytes).
+        kid:
+          type: string
+          description: |
+            Key ID. Matches the `kid` claim in issued JWTs.
+            Used for key rotation: a new keypair gets a new `kid`.
+        "use":
+          type: string
+          enum: [sig]
+          description: "Key usage: signature verification."
+        alg:
+          type: string
+          enum: [EdDSA]
+          description: "Algorithm: EdDSA (Ed25519)."
+
+    # ---- Core domain types ----
+
+    TokenRiskReport:
+      type: object
+      description: |
+        Aggregated risk report for a token, produced by `crates/scoring`.
+
+        Contains the overall risk score (0.0–1.0), per-detector breakdowns,
+        top evidence highlights, coverage metadata, and the scoring config snapshot
+        used to produce this report.
+
+        ## Score interpretation
+
+        | `overall_score` range | Suggested action |
+        |----------------------|------------------|
+        | 0.0 – 0.40 | Low risk — proceed with normal diligence |
+        | 0.40 – 0.70 | Medium risk — review evidence before trading |
+        | 0.70 – 1.0 | High risk — strong signal of anomaly |
+
+        These thresholds are CONSUMER-CONFIGURABLE. The scoring crate produces a
+        score; each consumer applies its own threshold policy.
+
+        ## Critical severity override
+
+        Even if `overall_score < 0.40`, if `overall_severity == "critical"`,
+        consumers SHOULD treat the token as high risk (e.g. confirmed honeypot at
+        high confidence with low importance weight still sets severity=critical).
+      required:
+        - token
+        - chain
+        - window
+        - computed_at
+        - overall_score
+        - base_score
+        - overall_severity
+        - per_detector
+        - top_evidence
+        - signal_counts
+        - coverage
+        - config_snapshot
+      properties:
+        token:
+          type: string
+          description: Token address (chain-canonical).
+        chain:
+          $ref: "#/components/schemas/Chain"
+        window:
+          $ref: "#/components/schemas/TimeWindow"
+        computed_at:
+          type: string
+          format: date-time
+          description: Wall-clock time when this report was produced.
+        overall_score:
+          type: number
+          format: double
+          minimum: 0.0
+          maximum: 1.0
+          description: |
+            Aggregated risk score after attenuation (jup_strict, jup_verified,
+            established_protocol, token_age multipliers). Range [0.0, 1.0].
+        base_score:
+          type: number
+          format: double
+          minimum: 0.0
+          maximum: 1.0
+          description: |
+            Pre-attenuation score. Useful for debugging and consumer overrides
+            that do not agree with the gateway's attenuation factors.
+        overall_severity:
+          $ref: "#/components/schemas/Severity"
+          description: |
+            Worst-case severity across all fired detector events.
+            Not affected by attenuation — reflects the raw worst signal seen.
+        per_detector:
+          type: object
+          description: |
+            Per-detector breakdown. Keys are detector_id strings in alphabetical
+            order (BTreeMap guarantees deterministic key order).
+          additionalProperties:
+            $ref: "#/components/schemas/DetectorScore"
+        top_evidence:
+          type: array
+          maxItems: 10
+          items:
+            $ref: "#/components/schemas/EvidenceHighlight"
+          description: |
+            Up to N (config default 5) highest-impact evidence entries across
+            all detectors, ranked by (severity DESC, confidence DESC, key ASC).
+        signal_counts:
+          $ref: "#/components/schemas/SignalCounts"
+        coverage:
+          $ref: "#/components/schemas/CoverageReport"
+        config_snapshot:
+          $ref: "#/components/schemas/ScoringConfigSnapshot"
+
+    DetectorScore:
+      type: object
+      description: Per-detector breakdown within a `TokenRiskReport`.
+      required:
+        - detector_id
+        - fired_events
+        - suppressed_events
+        - inconclusive_events
+        - max_confidence
+        - weighted_confidence
+        - severity
+        - evidence_summary
+      properties:
+        detector_id:
+          type: string
+          description: Stable detector identifier (e.g. `"rug_pull_lp_drain"`).
+        fired_events:
+          type: integer
+          minimum: 0
+          description: |
+            Events from this detector with confidence >= inconclusive_floor (0.30).
+        suppressed_events:
+          type: integer
+          minimum: 0
+          description: |
+            Events suppressed at the detector level by `is_established_protocol`.
+        inconclusive_events:
+          type: integer
+          minimum: 0
+          description: |
+            Events from this detector with confidence < inconclusive_floor (0.30).
+        max_confidence:
+          type: number
+          format: double
+          minimum: 0.0
+          maximum: 1.0
+          description: Max confidence among fired events (raw, no time decay).
+        weighted_confidence:
+          type: number
+          format: double
+          minimum: 0.0
+          maximum: 1.0
+          description: Time-decay-weighted average confidence. 0.0 if no events fired.
+        severity:
+          $ref: "#/components/schemas/Severity"
+          description: Worst-case severity among fired events.
+        evidence_summary:
+          type: array
+          maxItems: 3
+          items:
+            $ref: "#/components/schemas/EvidencePair"
+          description: Top 3 evidence key-value pairs by (severity DESC, confidence DESC).
+
+    EvidencePair:
+      type: object
+      required: [key, value]
+      properties:
+        key:
+          type: string
+          description: |
+            Evidence metric key, prefixed with detector_id.
+            Example: `"rug_pull_lp_drain/lp_removed_pct"`.
+        value:
+          type: string
+          description: String-encoded Decimal value.
+
+    EvidenceHighlight:
+      type: object
+      description: A single high-impact evidence entry selected for top_evidence.
+      required: [detector_id, severity, confidence, key, value]
+      properties:
+        detector_id:
+          type: string
+        severity:
+          $ref: "#/components/schemas/Severity"
+        confidence:
+          type: number
+          format: double
+          minimum: 0.0
+          maximum: 1.0
+          description: Raw confidence (no time decay).
+        key:
+          type: string
+          description: |
+            Evidence metric key. Format: `<detector_id>/<metric_name>`.
+            Examples:
+            - `"rug_pull_lp_drain/lp_removed_pct"` → LP percentage removed
+            - `"pump_dump/volume_ratio"` → 1h volume / 7-day median volume
+            - `"holder_concentration/top10_pct_now"` → current top-10 %
+        value:
+          type: string
+          description: String-encoded Decimal value.
+        note:
+          type: string
+          nullable: true
+          description: Human-readable annotation from the detector (first notes entry).
+
+    SignalCounts:
+      type: object
+      required: [fired, inconclusive, suppressed_info]
+      properties:
+        fired:
+          type: integer
+          minimum: 0
+          description: Events with confidence >= inconclusive_floor (0.30).
+        inconclusive:
+          type: integer
+          minimum: 0
+          description: Events with confidence < inconclusive_floor (0.30).
+        suppressed_info:
+          type: integer
+          minimum: 0
+          description: |
+            Events at Severity::Info emitted by detectors for audit purposes
+            (e.g. established-protocol latent-signal suppression notices).
+
+    CoverageReport:
+      type: object
+      required: [detectors_run, detectors_skipped, coverage_completeness]
+      properties:
+        detectors_run:
+          type: array
+          items:
+            type: string
+          description: |
+            Detector IDs that produced at least one AnomalyEvent in the window.
+        detectors_skipped:
+          type: array
+          items:
+            $ref: "#/components/schemas/SkipReason"
+          description: |
+            Detectors not run, with reasons. Critical for distinguishing "no signal"
+            from "not enough data to evaluate".
+        coverage_completeness:
+          type: number
+          format: float
+          minimum: 0.0
+          maximum: 1.0
+          description: |
+            Fraction of known detectors that either ran OR had a deliberate skip
+            reason. 1.0 = all 6 detectors covered; 0.5 = only 3 covered.
+            Low coverage reduces trust in the overall_score.
+
+    SkipReason:
+      type: object
+      required: [detector_id, reason]
+      properties:
+        detector_id:
+          type: string
+        reason:
+          type: string
+          description: |
+            Human-readable reason why this detector was skipped.
+            Examples:
+            - `"no swap events in window (required for D04/D05)"`
+            - `"insufficient holder snapshots: 1 snapshot, need ≥2 for delta signals"`
+            - `"D01 simulation disabled (config: simulation_enabled=false)"`
+
+    ScoringConfigSnapshot:
+      type: object
+      description: |
+        The `ScoringConfig` used to produce this report. Stored for reproducibility
+        auditing — consumers can verify the weights and thresholds that generated
+        this score.
+      required: [detector_weights, decay_half_life_hours, inconclusive_floor, evidence_highlight_count]
+      properties:
+        detector_weights:
+          type: object
+          description: Per-detector importance weights (must sum to 1.0).
+          additionalProperties:
+            type: number
+            format: double
+          example:
+            holder_concentration: 0.35
+            pump_dump: 0.35
+            rug_pull_lp_drain: 0.20
+            wash_trading_h1: 0.07
+            honeypot_sim: 0.015
+            mint_burn_anomaly: 0.015
+        decay_half_life_hours:
+          type: number
+          format: double
+          description: Exponential decay half-life for event-based signals (hours).
+        jup_strict_multiplier:
+          type: number
+          format: double
+          description: Attenuation factor for jup_strict tokens (default 0.30).
+        jup_verified_multiplier:
+          type: number
+          format: double
+          description: Attenuation for jup_verified (non-strict) tokens (default 0.60).
+        established_protocol_multiplier:
+          type: number
+          format: double
+          description: Attenuation for established protocols (default 0.50).
+        inconclusive_floor:
+          type: number
+          format: double
+          description: Confidence floor below which events are classified as inconclusive.
+        evidence_highlight_count:
+          type: integer
+          description: Maximum entries in top_evidence.
+
+    AnomalyEvent:
+      type: object
+      description: |
+        Output of a single detector invocation for a specific token and time window.
+        Serialized as camelCase JSON for REST/WS delivery (per `crates/common` serde
+        convention).
+      required:
+        - detectorId
+        - token
+        - chain
+        - confidence
+        - severity
+        - evidence
+        - observedAt
+        - window
+        - ingestedAt
+      properties:
+        detectorId:
+          type: string
+          description: |
+            Stable snake_case detector identifier.
+            Examples: `"rug_pull_lp_drain"`, `"honeypot_sim"`,
+            `"holder_concentration"`, `"pump_dump"`, `"wash_trading_h1"`,
+            `"mint_burn_anomaly"`.
+        token:
+          type: string
+          description: Token address (chain-canonical).
+        chain:
+          $ref: "#/components/schemas/Chain"
+        confidence:
+          type: number
+          format: double
+          minimum: 0.0
+          maximum: 1.0
+          description: |
+            Calibrated probability that the anomaly is real. [0.0, 1.0].
+            0.0 = certainly benign. 1.0 = certainly anomalous.
+            Serialized as a JSON number (not a string) — precision is sufficient
+            for a probability estimate.
+        severity:
+          $ref: "#/components/schemas/Severity"
+        evidence:
+          $ref: "#/components/schemas/Evidence"
+        observedAt:
+          type: string
+          format: date-time
+          description: |
+            Block time of the last block in the observation window.
+            MUST be block-derived time, not wall-clock time. This is what
+            makes detector output reproducible given the same block range.
+        window:
+          type: array
+          minItems: 2
+          maxItems: 2
+          items:
+            $ref: "#/components/schemas/BlockRef"
+          description: Block range `[start, end]` (inclusive) over which the anomaly was observed.
+        ingestedAt:
+          type: string
+          format: date-time
+          description: |
+            Wall-clock time when the event was computed and dispatched.
+            The ONLY field that is not deterministic across runs.
+
+    Evidence:
+      type: object
+      description: Supporting facts bundle for an `AnomalyEvent`.
+      properties:
+        txHashes:
+          type: array
+          items:
+            type: string
+          description: Transaction hashes that triggered or support the alert.
+          default: []
+        addresses:
+          type: array
+          items:
+            type: string
+          description: Wallet addresses implicated in the anomaly.
+          default: []
+        metrics:
+          type: object
+          description: |
+            Named numeric metrics supporting the detection. Keys are prefixed with
+            `<detector_id>/`. Values are string-encoded Decimal.
+
+            Examples:
+            - `"rug_pull_lp_drain/lp_removed_pct"` → `"0.92"`
+            - `"pump_dump/volume_ratio"` → `"14.7"`
+            - `"holder_concentration/gini_delta_24h"` → `"0.18"`
+          additionalProperties:
+            type: string
+            description: String-encoded Decimal value.
+          default: {}
+        notes:
+          type: array
+          items:
+            type: string
+          description: Free-form human-readable annotations.
+          default: []
+        observedRange:
+          type: array
+          nullable: true
+          minItems: 2
+          maxItems: 2
+          items:
+            $ref: "#/components/schemas/BlockRef"
+          description: Block range over which the evidence was observed.
+
+    BlockRef:
+      type: object
+      required: [chain, height]
+      properties:
+        chain:
+          $ref: "#/components/schemas/Chain"
+        height:
+          type: integer
+          format: int64
+          description: Block height (slot for Solana, block number for EVM).
+
+    TimeWindow:
+      type: array
+      description: |
+        Time window as `[start, end]` (inclusive start, exclusive end).
+        Both are ISO 8601 UTC timestamps.
+      minItems: 2
+      maxItems: 2
+      items:
+        type: string
+        format: date-time
+
+    DetectorInfo:
+      type: object
+      description: Configured detector with its thresholds and references.
+      required: [id, severity_floor, enabled, thresholds, references]
+      properties:
+        id:
+          type: string
+          description: Stable snake_case detector ID.
+          examples:
+            - "rug_pull_lp_drain"
+        severity_floor:
+          $ref: "#/components/schemas/Severity"
+          description: Minimum severity this detector can emit (from config).
+        enabled:
+          type: boolean
+          description: Whether this detector is active in the current config.
+        thresholds:
+          type: object
+          description: |
+            Named thresholds from `config/detectors.toml`. Each threshold is
+            a `{ value, rationale, refs }` object (Threshold<T> struct).
+          additionalProperties:
+            $ref: "#/components/schemas/ThresholdEntry"
+        references:
+          type: array
+          items:
+            type: string
+          description: REFERENCES.md entry slugs for this detector's methodology.
+
+    ThresholdEntry:
+      type: object
+      description: A single threshold value with its cited rationale.
+      required: [value, rationale, refs]
+      properties:
+        value:
+          description: |
+            The threshold value. May be a number or a string depending on the
+            threshold type (numeric values are JSON numbers; string thresholds
+            are JSON strings).
+          oneOf:
+            - type: number
+            - type: string
+            - type: integer
+        rationale:
+          type: string
+          description: Human-readable explanation of the chosen value and its source.
+        refs:
+          type: array
+          items:
+            type: string
+          description: |
+            REFERENCES.md entry IDs that justify this threshold.
+            Format: `"D<NN>/<slug>"`.
+
+    # ---- WebSocket message schemas ----
+    # (Documented here for consumer SDK generation; not enforced by HTTP routing)
+
+    WsSubscribeMessage:
+      type: object
+      description: "Client to Server: request a new subscription."
+      required: [action]
+      properties:
+        action:
+          type: string
+          enum: [subscribe]
+        chain:
+          $ref: "#/components/schemas/Chain"
+        tokens:
+          type: array
+          items:
+            type: string
+          description: |
+            Token addresses to subscribe to. Omit to subscribe to ALL tokens
+            (exchange use case). Max 1000 tokens per subscription filter.
+        detector_ids:
+          type: array
+          items:
+            type: string
+          description: |
+            Detector IDs to filter by. Omit for all detectors.
+        severity_min:
+          $ref: "#/components/schemas/Severity"
+          description: Minimum severity. Default `"info"`.
+        resume_from:
+          type: string
+          description: |
+            Opaque event ID from a previous `AnomalyEvent`. On reconnect, the
+            gateway replays events since this ID within the lookback window
+            (default 5 minutes). Omit for live-only feed.
+
+    WsSubscribedMessage:
+      type: object
+      description: "Server to Client: subscription acknowledgment."
+      required: [type, subscription_id, effective_filters]
+      properties:
+        type:
+          type: string
+          enum: [subscribed]
+        subscription_id:
+          type: string
+          description: Opaque subscription ID. Use to identify which subscription a pushed event belongs to.
+        effective_filters:
+          type: object
+          description: The filters actually applied (server may normalize or reject some filters).
+
+    WsEventMessage:
+      type: object
+      description: "Server to Client: anomaly event push."
+      required: [type, subscription_id, event]
+      properties:
+        type:
+          type: string
+          enum: [event]
+        subscription_id:
+          type: string
+        event:
+          $ref: "#/components/schemas/AnomalyEvent"
+
+    WsReportMessage:
+      type: object
+      description: |
+        Server → Client: updated `TokenRiskReport` push. Sent only when
+        `|new_score - previous_score| > ws_report_delta_threshold` (config default 0.10).
+      required: [type, subscription_id, report, previous_score, delta]
+      properties:
+        type:
+          type: string
+          enum: [report]
+        subscription_id:
+          type: string
+        report:
+          $ref: "#/components/schemas/TokenRiskReport"
+        previous_score:
+          type: number
+          format: double
+          minimum: 0.0
+          maximum: 1.0
+        delta:
+          type: number
+          format: double
+          description: |
+            Signed change in overall_score: `new_score - previous_score`.
+            Positive = risk increased. Negative = risk decreased.
+
+    WsPingMessage:
+      type: object
+      description: "Server to Client: heartbeat ping (every 30s)."
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [ping]
+
+    WsPongMessage:
+      type: object
+      description: "Client to Server: heartbeat response. Required within 60s of ping."
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [pong]
+
+    WsLagNoticeMessage:
+      type: object
+      description: |
+        Server → Client: sent when the per-subscriber send buffer is full and
+        events are being dropped. Oldest events are dropped first.
+        The connection is NOT closed — the client may reconnect with `resume_from`.
+      required: [type, dropped, buffer_capacity]
+      properties:
+        type:
+          type: string
+          enum: [lag_notice]
+        dropped:
+          type: integer
+          minimum: 0
+          description: Number of events dropped since last lag_notice.
+        buffer_capacity:
+          type: integer
+          description: Total per-subscriber buffer size.
+        recommendation:
+          type: string
+          description: Human-readable suggestion.
+          example: "Reduce subscription scope or increase processing speed"
+
+    WsReplayTruncatedMessage:
+      type: object
+      description: |
+        Server → Client: sent when `resume_from` replay is truncated because
+        the requested events are older than the lookback window (default 5 min).
+      required: [type, from_id, message]
+      properties:
+        type:
+          type: string
+          enum: [replay_truncated]
+        from_id:
+          type: string
+          description: The `resume_from` ID that was provided.
+        message:
+          type: string
+          description: Human-readable explanation of the truncation.
+
+    WsClosingMessage:
+      type: object
+      description: "Server to Client: graceful shutdown notice before WS close."
+      required: [type, reason]
+      properties:
+        type:
+          type: string
+          enum: [closing]
+        reason:
+          type: string
+          enum: [server_shutdown, idle_timeout, auth_expired]

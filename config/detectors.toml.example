@@ -1,0 +1,1166 @@
+# config/detectors.toml.example
+#
+# Threshold configuration for all anomaly detectors.
+# Copy to config/detectors.toml and adjust per deployment.
+#
+# Format:
+#   Every threshold is a TOML table with three required keys:
+#     value     — the numeric threshold value
+#     rationale — human-readable justification, citing primary source
+#     refs      — list of REFERENCES.md entry IDs (format: "D<NN>/<slug>")
+#
+# Rule: no threshold ships without a non-empty rationale and at least one ref.
+# Missing keys cause a hard error at startup (via serde Deserialize).
+#
+# ADR reference: ADR 0001 §D5 (MVP detector set), CLAUDE.md §Detector Rules.
+#
+# ---------------------------------------------------------------------------
+# D01 — Honeypot (simulation)
+# ---------------------------------------------------------------------------
+# Primary source: Torres, Steichen & State (2019) — HoneyBadger
+#   https://arxiv.org/abs/1902.06976
+# Supporting: GoPlus and Honeypot.is fork-state simulation methodology
+#   (research/01-market-scan.md)
+# Solana-specific: simulateTransaction RPC against Token-2022 transfer hooks
+#   (research/02-detection-methodology.md §2)
+#
+# Phase 2: first detector to ship. Other detectors' subsections are
+# included in this example file for completeness and will be populated
+# as each detector ships.
+# ---------------------------------------------------------------------------
+
+[honeypot_sim.sell_tax_threshold]
+value     = 0.30
+rationale = """Lowered from 0.50 (50%) to 0.30 (30%) as a compensating control for \
+              DG3 simulation deferral (docs/reviews/0001-d01-honeypot-evasions.md §6 \
+              priority #3). The original 50% threshold was derived from EVM data (Torres \
+              2019); Solana Token-2022 fees can be set at any bps value. A 30% effective \
+              sell fee means the seller recovers only 70 cents per dollar — operational \
+              honeypot territory for automated trading. Must remain consistent with \
+              sell_tax_threshold_bps (companion change: 5000→3000). Revert to 0.50 if \
+              Sprint 3 corpus shows false-positive rate > 5% in the 30–50% range."""
+refs      = ["D01/honeypot_sim"]
+
+[honeypot_sim.simulate_paths]
+value     = 3
+rationale = """Three probe amounts (small, medium, large relative to pool depth) \
+              catch max-sell-amount honeypots that allow small sells but block large \
+              ones. GoPlus fork-state method uses multiple probe sizes. One path is \
+              insufficient because max-sell restrictions are a common evasion. Three \
+              is a reasonable cost/coverage trade-off for Phase 2 on-demand mode; \
+              increase to 5 in Phase 3 if evasion rate warrants it."""
+refs      = ["D01/honeypot_sim"]
+
+[honeypot_sim.buy_sell_ratio_sentinel]
+value     = 5.0
+rationale = """Lowered from 10.0 to 5.0 as a compensating control for DG3 simulation \
+              deferral (docs/reviews/0001-d01-honeypot-evasions.md §6.3 control #1). \
+              Without simulation (S6), S5 is the primary behavioural signal; a 7:1 \
+              buy/sell ratio is already statistically anomalous for a normally-trading \
+              token (RAVE probe: 0.82 ratio; WET probe: 0.70 ratio). 10.0 was calibrated \
+              for sim-backed mode where S6 catches the cases S5 misses; in static-only \
+              mode 5.0 is more appropriate. Retain 10.0 when simulation is re-enabled \
+              (Phase 3). See docs/designs/0004-detector-01-honeypot.md §14."""
+refs      = ["D01/honeypot_sim"]
+
+[honeypot_sim.sell_tax_threshold_bps]
+value     = 3000
+rationale = """Lowered from 5000 (50%) to 3000 (30%) as a threshold calibration \
+              compensating for simulation deferral (docs/reviews/0001-d01-honeypot-evasions.md \
+              §6 priority #3). The original 5000 bps threshold was derived from EVM data \
+              (Torres 2019); Solana Token-2022 fees can be set at any bps value. A 30% transfer \
+              fee means the seller recovers only 70 cents per dollar — operational honeypot \
+              territory for automated trading. Must remain consistent with sell_tax_threshold \
+              (companion change: 0.50→0.30). Revert to 5000 bps if Sprint 3 corpus shows \
+              false-positive rate > 5% in the 3000–5000 bps range."""
+refs      = ["D01/honeypot_sim"]
+
+[honeypot_sim.min_buy_count_for_ratio]
+value     = 5
+rationale = """Minimum number of observed buy transfers required before the \
+              buy_sell_ratio signal (S5) is evaluated. Tokens with fewer than 5 buys \
+              have not attracted meaningful trading activity; their zero-sell count \
+              is more likely an artifact of age than sell suppression. 5 is a \
+              conservative floor — no academic citation exists for a Solana-specific \
+              value; calibrate from labelled corpus by Sprint 3."""
+refs      = ["D01/honeypot_sim"]
+
+[honeypot_sim.sol_probe_amount_lamports]
+value     = 10000000
+rationale = """Probe amount for each simulateTransaction path, in lamports (0.01 SOL). \
+              Small enough to not move price materially; large enough to be above dust \
+              threshold on any real pool. Honeypot.is uses small probe amounts."""
+refs      = ["D01/honeypot_sim"]
+
+[honeypot_sim.simulation_slippage_bps]
+value     = 500
+rationale = """Slippage tolerance in basis points (5%) applied when constructing the \
+              simulated sell transaction for simulateTransaction. 5% is a standard \
+              DEX slippage tolerance used by Jupiter aggregator as its default for \
+              new/volatile tokens."""
+refs      = ["D01/honeypot_sim"]
+
+[honeypot_sim.simulation_enabled]
+value     = true
+rationale = """Feature flag: set to false to run static-only mode (S1–S5 signals, no \
+              simulateTransaction RPC calls). Used in environments without a Solana \
+              RPC endpoint (CI, unit tests with mocked fixtures, low-latency scan \
+              pipelines where simulation latency > budget). When false, confidence is \
+              attenuated by 0.80."""
+refs      = ["D01/honeypot_sim"]
+
+[honeypot_sim.transfer_fee_authority_extra_weight]
+value     = 0.10
+rationale = """Resolved spec/config discrepancy: spec (docs/designs/0004-detector-01-honeypot.md \
+              §6) documented w_fee_auth = 0.05; config previously shipped 0.15. The \
+              discrepancy was identified by the security review as a CRITICAL finding \
+              (docs/reviews/0001-d01-honeypot-evasions.md §9.C1). The 0.10 midpoint is \
+              the recommended resolution. A pin test in d01_honeypot.rs prevents silent \
+              future drift between spec and config."""
+refs      = ["D01/honeypot_sim"]
+
+[honeypot_sim.reevaluation_interval_minutes]
+value     = 15
+rationale = """Compensating control for DG3 simulation deferral: any token that \
+              produces a D01 event must be re-evaluated every 15 minutes for the first \
+              24 hours after listing. This catches time-gated honeypots (E10 — delayed \
+              freeze, docs/reviews/0001-d01-honeypot-evasions.md §E10) and oracle-gated \
+              honeypots (E13 — oracle flip post-launch, §E13). The detector itself does \
+              not schedule re-evaluation; this value is consumed by crates/indexer and \
+              the server scheduler. See docs/designs/0004-detector-01-honeypot.md §14."""
+refs      = ["D01/honeypot_sim"]
+
+[honeypot_sim.non_transferable_attenuation]
+value     = 0.10
+rationale = """Token-2022 NonTransferable extension (discriminator 9) makes on-chain \
+              transfers structurally impossible. The freeze authority sub-signal (S1) is \
+              attenuated from 0.25 to 0.10 — retaining the audit signal without \
+              over-weighting a non-operational risk. See config/detectors.toml for full \
+              rationale."""
+refs      = ["D01/honeypot_sim"]
+
+# ---------------------------------------------------------------------------
+# D02 — Rug Pull / LP Drain
+# ---------------------------------------------------------------------------
+# Primary source: Chainalysis (2025) — deployer removes >=65% of LP in one tx
+#   https://www.chainalysis.com/blog/crypto-market-manipulation-wash-trading-pump-and-dump-2025/
+# Supporting: SolRPDS (Alhaidari et al., CODASPY 2025) — 62,895 suspicious pools
+#   https://arxiv.org/abs/2504.07132
+# Supporting: LROO (Shoaei et al., 2026) — >95% of rug-pulled tokens reach zero
+#   liquidity within 1-3 days.
+#   https://arxiv.org/html/2603.11324
+# State companion (RAVE probe gap): LP lock state leading indicator
+#   research/token-probes/rave-FeqiF7TE.md §4 Gap 1
+# ---------------------------------------------------------------------------
+
+[rug_pull_lp_drain.lp_removal_threshold]
+value     = 0.65
+rationale = """Chainalysis (2025): deployer removes >=65% of pool liquidity AND \
+              pool value >=$1,000 AND >100 prior transactions. This is the most \
+              widely cited empirical threshold from a large-scale study (2024 \
+              on-chain data, 3.59% of 2,063,519 tokens). SolRPDS (2025) corroborates \
+              on 62,895 Solana pools. Round-number thresholds (50%, 75%) are used by \
+              individual actors to evade detection; 65% is a calibrated midpoint from \
+              the 2M+ token study."""
+refs      = ["D02/rug_pull_lp_drain"]
+
+[rug_pull_lp_drain.min_pool_usd]
+value     = 1500.0
+rationale = """Raised from $1,000 (Chainalysis 2025) to $1,500 to compress the \
+              dead-pool straddling band. Security review 0002 §4 recommendation #3. \
+              Classified as unverified-heuristic adjustment."""
+refs      = ["D02/rug_pull_lp_drain"]
+
+[rug_pull_lp_drain.min_prior_txs]
+value     = 100
+rationale = """Chainalysis (2025): pool must have had >100 prior transactions. \
+              Pools with <100 txs have not attracted meaningful trading activity; \
+              a drain on such a pool is indistinguishable from an abandoned liquidity \
+              position being reclaimed by the LP. 100 is the Chainalysis cutoff. \
+              Applies to Signal A only; Signal B still evaluates low-activity pools."""
+refs      = ["D02/rug_pull_lp_drain"]
+
+[rug_pull_lp_drain.lp_safe_floor_pct]
+value     = 70.0
+rationale = """SolRPDS (Alhaidari et al. 2025) Table 3: >70% LP burned or locked is \
+              the structural threshold distinguishing safe from at-risk pools in their \
+              62,895-pool Solana dataset. LROO (2026) corroborates: >95% of rugged \
+              tokens had <70% protected LP before the drain event. Replaces the \
+              architect's split lp_burn_safe_floor (80%) + lp_lock_safe_floor (50%) \
+              with a unified effective_safe_pct = burned + active_locked. The 70% \
+              value is the published threshold; 80% was architecturally conservative. \
+              Source: https://arxiv.org/abs/2504.07132"""
+refs      = ["D02/rug_pull_lp_drain"]
+
+[rug_pull_lp_drain.minimum_lock_horizon_days]
+value     = 45
+rationale = """Raised from 30 to 45 days per security review 0002 §4 recommendation #2 \
+              (E-D02-15 compounded lock expiry + same-block drain). 30 days gave zero \
+              advance warning. 45 days + expiry_proximity_bonus gives a 90-day runway. \
+              Classified as unverified-heuristic; calibrate in Sprint 4."""
+refs      = ["D02/rug_pull_lp_drain"]
+
+[rug_pull_lp_drain.single_provider_bonus]
+value     = 0.15
+rationale = """RAVE probe anchor calibration: the RAVE pre-drain fixture \
+              (research/token-probes/rave-FeqiF7TE.md §2 D02) had \
+              lp_provider_count=1; the analyst's manual confidence assessment \
+              was 0.72 / High. The +0.15 bonus is the value that correctly elevates \
+              the latent confidence into the High band for single-provider pools \
+              and matches the probe's qualitative assessment. Derived from probe \
+              anchor, not from academic citation."""
+refs      = ["D02/rug_pull_lp_drain"]
+
+[rug_pull_lp_drain.drain_window_minutes]
+value     = 60
+rationale = """Window over which cumulative LP removal by a single actor is summed. \
+              A 65%+ drain split across multiple transactions over 60 minutes is \
+              still a rug pull. SolRPDS (2025) trickle-drain analysis confirms most \
+              actual drain events complete within minutes; 60 minutes provides \
+              tolerance for deliberate slow drains without generating false positives \
+              from legitimate LP providers reducing over days."""
+refs      = ["D02/rug_pull_lp_drain"]
+
+[rug_pull_lp_drain.lp_providers_threshold]
+value     = 1
+rationale = """Only single-provider pools (count=1) receive the single_provider_bonus. \
+              Two-provider pools have structural diversity: two separate actors must \
+              collude or one actor controls both positions. The architect's stub value \
+              of 2 would penalize legitimate two-provider pools. Changed to 1 per \
+              docs/designs/0005-detector-02-rug-pull.md §5 Threshold changes. \
+              Source: RAVE probe §5; SolRPDS (2025)."""
+refs      = ["D02/rug_pull_lp_drain"]
+
+[rug_pull_lp_drain.drain_window_24h_minutes]
+value     = 1440
+rationale = """24-hour companion window for Signal A (E-D02-7 trickle drain). \
+              When only the 24h window fires, confidence is fixed at 0.75. \
+              Source: LROO 2026; SolRPDS 2025; review 0002 §4 recommendation #1."""
+refs      = ["D02/rug_pull_lp_drain"]
+
+[rug_pull_lp_drain.expiry_proximity_bonus_max]
+value     = 0.20
+rationale = """Max Signal B confidence bonus for near-expiry lockers (E-D02-15). \
+              Scales 0→0.20 as unlock_at approaches minimum_lock_horizon_days. \
+              Added before 0.75 ceiling. Source: review 0002 §4 recommendation #2."""
+refs      = ["D02/rug_pull_lp_drain"]
+
+# ---------------------------------------------------------------------------
+# D03 — Holder Concentration Shift
+# ---------------------------------------------------------------------------
+# Primary source: Brown (2023) — Gini coefficient methodology for Ethereum
+#   https://eprint.iacr.org/2023/1493.pdf
+# Supporting: TM-RugPull (Shoaei et al., 2026) — scam tokens show significantly
+#   higher concentration and holder variance
+#   https://arxiv.org/html/2602.21529
+# Supporting: RugCheck live API field list (top_10_holder_percent, Gini)
+# ---------------------------------------------------------------------------
+
+[holder_concentration.gini_delta_24h]
+value     = 0.05
+rationale = """Brown (2023) studied Gini coefficient changes across Ethereum holder \
+              distributions as a methodology reference for rapid concentration anomaly \
+              detection. A 24-hour liquid-filtered Gini INCREASE of 0.05 represents a \
+              rapid concentration event inconsistent with organic holder churn. \
+              The 0.05 threshold is the working default from research/02-detection-methodology.md \
+              §10; calibrate from labelled SolRPDS / TM-RugPull fixture corpus in Sprint 4. \
+              Applied only when liquid_count >= min_liquid_holders (50); below that threshold \
+              the Gini is statistically unreliable per Brown 2023 §3 population caveat."""
+refs      = ["D03/holder_concentration"]
+
+[holder_concentration.top10_pct_delta_24h]
+value     = 0.10
+rationale = """A 10 percentage-point increase in LIQUID-ONLY top-10 holder share within \
+              24 hours indicates rapid accumulation by large wallets (excluding vesting, \
+              DEX pools, CEX hot wallets). Derived from RugCheck DANGER breakpoints \
+              (>70% absolute) and TM-RugPull (2026) pre-collapse concentration variance \
+              analysis. No published Solana-specific delta threshold exists; calibrate \
+              from SolRPDS labelled dataset in Sprint 4. Applied only when liquid_count \
+              >= min_liquid_holders."""
+refs      = ["D03/holder_concentration"]
+
+[holder_concentration.absolute_top10_ceiling]
+value     = 0.80
+rationale = """LIQUID-ONLY top-10 holders controlling >=80% of sellable float is a \
+              structural concentration risk signal (Signal 3). Set higher than the raw \
+              RugCheck DANGER threshold (0.70 over all holders) because: (1) sidecar \
+              exclusion already removes vesting contracts + DEX pools + CEX wallets, so \
+              a post-exclusion 80% is a stronger signal than a pre-exclusion 70%; \
+              (2) TM-RugPull (2026) confirms >80% concentration as a pre-collapse feature \
+              in their labelled scam dataset. WET probe (research/token-probes/wet-WETZjtp.md) \
+              showed that a 70% ceiling over liquid holders would fire falsely on WET \
+              before sidecar classification warmed up; 80% provides headroom. \
+              This replaces the architect's top10_pct_high_risk = 0.70 threshold."""
+refs      = ["D03/holder_concentration"]
+
+[holder_concentration.delta_window_hours]
+value     = 24
+rationale = """Standard 24-hour delta window for holder distribution comparison, \
+              matching the interval used in Brown (2023) and TM-RugPull (2026) \
+              concentration variance analysis. Shorter windows produce noise from \
+              single large trades; longer windows miss rapid accumulation before a \
+              dump. 24 hours is the canonical interval in all academic sources for \
+              this signal class."""
+refs      = ["D03/holder_concentration"]
+
+[holder_concentration.prior_snapshot_tolerance_hours]
+value     = 2
+rationale = """Tolerance window (±2h) when looking up the prior snapshot in \
+              holder_snapshots_history. The snapshot pipeline may lag 1–2 hours \
+              under high load. A ±2h tolerance is sufficient to find the closest \
+              24h-ago snapshot without pulling in a snapshot >26h old that would \
+              materially bias the delta. Unverified-heuristic; no academic citation. \
+              Reduce to ±1h if pipeline consistently achieves <60 min lag."""
+refs      = ["D03/holder_concentration"]
+
+[holder_concentration.min_liquid_holders]
+value     = 50
+rationale = """Gini coefficient is statistically unreliable for small populations. \
+              Brown (2023) §3 notes population sensitivity as a known limitation: \
+              a single large purchase can shift Gini by 0.10+ when liquid_count < 50. \
+              Below 50 liquid holders, Signal 1 (Gini delta) and Signal 2 (top-10 delta) \
+              are suppressed; an Info event is emitted instead. Signal 3 (absolute \
+              ceiling) still evaluates — even a small number of liquid holders can \
+              exhibit dangerous concentration. 50 is a pragmatic floor; calibrate \
+              from labelled corpus in Sprint 4."""
+refs      = ["D03/holder_concentration"]
+
+[holder_concentration.max_lazy_classifications]
+value     = 10
+rationale = """Maximum number of ctx.registry.classify_holder() RPC calls per \
+              evaluate() invocation to bound latency. Top-N unclassified holders \
+              (by balance_raw) are classified first — highest-impact addresses get \
+              classified earliest. 10 is a conservative default for on-demand mode \
+              where evaluation latency < 500ms is required. Increase to 50 for \
+              batch/background mode. Unverified-heuristic; tune based on observed \
+              classify_holder() latency distribution in Phase 3."""
+refs      = ["D03/holder_concentration"]
+
+# ---------------------------------------------------------------------------
+# D04 — Pump & Dump (volume/price spike)
+# ---------------------------------------------------------------------------
+# Primary source: Karbalaii (2025) — ~70% of pump events have accumulation phase;
+#   ~70% of pre-event volume occurs within 1 hour before announcement
+#   https://arxiv.org/abs/2504.15790
+# Supporting: Bolz et al. (2024) — Z-score vs 30-day baseline; market-cap filter
+#   https://arxiv.org/abs/2412.18848
+# Supporting: Chainalysis (2025) — 3.59% of 2024 tokens meet P&D criteria
+#   https://www.chainalysis.com/blog/crypto-market-manipulation-wash-trading-pump-and-dump-2025/
+# Fallback signal (RAVE probe §4 Gap 2 + WET probe §D4):
+#   burst_concentration_ratio for zero-baseline case
+# ---------------------------------------------------------------------------
+
+[pump_dump.volume_multiplier]
+value     = 5.0
+rationale = """Karbalaii (2025): ~70% of pump events have >=5x volume vs baseline in \
+              the accumulation hour. Bolz et al. (2024): z-score >=3 corresponds to \
+              approximately 5x baseline for normally distributed volume. Chainalysis \
+              (2025) corroborates multi-sigma volume spikes as the primary pump signal."""
+refs      = ["D04/pump_dump"]
+
+[pump_dump.price_spike_pct]
+value     = 0.30
+rationale = """Chainalysis (2025): 30% intra-hour price increase accompanies the \
+              majority of confirmed P&D events. La Morgia et al. (2021): RAVE probe \
+              measured +115% in 1h — 3.8x this threshold. No Solana-DEX-native published \
+              threshold; calibrated from EVM studies. Recalibrate in Sprint 5."""
+refs      = ["D04/pump_dump"]
+
+[pump_dump.min_baseline_days]
+value     = 3
+rationale = """When fewer than 3 days of non-zero volume exist in the 7-day window, \
+              the average-as-median is not statistically meaningful (RAVE probe §4 \
+              Gap 2). 3 is the minimum for a sample mean that meaningfully differs \
+              from a point estimate."""
+refs      = ["D04/pump_dump"]
+
+[pump_dump.burst_concentration_threshold]
+value     = 0.70
+rationale = """Originally 0.90 from 2 data points (RAVE=1.00, WET=0.0024). Lowered \
+              to 0.70 per review 0003 §E-D04-9 (2026-04-21): 2h slow pumps produce \
+              burst_ratio 0.40-0.55 and are invisible at 0.90. 0.70 extends Signal B \
+              coverage without dropping the floor confidence. Calibrate FP rate in \
+              Sprint 5 against 100+100 corpus."""
+refs      = ["D04/pump_dump"]
+
+[pump_dump.min_burst_volume_usd]
+value     = 5000.0
+rationale = """Dust filter. Below $5,000 in 1h volume, the signal-to-noise ratio is \
+              dominated by thin-market tokens where a single retail trade can produce \
+              a 100% concentration ratio. No academic citation. Conservative floor."""
+refs      = ["D04/pump_dump"]
+
+[pump_dump.insider_sell_pct]
+value     = 0.40
+rationale = """research/02-detection-methodology.md §3: insider wallets selling >=40% \
+              of their accumulated position within 24h confirms the dump phase. \
+              Chainalysis (2025): 94% of confirmed P&D cases involve deployer selling. \
+              40% is a working default with no Solana-specific calibration."""
+refs      = ["D04/pump_dump"]
+
+[pump_dump.insider_amplifier]
+value     = 0.15
+rationale = """Additive confidence boost when Signal C confirms insider sell-off. \
+              Calibrated so borderline Signal A (0.60) + 0.15 reaches 0.75 (High). \
+              Capped at 0.95 for Signal A base, 0.85 for Signal B base. \
+              No academic citation; from confidence-formula design (0007 §5.3)."""
+refs      = ["D04/pump_dump"]
+
+[pump_dump.post_pump_insider_window_hours]
+value     = 24
+rationale = """Karbalaii (2025): ~70% of dump-phase sells complete within 1h of \
+              peak; 24h is the outer bound for slower distributions. Chainalysis (2025) \
+              uses 24h window for insider-sell confirmation."""
+refs      = ["D04/pump_dump"]
+
+[pump_dump.market_cap_filter_usd]
+value     = 60000000.0
+rationale = """Bolz et al. (2024) §4.2: market-cap filter <$60M reduced noise in their \
+              CEX-based pump detector (top-5 accuracy improved from ~40% to 55.81%). \
+              At >$60M FDV, organic pressure from CEX listings creates indistinguishable \
+              volume spikes without order-book data."""
+refs      = ["D04/pump_dump"]
+
+[pump_dump.top_holders_insider_floor_pct]
+value     = 0.01
+rationale = """Signal C Priority 2 proxy floor: holders below 1% of total supply lack \
+              sufficient sell volume for a material dump signal. Filters retail holders \
+              in top-N list. Recalibrate in Sprint 5. Source: docs/designs/0007 §10."""
+refs      = ["D04/pump_dump"]
+
+[pump_dump.pre_pump_window_minutes]
+value     = 60
+rationale = "Fantazzini & Xiao 2023: 60-minute pre-announcement window for insider buyers. Design 0023 §4.1."
+refs      = ["D04/pump_dump", "fantazzini_2023"]
+
+[pump_dump.smart_money_tier1_delta]
+value     = 0.12
+rationale = "Confidence amplification when >= 1 Tier1 smart-money wallet bought pre-pump. Design 0023 Decision 2."
+refs      = ["D04/pump_dump", "design_0023"]
+
+[pump_dump.smart_money_tier2_delta]
+value     = 0.07
+rationale = "Confidence amplification when >= smart_money_tier2_min_count Tier2 wallets bought pre-pump. Design 0023 Decision 2."
+refs      = ["D04/pump_dump", "design_0023"]
+
+[pump_dump.smart_money_tier2_min_count]
+value     = 2
+rationale = "Minimum Tier2 wallets required for Tier2 amplification. Single Tier2 hit below noise floor. Design 0023 §9."
+refs      = ["D04/pump_dump", "design_0023"]
+
+# ---------------------------------------------------------------------------
+# D05 — Wash Trading (Heuristic 1)
+# Full implementation: Sprint 4 P4-2 (docs/designs/0008-detector-05-wash-trading.md)
+# Primary source: Chainalysis (2025) — Heuristic 1: same address, buy+sell within
+#   25 blocks, volume diff <1%, >=3 reps. $704M detected in 2024.
+#   https://www.chainalysis.com/blog/crypto-market-manipulation-wash-trading-pump-and-dump-2025/
+# Supporting: Victor & Weintraud (2021) — legal-definition approach on IDEX/EtherDelta
+#   https://arxiv.org/abs/2102.07001
+# ---------------------------------------------------------------------------
+
+[wash_trading_h1.block_window_slots]
+value     = 25
+rationale = """Chainalysis (2025) Heuristic 1 canonical value. Solana recalibration: \
+              25 slots ≈ 10s (400ms/slot). Legitimate MMs rarely round-trip within 10s \
+              on a single pool. Renamed from block_window for Solana-specificity. \
+              Source: Chainalysis 2025."""
+refs      = ["D05/wash_trading_h1"]
+
+[wash_trading_h1.volume_diff_pct]
+value     = 0.01
+rationale = """Chainalysis (2025): buy and sell volumes within 1% of each other constitute \
+              a round-trip. Solana AMM fees (0.25-1.0%) mean true self-trades clear under \
+              1% diff after fee accounting. Victor & Weintraud (2021) use near-zero-imbalance."""
+refs      = ["D05/wash_trading_h1"]
+
+[wash_trading_h1.min_repetitions]
+value     = 3
+rationale = """Chainalysis (2025): at least 3 qualifying round-trips required. Three \
+              establishes a deliberate pattern. Chainalysis detected $704M using this \
+              threshold on 2024 DEX data."""
+refs      = ["D05/wash_trading_h1"]
+
+[wash_trading_h1.severity_amplifier_ratio]
+value     = 0.30
+rationale = """30% wash-volume-to-pool-volume ratio triggers Signal C severity upgrade. \
+              Victor & Weintraud (2021) found >30% wash-trading prevalence on IDEX/EtherDelta \
+              as a threshold for market integrity concern."""
+refs      = ["D05/wash_trading_h1"]
+
+[wash_trading_h1.detection_window_hours]
+value     = 24
+rationale = """Standard 24-hour observation window, matching D04. Shorter windows produce \
+              high FP rates from transient arbitrage; longer windows miss timely alerts. \
+              Source: Chainalysis 2025; D04 window consistency."""
+refs      = ["D05/wash_trading_h1"]
+
+[wash_trading_h1.min_pool_usd_for_h1]
+value     = 10000.0
+rationale = """Pools below $10,000 USD have negligible price-discovery value; wash trading \
+              in a dead pool produces false positives. Source: design derivation; unverified-heuristic."""
+refs      = ["D05/wash_trading_h1"]
+
+[wash_trading_h1.min_wash_volume_usd]
+value     = 500.0
+rationale = """Minimum total wash volume USD for Signal A confidence formula denominator. \
+              Prevents log(0); at $500 minimum, vol_term = ln(1)*0.10 = 0. \
+              Source: design derivation; unverified-heuristic."""
+refs      = ["D05/wash_trading_h1"]
+
+[wash_trading_h1.signal_b_cycles.max_cycle_length]
+value     = 5
+rationale = """Maximum elementary cycle length (hops). Victor & Weintraud (2021) §4.2: \
+              95th percentile of wash rings has 6 participants; median 3–4. \
+              max_cycle_length=5 catches the median, misses extreme rings. See design 0017 §5.3."""
+refs      = ["D05/signal_b_cycles"]
+
+[wash_trading_h1.signal_b_cycles.max_cycle_window_minutes]
+value     = 120
+rationale = """Time window (minutes) for all cycle edges. Victor & Weintraud (2021) §3.1: \
+              circular trades occur within a single session. 120min is conservative. \
+              User-approved 2026-04-24; see design 0017 §7."""
+refs      = ["D05/signal_b_cycles"]
+
+[wash_trading_h1.signal_b_cycles.min_cycle_volume_usd]
+value     = 1000.0
+rationale = """Minimum USD volume for the bottleneck edge of a qualifying cycle. \
+              Victor & Weintraud (2021) §4.2: median circular trade $5K–$20K. \
+              $1,000 is below median to catch emerging wash rings. See design 0017 §5.2."""
+refs      = ["D05/signal_b_cycles"]
+
+[wash_trading_h1.signal_b_cycles.max_cycles_per_scc]
+value     = 100
+rationale = """Maximum cycles enumerated per SCC to bound Johnson's worst-case latency. \
+              >100 cycles in one SCC is a large clique or adversarial construction. \
+              Do NOT raise above 1,000 without re-evaluating latency. See design 0017 §4.4."""
+refs      = ["D05/signal_b_cycles"]
+
+[wash_trading_h1.signal_b_cycles.min_scc_size]
+value     = 3
+rationale = """Minimum SCC size for Johnson's algorithm. Size-1 SCCs have no cycles. \
+              Size-2 SCCs produce only 2-hop cycles (covered by Signal A). \
+              Tarjan 1972 §2; Johnson 1975 §1; see design 0017 §3.4."""
+refs      = ["D05/signal_b_cycles"]
+
+[wash_trading_h1.signal_b_cycles.max_transfers_per_window]
+value     = 10000
+rationale = """Safety ceiling on transfer rows fetched per evaluation. 10,000 transfers \
+              in 120min = ~83/min. Hitting cap logs WARN; detection continues on capped set. \
+              See design 0017 §2.3."""
+refs      = ["D05/signal_b_cycles"]
+
+# ---------------------------------------------------------------------------
+# D06 — Mint / Burn Anomaly
+# ---------------------------------------------------------------------------
+# Primary source: Xia et al. (2021) — ~10,000 scam tokens on Uniswap V2 with
+#   hidden mint as primary mechanism
+#   https://arxiv.org/abs/2109.00229
+# Supporting: Sun et al. (2024) — hidden mint and hidden owner as distinct
+#   root cause categories among top rug causes
+#   https://arxiv.org/abs/2403.16082
+# Supporting: RugCheck live API: is_mintable + mint_authority as primary Solana signals
+# ---------------------------------------------------------------------------
+
+[mint_burn_anomaly.supply_change_pct]
+value     = 0.05
+rationale = """research/02-detection-methodology.md §9: supply change >5% of \
+              circulating supply in a single Transfer event (mint or burn) triggers \
+              Signal B. Xia et al. (2021) identified hidden mint as the primary \
+              mechanism in ~10,000 scam Uniswap tokens; Sun et al. (2024) confirms \
+              it as a top rug root cause. 5% in one event is anomalous for fixed-supply \
+              tokens. No published Solana-specific calibration; working default. \
+              Reduce to 2% if labelled fixture data shows mints below 5% causing harm."""
+refs      = ["D06/mint_burn_anomaly"]
+
+[mint_burn_anomaly.mint_authority_grace_period_days]
+value     = 7
+rationale = """New projects commonly deploy with mint authority to execute genesis-phase \
+              minting (airdrops, LP seeding, team allocation) and revoke within the first \
+              week. Sun et al. (2024) observe that rugged tokens almost never revoke; \
+              non-rugged tokens revoke within 1-7 days post-launch. A 7-day grace period \
+              prevents alerting on every new token while remaining short enough to catch \
+              projects that retain authority without a stated reason. Classified as \
+              unverified-heuristic; calibrate from labelled corpus in Sprint 5. \
+              Source: Sun et al. 2024 §4 hidden mint pattern; RugCheck mintAuthority signal."""
+refs      = ["D06/mint_burn_anomaly"]
+
+[mint_burn_anomaly.hidden_mint_cumulative_pct]
+value     = 0.20
+rationale = """Sun et al. (2024) hidden mint category: supply inflation post-genesis is \
+              the defining characteristic of the pattern. A 20% cumulative non-LP mint \
+              over 30 days provides 4x headroom above the per-event 5% threshold (to \
+              catch trickle-mint evasion E2) while remaining high enough to distinguish \
+              from legitimate treasury operations. Classified as unverified-heuristic; \
+              calibrate from labelled corpus in Sprint 5. \
+              Source: Sun et al. 2024 §4; no published numeric threshold for cumulative variant."""
+refs      = ["D06/mint_burn_anomaly"]
+
+[mint_burn_anomaly.hidden_mint_window_days]
+value     = 30
+rationale = """30-day rolling window for Signal C cumulative supply change calculation. \
+              Consistent with D04/D05 detection windows; long enough to aggregate \
+              trickle-mint attacks while short enough to remain actionable. A 30-day \
+              window is standard in academic sources for supply anomaly detection. \
+              Classified as unverified-heuristic. \
+              Source: research/02-detection-methodology.md §Cross-cutting C."""
+refs      = ["D06/mint_burn_anomaly"]
+
+[mint_burn_anomaly.min_token_age_days_for_hidden_mint]
+value     = 14
+rationale = """14 days gives genesis-phase minting activity time to settle before \
+              Signal C fires. Tokens legitimately execute multi-round mints (airdrops, \
+              LP seeding, team vesting) within the first two weeks. A 14-day floor \
+              prevents false positives on legitimate launch-phase activity while \
+              remaining short enough to catch early rugs. Design derivation; \
+              no prior academic citation. Calibrate from labelled corpus in Sprint 5."""
+refs      = ["D06/mint_burn_anomaly"]
+
+[mint_burn_anomaly.established_protocol_confidence_dampening]
+value     = 0.5
+rationale = """Signal A confidence multiplier for established protocols (is_established_protocol \
+              = true). Value 0.5 halves base confidence from 0.20 to 0.10, retaining \
+              Signal A at Info severity for audit observability while preventing spurious \
+              Medium alerts on regulated stablecoins (USDC, PYUSD). Full suppression \
+              is rejected because it would hide the audit trail. 0.5 halving is \
+              consistent with the D02/D03 asymmetric suppression pattern (P4-0). \
+              Source: token_status.rs P4-0; docs/designs/0005-detector-02-rug-pull.md §14."""
+refs      = ["D06/mint_burn_anomaly"]
+
+[mint_burn_anomaly.non_lp_recipient_signal_weight]
+value     = 0.30
+rationale = """Additive confidence bonus when the mint recipient is NOT a known LP contract. \
+              Non-LP recipient is the key distinguishing feature between a hidden mint \
+              (attacker benefits) and legitimate treasury/LP mint (protocol benefits). \
+              0.30 elevates baseline Signal B confidence from 0.55 to 0.85 at threshold, \
+              placing it firmly in the High severity band. Calibrated so borderline cases \
+              (exactly at supply_change_threshold) reach High; above threshold saturates \
+              the 0.85 cap. Classified as unverified-heuristic; calibrate from labelled \
+              corpus in Sprint 5. \
+              Source: Sun et al. 2024 hidden mint recipient analysis; design derivation."""
+refs      = ["D06/mint_burn_anomaly"]
+
+# ---------------------------------------------------------------------------
+# D07 — Token-2022 Withdraw-Withheld Drain
+# ---------------------------------------------------------------------------
+
+[withdraw_withheld.min_extraction_events]
+value     = 3
+rationale = "Unverified-heuristic. Three events within the 7-day window indicates extraction pattern."
+refs      = ["D07/withdraw_withheld_drain"]
+
+[withdraw_withheld.min_cumulative_withdraw_usd]
+value     = 1000.0
+rationale = "Unverified-heuristic. $1,000 USD dust filter consistent with D02 min_pool_usd."
+refs      = ["D07/withdraw_withheld_drain"]
+
+[withdraw_withheld.authority_rotation_window_days]
+value     = 30
+rationale = "Consistent with D02/D06 30-day windows."
+refs      = ["D07/withdraw_withheld_drain"]
+
+[withdraw_withheld.min_authority_tenure_days]
+value     = 7
+rationale = "Consistent with D06 mint_authority_grace_period_days."
+refs      = ["D07/withdraw_withheld_drain"]
+
+[withdraw_withheld.min_withheld_at_rotation_usd]
+value     = 500.0
+rationale = "Unverified-heuristic. Half the Signal A USD threshold."
+refs      = ["D07/withdraw_withheld_drain"]
+
+[withdraw_withheld.fresh_wallet_funding_hours]
+value     = 24
+rationale = "Lowered 48→24 per review 0004 §4 T3. Increases operational friction without blocking legitimate same-day key ceremonies."
+refs      = ["D07/withdraw_withheld_drain", "review/0004-d07-evasions-§4-T3"]
+
+[withdraw_withheld.detection_window_hours]
+value     = 168
+rationale = "7-day window consistent with D04/D05."
+refs      = ["D07/withdraw_withheld_drain"]
+
+[withdraw_withheld.cross_detector_composite_enabled]
+value     = true
+rationale = "Enable combined_with_d01_s2 evidence key emission."
+refs      = ["D07/withdraw_withheld_drain"]
+
+[withdraw_withheld.established_protocol_fee_extraction_allowlist_pct]
+value     = 0.50
+rationale = "Lowered 0.90→0.50 per review 0004 §4 T2. Non-operational in MVP (ACCEPTED-RISK-D07-01); must calibrate before DG-D07-2 ships."
+refs      = ["D07/withdraw_withheld_drain", "review/0004-d07-evasions-§4-T2"]
+
+[withdraw_withheld.min_single_event_withdraw_usd]
+value     = 5000.0
+rationale = "E-D07-9 mitigation (review 0004 §4 T1): single-event floor for two-tier Signal A. event_count==1 AND usd>=$5k fires at 0.65; event_count==2 fires at 0.60."
+refs      = ["D07/withdraw_withheld_drain", "review/0004-d07-evasions-§4-T1"]
+
+# ---------------------------------------------------------------------------
+# D08 — Sybil Bundled-Launch (Sprint 11 S11-6)
+# ---------------------------------------------------------------------------
+
+[sybil_detection.sybil_cluster_top_holder_pct_threshold]
+value     = 0.30
+rationale = "Liu et al. (2025) top-5 LightGBM feature; low floor maximises recall per CLAUDE.md. Chainalysis 2025 H2 analog."
+refs      = ["D08/sybil_detection"]
+
+[sybil_detection.sybil_cluster_min_size]
+value     = 3
+rationale = "MVP lower bound matching graph.toml min_cluster_size. Liu et al. (2025) Table 2; Chainalysis 2025 H2 uses >=5 (raise after calibration)."
+refs      = ["D08/sybil_detection"]
+
+[sybil_detection.smart_money_tier1_delta]
+value     = 0.10
+rationale = "Confidence amplification for Sybil clusters with >= 1 Tier1 smart-money member. Design 0023 Decision 4."
+refs      = ["D08/sybil_detection", "design_0023"]
+
+[sybil_detection.smart_money_tier2_delta]
+value     = 0.05
+rationale = "Confidence amplification for Sybil clusters with >= smart_money_tier2_min_count Tier2 members. Design 0023 Decision 4."
+refs      = ["D08/sybil_detection", "design_0023"]
+
+[sybil_detection.smart_money_tier2_min_count]
+value     = 2
+rationale = "Minimum Tier2 wallets in cluster for Tier2 amplification. Design 0023 §9."
+refs      = ["D08/sybil_detection", "design_0023"]
+
+# ---------------------------------------------------------------------------
+# D09 — BOCPD Deployer Changepoint (Sprint 12)
+# ---------------------------------------------------------------------------
+
+[deployer_changepoint.changepoint_prob_threshold]
+value     = 0.50
+rationale = "Adams & MacKay 2007 §4 canonical threshold; latent-flux (#10) production confirmed 0.50 for deployer behavior."
+refs      = ["D09/deployer_changepoint"]
+
+[deployer_changepoint.min_history_length]
+value     = 3
+rationale = "Minimum launches before alert fires; below 3 the posterior is too diffuse. Spec §6.1 warm-up guard."
+refs      = ["D09/deployer_changepoint"]
+
+[deployer_changepoint.hazard_rate_denom]
+value     = 300
+rationale = "Constant hazard H=1/300; expected run length 300 launches. Latent-flux (#10) confirmed. LOCKED DECISION."
+refs      = ["D09/deployer_changepoint"]
+
+[deployer_changepoint.mu_0]
+value     = 0.20
+rationale = "Prior mean composite score for a typical legitimate deployer (80% LP locked, low rug rate). Spec §3.3 locked."
+refs      = ["D09/deployer_changepoint"]
+
+[deployer_changepoint.kappa_0]
+value     = 1.0
+rationale = "Prior virtual sample count = 1 (weakly informative). Murphy 2007 §2.1; spec §3.3 locked."
+refs      = ["D09/deployer_changepoint"]
+
+[deployer_changepoint.alpha_0]
+value     = 3.0
+rationale = "Gamma shape; nu_0=6 gives Student-t with finite variance from first observation. Murphy 2007 §2.1; spec §3.3 locked."
+refs      = ["D09/deployer_changepoint"]
+
+[deployer_changepoint.beta_0]
+value     = 1.0
+rationale = "Gamma rate; prior predictive SD ≈ 0.89, covers [0,1] score range. Murphy 2007 §2.1; spec §3.3 locked."
+refs      = ["D09/deployer_changepoint"]
+
+[deployer_changepoint.max_run_length_tracked]
+value     = 300
+rationale = "State vector bound: O(300) memory/deployer. Equals hazard_rate_denom; latent-flux (#10) confirmed. LOCKED."
+refs      = ["D09/deployer_changepoint"]
+
+[deployer_changepoint.w0]
+value     = 0.25
+rationale = "F1 (log_gap_seconds) weight. Cadence is the primary behavioral regime signal. Spec §2.3 Table 2."
+refs      = ["D09/deployer_changepoint"]
+
+[deployer_changepoint.w1]
+value     = 0.25
+rationale = "F2 (1-lp_locked_pct) weight. LP protection top-3 predictor (Alhaidari et al. 2025 SolRPDS). Spec §2.3."
+refs      = ["D09/deployer_changepoint"]
+
+[deployer_changepoint.w2]
+value     = 0.20
+rationale = "F3 (log_initial_liquidity_usd) weight. Launch quality proxy; lower weight due to natural project-size variation."
+refs      = ["D09/deployer_changepoint"]
+
+[deployer_changepoint.w3]
+value     = 0.15
+rationale = "F4 (holder_count_at_1h) weight. Weak individual signal; noisy, so lower weight than F1/F2."
+refs      = ["D09/deployer_changepoint"]
+
+[deployer_changepoint.w4]
+value     = 0.15
+rationale = "F5 (prior_rug_rate) weight. INVARIANT: w0+w1+w2+w3+w4=1.00. Chainalysis 2025 deployer rug rate signal."
+refs      = ["D09/deployer_changepoint"]
+
+[deployer_changepoint.rug_confidence_threshold]
+value     = 0.30
+rationale = "Minimum confidence for DB persistence. Consistent floor with D02-D08. Spec §6.2."
+refs      = ["D09/deployer_changepoint"]
+
+# ---------------------------------------------------------------------------
+# D10 — Launch Audit
+# ---------------------------------------------------------------------------
+
+[launch_audit.initial_liquidity_usd_threshold]
+value     = 750.0
+rationale = "USD-normalised RugWatch threshold: $750 = 5 SOL @ $150 = 0.25 ETH @ $3000 = 1.25 BNB @ $600. Chain-agnostic. Sprint 24 EVM expansion."
+refs      = ["D10/launch_audit"]
+
+[launch_audit.lp_safe_floor_pct]
+value     = 0.70
+rationale = "Alhaidari et al. 2025 (SolRPDS) Table 3: >=70% safe floor. Evidence metadata only; Signal B gates on == 0.0."
+refs      = ["D10/launch_audit", "D02/rug_pull_lp_drain"]
+
+# ---------------------------------------------------------------------------
+# D11 — Synchronized-Activity Clustering
+# ---------------------------------------------------------------------------
+
+[synchronized_activity_v1.window_seconds]
+value     = 30
+rationale = "30s: 2 Solana slot-equivalents; above MEV arb range; below human-coordination reaction time. research/sprint13-b-citations.md."
+refs      = ["D11/synchronized_activity_v1"]
+
+[synchronized_activity_v1.min_cluster_size]
+value     = 5
+rationale = "N_min=5: midpoint between Arnold 2024 (N=3) and RTbust 2019 (N>=10). research/sprint13-b-citations.md."
+refs      = ["D11/synchronized_activity_v1"]
+
+[synchronized_activity_v1.poisson_p_threshold]
+value     = 1e-6
+rationale = "Poisson p-value gate: lenient relative to k=5, λ=1/hour, δ=30s derivation (p≈4e-10). research/sprint13-b-citations.md."
+refs      = ["D11/synchronized_activity_v1"]
+
+[synchronized_activity_v1.temporal_tightness_threshold]
+value     = 0.50
+rationale = "Unverified-heuristic; midpoint of [0, 1.0]. Calibrate against Sprint 14 fixture corpus."
+refs      = ["D11/synchronized_activity_v1"]
+
+[synchronized_activity_v1.jaccard_similarity_threshold]
+value     = 0.70
+rationale = "Unverified-heuristic; midpoint of [0.5, 0.9] per Mannocci et al. 2024. eps = 1 - 0.70 = 0.30."
+refs      = ["D11/synchronized_activity_v1"]
+
+[synchronized_activity_v1.max_lookback_minutes]
+value     = 10
+rationale = "10-minute lookback window for cluster detection. 7-day baseline window for lambda is separate."
+refs      = ["D11/synchronized_activity_v1"]
+
+[synchronized_activity_v1.max_events_per_window]
+value     = 10000
+rationale = "Safety ceiling: analogous to D05 Signal B max_transfers_per_window=10,000."
+refs      = ["D11/synchronized_activity_v1"]
+
+[synchronized_activity_v1.max_wallets_per_cluster_cap]
+value     = 500
+rationale = "O(n^2) guard: 500 wallets = 250,000 distance comparisons ≈ 0.25ms worst case."
+refs      = ["D11/synchronized_activity_v1"]
+
+[synchronized_activity_v1.min_baseline_events]
+value     = 10
+rationale = "Warmup guard: <10 events in 7-day window → lambda unreliable → skip. Analogous to D04 min_baseline_days=3."
+refs      = ["D11/synchronized_activity_v1"]
+
+[synchronized_activity_v1.cadence_seconds]
+value     = 120
+rationale = "Scheduler cadence per token. Analogous to D08 sybil_cluster_cadence_seconds."
+refs      = ["D11/synchronized_activity_v1"]
+
+[synchronized_activity_v1.suppress_established_protocols]
+value     = false
+rationale = "D11 does NOT suppress by default. Consistent with D08 Sybil (gotcha #42). Decision 7, design 0018 §11."
+refs      = ["D11/synchronized_activity_v1"]
+
+[synchronized_activity_v1.weight_cluster_size]
+value     = 0.40
+rationale = "Cluster size strongest predictor (RTbust 2019). Highest weight. design 0018 §4.2."
+refs      = ["D11/synchronized_activity_v1"]
+
+[synchronized_activity_v1.weight_temporal_tightness]
+value     = 0.30
+rationale = "Equal weight with S_stat. INVARIANT: 0.40+0.30+0.30=1.00. design 0018 §4.2."
+refs      = ["D11/synchronized_activity_v1"]
+
+[synchronized_activity_v1.weight_statistical_significance]
+value     = 0.30
+rationale = "Equal weight with S_tight. INVARIANT: 0.40+0.30+0.30=1.00. design 0018 §4.2."
+refs      = ["D11/synchronized_activity_v1"]
+
+[synchronized_activity_v1.cluster_size_scale]
+value     = 5.0
+rationale = "Sigmoid stretch: at cluster_size=min+5 (10 wallets), S_size≈0.73. Arnold 2024. design 0018 §4.1."
+refs      = ["D11/synchronized_activity_v1"]
+
+# ===========================================================================
+# D12 — Permit2 Signature Drainer (permit2_drainer_v1)
+# ===========================================================================
+
+[permit2_drainer_v1.min_amount_usd]
+value     = "100"
+rationale = "Minimum USD drain value. Pink Drainer p5 victim loss ~$200; $100 captures >97% victim volume. Source: Dune beetle/pink-drainer."
+refs      = ["D12/permit2_drainer_v1"]
+
+[permit2_drainer_v1.lookback_minutes]
+value     = 60
+rationale = "Lookback window for transfers and permit events. Drains complete in one block (~12s); 60m is generous buffer."
+refs      = ["D12/permit2_drainer_v1"]
+
+[permit2_drainer_v1.min_batch_size]
+value     = 2
+rationale = "PermitBatch N >= 2 triggers batch bonus. Legitimate batch swaps are allowlisted. Unverified-heuristic."
+refs      = ["D12/permit2_drainer_v1"]
+
+[permit2_drainer_v1.conf_weight_a1]
+value     = "0.70"
+rationale = "Known-drainer label is near-ground-truth (forensic, ~0% label error). 0.70 not 0.95 reflects label lag. Unverified-heuristic."
+refs      = ["D12/permit2_drainer_v1"]
+
+[permit2_drainer_v1.conf_weight_a2]
+value     = "0.55"
+rationale = "Structural Permit2 correlation is strong but FP risk from allowlist gaps. Combined A1+A2=1.25 → cap 0.95. Unverified-heuristic."
+refs      = ["D12/permit2_drainer_v1"]
+
+[permit2_drainer_v1.conf_bonus_batch]
+value     = "0.10"
+rationale = "PermitBatch with N >= min_batch_size tokens: drainer template signal. Unverified-heuristic."
+refs      = ["D12/permit2_drainer_v1"]
+
+[permit2_drainer_v1.conf_bonus_max_approval]
+value     = "0.05"
+rationale = "uint160 max approval: drainer template. Legitimate swaps use exact amounts. Unverified-heuristic."
+refs      = ["D12/permit2_drainer_v1"]
+
+[permit2_drainer_v1.conf_cap]
+value     = "0.95"
+rationale = "Loss-of-funds ceiling; 5% residual uncertainty maintained. Analogous to D02 rug pull cap."
+refs      = ["D12/permit2_drainer_v1"]
+
+[permit2_drainer_v1.min_emit_confidence]
+value     = "0.05"
+rationale = "Very low floor per CLAUDE.md: false negatives are expensive. A2-only (0.55) is well above this."
+refs      = ["D12/permit2_drainer_v1"]
+
+[permit2_drainer_v1.known_drainer_addresses]
+value     = [
+    "0x3c116dedca98c1813eadb17b71e869c0faba0f5e",
+    "0x54d3b81a58d5b1fc51c620e2c8f5ea0c97c9c2ab",
+]
+rationale = "Seed list: Inferno Drainer (Scam Sniffer 2023-12-23) and Pink Drainer (ZachXBT/Dune 2024). Per ADR 0003: no runtime API calls. Placeholder — verify Sprint 19."
+refs      = ["D12/permit2_drainer_v1"]
+
+[permit2_drainer_v1.known_legitimate_permit2_spenders]
+value     = [
+    "0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad",
+    "0x66a9893cc07d91d95644aedd05d03f95e1dba8af",
+    "0x1111111254eeb25477b68fb85ed929f73a960582",
+    "0xe592427a0aece92de3edee1f18e0157c05861564",
+    "0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45",
+]
+rationale = "Legitimate Permit2 DEX routers (Uniswap UniversalRouter v1/v2, 1inch v5, Uniswap v3 SwapRouter/v2). Hard suppression of A2 signal for these addresses."
+refs      = ["D12/permit2_drainer_v1"]
+
+[permit2_drainer_v1.suppress_established_protocols]
+value     = false
+rationale = "D12 does NOT suppress on established protocols. USDC/WETH/wBTC are most-drained tokens. Consistent with D08+D11 non-suppression (gotcha #17)."
+refs      = ["D12/permit2_drainer_v1"]
+
+[permit2_drainer_v1.unknown_token_usd_fallback]
+value     = "0"
+rationale = "'0' = do not estimate; conservatively pass min_amount_usd gate for unknown tokens. No oracle dependency (ADR 0003)."
+refs      = ["D12/permit2_drainer_v1"]
+
+# =============================================================================
+# D13 — Sandwich / MEV Detector (sandwich_mev_v1)
+# Sprint 20: UniV2 + UniV3 on Ethereum mainnet.
+# Design reference: docs/designs/0021-detector-13-sandwich-mev.md
+# =============================================================================
+
+[sandwich_mev_v1.min_victim_slippage_pct]
+value     = "0.005"
+rationale = "Minimum victim slippage fraction for a sandwich event to fire. 0.005 = 0.5%. Chi et al. 2024 median sandwich-imposed slippage ≈ 0.8%; values below 0.5% are indistinguishable from normal AMM price impact on liquid pools (typical pool fee is 0.3%). Decision D-4 of design 0021 §11."
+refs      = ["D13/sandwich_mev_v1"]
+
+[sandwich_mev_v1.min_attacker_profit_usd]
+value     = "10"
+rationale = "Minimum attacker profit in USD to trigger the +0.15 confidence profit bonus. Does NOT suppress event emission. Chi et al. 2024 median profit ~$32 per attack; $10 provides margin above gas cost floor (~$2-5 at moderate gas). Decision D-5 of design 0021 §11."
+refs      = ["D13/sandwich_mev_v1"]
+
+[sandwich_mev_v1.min_victim_swap_usd]
+value     = "1000"
+rationale = "Minimum victim swap size in USD for evaluation. Below this, sandwich profit cannot cover gas cost on Ethereum. SPEC-NOTE: applied only when usd_value > 0; swaps with usd_value=0 pass conservatively. Source: Chi et al. 2024 arXiv:2405.17944 §3.1."
+refs      = ["D13/sandwich_mev_v1"]
+
+[sandwich_mev_v1.confidence_base]
+value     = "0.55"
+rationale = "Base confidence for structural A1 F-V-B pattern match. 0.55: above 0.50 (more likely than not sandwich) but below 0.70 (not definitive). Decision D-1 of design 0021 §11. Source: Flashbots mev-inspect-py; Daian et al. 2019 §3."
+refs      = ["D13/sandwich_mev_v1"]
+
+[sandwich_mev_v1.confidence_profit_bonus]
+value     = "0.15"
+rationale = "Confidence bonus added when attacker profit > min_attacker_profit_usd. 0.15: profit is a strong confirming signal but is an outcome, not an independent structural signal. Decision D-1. Source: Chi et al. 2024 §3.1."
+refs      = ["D13/sandwich_mev_v1"]
+
+[sandwich_mev_v1.confidence_slippage_bonus]
+value     = "0.15"
+rationale = "Confidence bonus added when victim_slippage_pct >= min_victim_slippage_pct. 0.15: slippage above 0.5% on liquid pools is anomalous. Decision D-1. Source: Chi et al. 2024 §3 slippage distribution."
+refs      = ["D13/sandwich_mev_v1"]
+
+[sandwich_mev_v1.confidence_cap]
+value     = "0.85"
+rationale = "Maximum confidence ceiling for D13. Sandwich attacks impose indirect harm (slippage) rather than direct asset removal (D12 cap 0.95). Decision D-6 of design 0021 §11."
+refs      = ["D13/sandwich_mev_v1"]
+
+[sandwich_mev_v1.pool_kinds_enabled]
+value     = ["univ2", "univ3"]
+rationale = "Pool types evaluated by D13. UniV2 + UniV3 are the two pool types with Sprint 16 decoders. Other pools deferred to Sprint 21+. Decision D-2 of design 0021 §11 (B1 coverage)."
+refs      = ["D13/sandwich_mev_v1"]
+
+[sandwich_mev_v1.settlement_allowlist_extra]
+value     = []
+rationale = "Operator-extension allowlist for settlement contracts. Hardcoded baseline (CoW Protocol, Flashbots Protect, 1inch Fusion) is always active. Empty default — add operator-specific addresses here. Decision D-7 of design 0021 §11 (ADR 0003 compliant)."
+refs      = ["D13/sandwich_mev_v1"]
+
+[sandwich_mev_v1.suppress_established_protocols]
+value     = false
+rationale = "D13 does NOT suppress on established protocols. WETH/USDC/DAI pools are primary sandwich venues. Consistent with D08/D11/D12 non-suppression policy (gotcha #17). See design 0021 §5.2."
+refs      = ["D13/sandwich_mev_v1"]
+
+# ---------------------------------------------------------------------------
+# [smart_money_v1] — Smart-Money Labelling Pipeline (Sprint 22)
+#
+# Background-task batch job (NOT a streaming Detector). Spawned every
+# batch_interval_seconds. Writes LabelType::SmartMoney to address_labels.
+#
+# Stage 1: Realized PnL corpus (FIFO round-trips from swaps table).
+# Stage 3: Timing features (pre-event entry, cross-event recurrence).
+# Stage 2: FDR alpha separation (Barras 2010) — data-blocked; NOT activated.
+# ---------------------------------------------------------------------------
+
+[smart_money_v1.enabled]
+value     = true
+rationale = "Smart-money labelling enabled by default. Set false to disable the background task entirely."
+refs      = ["smart_money_v1/enabled"]
+
+[smart_money_v1.batch_interval_seconds]
+value     = 21600
+rationale = "6-hour batch interval (4 runs/day). Balances incremental update scope vs label freshness. Design 0022 Decision 5."
+refs      = ["smart_money_v1/batch_interval_seconds"]
+
+[smart_money_v1.min_round_trips]
+value     = 10
+rationale = "Minimum completed round-trips before a wallet enters the corpus. Barras et al. 2010 JoF 65(1): below 10, alpha t-statistic has insufficient power."
+refs      = ["smart_money_v1/min_round_trips", "barras_2010"]
+
+[smart_money_v1.min_round_trips_floor]
+value     = 5
+rationale = "Configurable floor for min_round_trips. Below 5, win-rate SE > 0.22 — label signal is noise-dominated. Enforced: effective_min = max(min_round_trips, floor)."
+refs      = ["smart_money_v1/min_round_trips_floor", "barras_2010"]
+
+[smart_money_v1.tier1_min_pnl_usd]
+value     = "10000"
+rationale = "Tier 1: minimum total realized PnL in USD. $10K is a commonly-cited smart-money threshold. String Decimal per ADR 0002."
+refs      = ["smart_money_v1/tier1_min_pnl_usd"]
+
+[smart_money_v1.tier1_min_win_rate]
+value     = "0.55"
+rationale = "Tier 1: minimum win rate. 0.55 is above 50% breakeven. unverified-heuristic; Stage 2 FDR replaces. String Decimal per ADR 0002."
+refs      = ["smart_money_v1/tier1_min_win_rate"]
+
+[smart_money_v1.tier1_min_recurrence]
+value     = 3
+rationale = "Tier 1: minimum distinct pump events in pre-event window. Perseus 2025 (arXiv:2503.01686): all 438 confirmed masterminds recurred >= 3 times."
+refs      = ["smart_money_v1/tier1_min_recurrence", "perseus_2025"]
+
+[smart_money_v1.tier1_top_timing_percentile]
+value     = "0.90"
+rationale = "Tier 1: timing lead percentile (top-10% earliest entries). Fantazzini & Xiao 2023: 60-min window. String Decimal per ADR 0002."
+refs      = ["smart_money_v1/tier1_top_timing_percentile", "fantazzini_2023"]
+
+[smart_money_v1.tier2_min_pnl_usd]
+value     = "1000"
+rationale = "Tier 2: minimum total realized PnL in USD (PnL-only path). $1K directional edge signal. String Decimal per ADR 0002."
+refs      = ["smart_money_v1/tier2_min_pnl_usd"]
+
+[smart_money_v1.tier2_min_recurrence]
+value     = 2
+rationale = "Tier 2: minimum distinct pump events for recurrence path (either criterion: PnL OR recurrence). 2 events is heuristic lower bound."
+refs      = ["smart_money_v1/tier2_min_recurrence"]
+
+[smart_money_v1.pre_event_lookback_blocks]
+value     = 100
+rationale = "Pre-event entry window in blocks for Stage 3 timing features. Used alongside the minute-based window."
+refs      = ["smart_money_v1/pre_event_lookback_blocks", "fantazzini_2023"]
+
+[smart_money_v1.pre_event_lookback_max_minutes]
+value     = 60
+rationale = "Maximum pre-event lookback in minutes for Stage 3. Fantazzini & Xiao 2023 (Econometrics 11(3)): 60-minute window."
+refs      = ["smart_money_v1/pre_event_lookback_max_minutes", "fantazzini_2023"]
+
+[smart_money_v1.smart_money_fdr_enabled]
+value     = false
+rationale = "Stage 2 FDR (Barras 2010) NOT activated. Requires >= 30-day corpus. When ready, operator sets true after TPR/FPR validation."
+refs      = ["smart_money_v1/smart_money_fdr_enabled", "barras_2010"]
+
+[smart_money_v1.batch_lookback_minutes]
+value     = 720
+rationale = "Batch lookback for stale-wallet detection (12h = 2 batch intervals). Design 0022 Decision 5."
+refs      = ["smart_money_v1/batch_lookback_minutes"]
+
+[smart_money_v1.label_ttl_hours]
+value     = 720
+rationale = "Label TTL: 30 days. Labels expire and must be re-earned on each batch run. Design 0022 §6.4."
+refs      = ["smart_money_v1/label_ttl_hours"]
+
+[smart_money_v1.corpus_lookback_days]
+value     = 90
+rationale = "Swap history window for corpus computation. 90 days balances recency vs depth. Design 0022 §5.1."
+refs      = ["smart_money_v1/corpus_lookback_days"]
+
+[smart_money_v1.pump_event_min_confidence]
+value     = 0.60
+rationale = "Minimum D04 pump_dump_v1 confidence for Stage 3 event index. 0.60 above midpoint; excludes noise-level D04 output."
+refs      = ["smart_money_v1/pump_event_min_confidence"]
+
+[smart_money_v1.wash_trading_exclusion_confidence]
+value     = 0.70
+rationale = "Confidence floor for wash_trading_v1 events triggering wallet exclusion. Prevents E-SM-2 evasion. Design 0022 §8."
+refs      = ["smart_money_v1/wash_trading_exclusion_confidence"]
+
+[smart_money_v1.min_label_confidence]
+value     = 0.40
+rationale = "Minimum label confidence for smart-money lookup sent to D04/D08/D05 amplifiers. Design 0023 §9."
+refs      = ["smart_money_v1/min_label_confidence", "design_0023"]
+
+# D14 Bridge Drain (Sprint 26)
+[bridge_drain_v1.min_drain_pct]
+value     = 0.20
+rationale = "Minimum drain fraction to fire. 20% of custody balance. Source: rekt.news leaderboard."
+refs      = ["D14/bridge_drain_v1"]
+
+[bridge_drain_v1.tier1_base_confidence]
+value     = 0.85
+rationale = "Base confidence for Tier1 bridges. Near-certain Critical. Source: rekt.news leaderboard."
+refs      = ["D14/bridge_drain_v1"]
+
+[bridge_drain_v1.tier2_base_confidence]
+value     = 0.65
+rationale = "Base confidence for Tier2 bridges. High band. Source: rekt.news leaderboard."
+refs      = ["D14/bridge_drain_v1"]
+
+[bridge_drain_v1.large_drain_amplifier]
+value     = 0.10
+rationale = "Additional confidence when drain >= 50%. All rekt.news incidents exceeded 50%."
+refs      = ["D14/bridge_drain_v1"]
+
+[bridge_drain_v1.confidence_cap]
+value     = 0.95
+rationale = "Cap preserves 5% epistemic uncertainty. Consistent with D12 cap."
+refs      = ["D14/bridge_drain_v1"]
+
+[bridge_drain_v1.max_rows_per_address]
+value     = 10000
+rationale = "DB row cap per address per window. 10k covers high-volume bridges."
+refs      = ["D14/bridge_drain_v1"]
+
+[bridge_drain_v1.bridge_registry_path]
+value     = "config/known_bridges.toml"
+rationale = "Path to bridge TOML registry. Loaded at startup."
+refs      = ["D14/bridge_drain_v1"]

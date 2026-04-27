@@ -1,0 +1,75 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthRug082FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+    "symbol": "RUG082",
+    "label": "positive",
+    "category": "rug_latent",
+    "source_url": "synthetic/rug_pull/20pct_locked_single_provider",
+    "fetched_at": "2026-04-21T20:31:00Z",
+    "synthetic": true,
+    "notes": "D02 Signal B: effective_safe_pct=20%, single provider. conf=0.75 (cap hit). Near-worst case for partial lock."
+  },
+  "token_meta": {
+    "mint": "SynthRug082FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "TwentyPctLock082",
+    "symbol": "RUG082",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevTwenty082111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 2300,
+    "rugcheck_score_normalised": 51,
+    "risks": [ { "name": "LP Vault unlocked", "level": "danger" } ],
+    "markets": [
+      { "pool_address": "TwentyPool082111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "20.00", "liquidity_usd": "52000.00", "lp_provider_count": 1 }
+    ],
+    "lockers": {},
+    "creator": "DevTwenty082111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "52000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 420,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "TwentyHolder082_0111111111111111111111111": 58000000000000,
+      "TwentyHolder082_0211111111111111111111111": 41000000000000,
+      "TwentyHolder082_0311111111111111111111111": 29000000000000,
+      "TwentyHolder082_0411111111111111111111111": 19000000000000,
+      "TwentyHolder082_0511111111111111111111111": 12500000000000,
+      "TwentyHolder082_0611111111111111111111111": 8200000000000,
+      "TwentyHolder082_0711111111111111111111111": 5400000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 415,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.173",
+    "gini_liquid_after_exclusion": "0.45"
+  },
+  "holder_classifications": [],
+  "pool_rows": [
+    { "pool_address": "TwentyPool082111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "20.00", "lp_locked_pct": "0.00", "effective_safe_pct": "20.00", "lp_provider_count": 1, "liquidity_usd": "52000.00" }
+  ],
+  "expected": {
+    "d01_honeypot": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.15], "severity": "Info", "reason": "No honeypot signals." },
+    "d02_rug_pull": {
+      "verdict": "FIRES",
+      "confidence_band": [0.70, 0.75],
+      "severity": "High",
+      "reason": "Signal B: effective_safe=20% < 70%. single_provider=true. conf=min(0.75, 0.50+(70-20)/70*0.25+0.15)=min(0.75, 0.50+0.179+0.15)=min(0.75,0.829)=0.75 (cap hit)."
+    },
+    "d03_concentration": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "top10=0.173; stable." },
+    "d04_pump_dump": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No spike." },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No self-dealing." },
+    "d06_mint_burn_anomaly": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "mint_authority=null." }
+  }
+}

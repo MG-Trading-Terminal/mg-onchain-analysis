@@ -1,0 +1,64 @@
+[package]
+name        = "mg-onchain-storage"
+version.workspace     = true
+edition.workspace     = true
+rust-version.workspace = true
+license.workspace     = true
+repository.workspace  = true
+description = "Storage adapters: sqlx (Postgres) wrappers with migration support (ADR 0002)"
+
+# ---------------------------------------------------------------------------
+# Storage crate dependency rationale
+# ---------------------------------------------------------------------------
+#
+# Postgres client — sqlx 0.8:
+#   - Compile-time query macros (sqlx::query_as!, sqlx::query!) require a live DB
+#     at compile time. We use runtime queries (sqlx::query_as / sqlx::query)
+#     everywhere to keep `cargo check` and `cargo test` working without a DB.
+#     The query macro approach is available behind a future `sqlx-check` feature flag
+#     once CI has a live Postgres container.
+#   - Features: runtime-tokio-rustls (async + TLS), postgres, uuid, chrono, migrate, macros.
+#   - sqlx migrate: chosen over refinery because sqlx is already in the dep graph
+#     (no extra crate), migration files are plain .sql (same as refinery), and
+#     sqlx migrate integrates with the sqlx Pool type we use everywhere.
+#     Refinery would add a dep with no additional value.
+
+[features]
+# Expose mock helpers to downstream crates' test suites.
+test-utils = []
+
+[dependencies]
+# Workspace-shared
+anyhow.workspace      = true
+tokio.workspace       = true
+tracing.workspace     = true
+serde.workspace       = true
+serde_json.workspace  = true
+thiserror.workspace   = true
+chrono.workspace      = true
+rust_decimal.workspace = true
+
+# Internal domain types
+mg-onchain-common     = { path = "../common" }
+
+# Postgres — runtime queries only (no compile-time macro DB connection needed)
+sqlx = { version = "0.8", features = [
+    "runtime-tokio-rustls",
+    "postgres",
+    "chrono",
+    "migrate",
+    "macros",
+    "uuid",
+] }
+
+# For generating UUIDs in deployer_clusters
+uuid = { version = "1", features = ["v4", "serde"] }
+
+# Async trait support (CheckpointStore is async in the Postgres-backed impl)
+async-trait = "0.1"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full", "test-util"] }
+bs58 = "0.5"
+# TOML config parsing (used in config serde tests)
+toml = "0.8"

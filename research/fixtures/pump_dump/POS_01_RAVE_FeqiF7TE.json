@@ -1,0 +1,112 @@
+{
+  "fixture_id": "POS_01_RAVE_FeqiF7TE",
+  "synthetic": false,
+  "detector": "pump_dump",
+  "category": "burst_fallback",
+  "label": "positive",
+  "source": "RugCheck API + DEXScreener API, live fetch 2026-04-21 (research/token-probes/rave-FeqiF7TE.md)",
+  "mint": "FeqiF7TEVmpYuuj4goD8WgmgyhFgFnZiWtw226wF4hNm",
+  "chain": "solana",
+  "token_name": "RaveDAO (copycat, Solana)",
+  "token_symbol": "RAVE",
+
+  "token_meta": {
+    "decimals": 6,
+    "total_supply_raw": "999999659959557",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "transfer_fee_bps": 0,
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "jup_verified": false,
+    "jup_strict": false,
+    "rugcheck_score": 64,
+    "total_holders": 1068,
+    "total_market_liquidity_usd": "110232",
+    "launchpad": null,
+    "deploy_platform": "PumpSwap"
+  },
+
+  "observation_window": {
+    "start": "2026-04-21T00:00:00Z",
+    "end": "2026-04-21T01:00:00Z",
+    "window_hours": 1,
+    "baseline_window_start": "2026-04-14T00:00:00Z",
+    "baseline_window_end": "2026-04-21T00:00:00Z"
+  },
+
+  "swaps_1h": {
+    "volume_usd": "7032876",
+    "buy_count": 5670,
+    "sell_count": 4663,
+    "unique_wallets": 1068
+  },
+
+  "swaps_24h": {
+    "volume_usd": "7032876",
+    "note": "1h volume equals 24h volume — all activity occurred in a single burst"
+  },
+
+  "baseline_7d": {
+    "days_with_nonzero_volume": 0,
+    "median_volume_usd": "0",
+    "mean_volume_usd": "0",
+    "std_volume_usd": "0",
+    "note": "Token pair created 2026-01-19; dormant for ~3 months before this burst"
+  },
+
+  "price_data": {
+    "price_at_window_start_usd": "0.0000311",
+    "price_at_window_end_usd": "0.0000682",
+    "price_change_pct_1h": "1.19",
+    "note": "DEXScreener reported +115% in 1h; approximated here as +119% for formula illustration"
+  },
+
+  "market_cap": {
+    "fdv_usd": "68129",
+    "circulating_supply_pct": "100",
+    "market_cap_proxy": "fdv",
+    "market_cap_usd": "68129",
+    "above_filter": false,
+    "filter_threshold_usd": "60000000"
+  },
+
+  "signal_evaluation": {
+    "signal_a_applicable": false,
+    "signal_a_reason": "baseline_days_available = 0 < min_baseline_days = 3; median_volume_usd = 0 causes Query 1 INNER JOIN to return empty",
+    "signal_b_applicable": true,
+    "burst_concentration_ratio": "1.00",
+    "burst_threshold": "0.90",
+    "burst_ratio_above_threshold": true,
+    "min_burst_volume_usd_threshold": "5000",
+    "volume_1h_above_dust_filter": true,
+    "signal_c_applicable": false,
+    "signal_c_reason": "deployer_clusters empty; top_holders_proxy available (9CbNrmTyc4o3rBrfKMZHRs7qHaaqDG2edFhH2adccMKt holds 81.47%) but 24h post-spike insider sell data not available in probe snapshot",
+    "insider_source": "unavailable",
+    "is_established_protocol": false
+  },
+
+  "expected_output": {
+    "fires": true,
+    "signal_fired": "burst_fallback",
+    "confidence": "0.75",
+    "severity": "High",
+    "evidence_keys": {
+      "pump_dump/volume_1h_usd": "7032876",
+      "pump_dump/baseline_7d_median_usd": "0",
+      "pump_dump/burst_concentration_ratio": "1.00",
+      "pump_dump/baseline_days_available": "0",
+      "pump_dump/market_cap_usd": "68129"
+    },
+    "evidence_notes": "signal=burst_fallback insider_source=unavailable",
+    "signal_c_applied": false
+  },
+
+  "notes": [
+    "Primary regression for the zero-baseline gap (RAVE probe §4 Gap 2).",
+    "burst_ratio = 1.0 (maximum) because 1h volume = 6h volume = 24h volume.",
+    "Probe analyst assessed confidence 0.92 manually; formula produces 0.75 because Signal C is unavailable in snapshot.",
+    "The 0.75 confidence is correct for a snapshot-time evaluation; real production detection at spike time would have the post-spike window for Signal C.",
+    "Also serves as negative fixture for D01 (no freeze/mint authority) and D06 (mint authority null).",
+    "Fixture data verified against RugCheck API live fetch 2026-04-21 and DEXScreener API live fetch 2026-04-21."
+  ]
+}

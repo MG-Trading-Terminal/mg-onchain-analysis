@@ -1,0 +1,100 @@
+{
+  "fixture_id": "NEG_01_BONK_DezXAZ8z",
+  "synthetic": false,
+  "detector": "pump_dump",
+  "category": "high_volume_normal_baseline",
+  "label": "negative",
+  "source": "CoinMarketCap + Solana Explorer + RugCheck API, 2026-04-22",
+  "mint": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+  "chain": "solana",
+  "token_name": "Bonk",
+  "token_symbol": "BONK",
+
+  "token_meta": {
+    "decimals": 5,
+    "total_supply_raw": "92666179108272854",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "transfer_fee_bps": 0,
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "jup_verified": true,
+    "jup_strict": true,
+    "rugcheck_score": 5,
+    "total_holders": 936000,
+    "total_market_liquidity_usd": "89000000",
+    "launchpad": null,
+    "deploy_platform": "airdrop community launch 2022-12-25",
+    "cex_listings": ["Binance", "Coinbase", "Kraken", "Robinhood", "OKX", "Gate.io"]
+  },
+
+  "observation_window": {
+    "start": "2026-04-22T12:00:00Z",
+    "end": "2026-04-22T13:00:00Z",
+    "window_hours": 1,
+    "baseline_window_start": "2026-04-15T12:00:00Z",
+    "baseline_window_end": "2026-04-22T12:00:00Z"
+  },
+
+  "market_cap": {
+    "fdv_usd": "555600000",
+    "circulating_supply_pct": "98",
+    "market_cap_proxy": "fdv",
+    "market_cap_usd": "555600000",
+    "above_filter": true,
+    "filter_threshold_usd": "60000000",
+    "note": "BONK FDV ~$555M >> $60M filter. Detector exits with Info event after market_cap check."
+  },
+
+  "swaps_1h": {
+    "volume_usd": "2200000",
+    "note": "Approximate 1h slice of typical $30M–$50M daily BONK DEX volume"
+  },
+
+  "baseline_7d": {
+    "days_with_nonzero_volume": 7,
+    "approximate_daily_volumes_usd": [
+      "35000000", "28000000", "42000000", "31000000", "38000000", "27000000", "33000000"
+    ],
+    "mean_volume_usd": "33429000",
+    "note": "Robust 7-day baseline. 1h slice of $2.2M vs daily baseline $33.4M is normal turnover (~6.6% of daily in 1h)."
+  },
+
+  "price_data": {
+    "price_at_window_start_usd": "0.000006",
+    "price_at_window_end_usd": "0.0000059",
+    "price_change_pct_1h": "-0.017",
+    "note": "Small negative price movement — within normal noise. Well below 30% threshold."
+  },
+
+  "signal_evaluation": {
+    "market_cap_filter_triggers": true,
+    "market_cap_filter_reason": "market_cap_usd = 555600000 > filter = 60000000",
+    "signal_a_evaluated": false,
+    "signal_b_evaluated": false,
+    "signal_c_evaluated": false,
+    "is_established_protocol": true,
+    "is_established_protocol_reason": "jup_strict=true"
+  },
+
+  "expected_output": {
+    "fires": false,
+    "fires_anomaly_event": false,
+    "fires_info_event": true,
+    "info_signal": "market_cap_above_filter",
+    "confidence": "0.05",
+    "severity": "Info",
+    "evidence_keys": {
+      "pump_dump/market_cap_usd": "555600000",
+      "pump_dump/signal": "market_cap_above_filter"
+    },
+    "note": "evaluate() returns Ok(vec![Info event]) and exits. No A/B/C evaluation."
+  },
+
+  "notes": [
+    "Primary negative regression: high-volume legitimate token with robust rolling baseline.",
+    "Market-cap filter (Bolz et al. 2024, $60M) correctly excludes BONK before any spike logic runs.",
+    "If market_cap_filter were hypothetically disabled: volume_ratio = 2200000 / 33429000 * 24 ≈ 1.58× (well below 5× threshold). Price change = -1.7% (well below 30%). Neither A nor B would fire.",
+    "is_established_protocol = true (jup_strict=true). Demonstrates that Signal C would be suppressed if it somehow applied.",
+    "BONK mint: DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263 — confirmed via Solana Explorer."
+  ]
+}

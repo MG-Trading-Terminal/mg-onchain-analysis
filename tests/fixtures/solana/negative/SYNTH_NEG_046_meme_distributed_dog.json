@@ -1,0 +1,155 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthNeg046DOGDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+    "symbol": "DOG46",
+    "label": "negative",
+    "category": "meme_distributed",
+    "source_url": "synthetic/meme_distributed/dog_meme_healthy",
+    "fetched_at": "2026-04-21T21:12:00Z",
+    "synthetic": true,
+    "notes": "Dog meme token. LP 100% burned. 900 holders distributed."
+  },
+  "token_meta": {
+    "mint": "SynthNeg046DOGDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "DogMeme046",
+    "symbol": "DOG46",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevNeg046111111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": {
+      "jup_verified": false,
+      "jup_strict": false
+    },
+    "rugcheck_score": 800,
+    "rugcheck_score_normalised": 21,
+    "risks": [],
+    "markets": [
+      {
+        "pool_address": "Neg046Pool1111111111111111111111111111111",
+        "dex": "raydium",
+        "lp_burned_pct": "100.00",
+        "liquidity_usd": "81000.00",
+        "lp_provider_count": 1
+      }
+    ],
+    "lockers": {},
+    "creator": "DevNeg046111111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "81000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 900,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "Neg46Holder00111111111111111111111": 52800000000000,
+      "Neg46Holder01111111111111111111111": 38400000000000,
+      "Neg46Holder02111111111111111111111": 31200000000000,
+      "Neg46Holder03111111111111111111111": 26400000000000,
+      "Neg46Holder04111111111111111111111": 21600000000000,
+      "Neg46Holder05111111111111111111111": 19200000000000,
+      "Neg46Holder06111111111111111111111": 16800000000000,
+      "Neg46Holder07111111111111111111111": 14400000000000,
+      "Neg46Holder08111111111111111111111": 12000000000000,
+      "Neg46Holder09111111111111111111111": 7200000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 880,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.27",
+    "gini_liquid_after_exclusion": "0.61"
+  },
+  "holder_classifications": [],
+  "pool_rows": [
+    {
+      "pool_address": "Neg046Pool1111111111111111111111111111111",
+      "dex": "raydium",
+      "lp_burned_pct": "100.00",
+      "lp_locked_pct": "0.00",
+      "effective_safe_pct": "100.00",
+      "lp_provider_count": 1,
+      "liquidity_usd": "81000.00"
+    }
+  ],
+  "swaps_1h": {
+    "volume_usd": "41000.00",
+    "trade_count": 65,
+    "unique_buyers": 54,
+    "price_start": "0.000045",
+    "price_end": "0.00004581",
+    "price_change_pct": "0.018"
+  },
+  "swaps_7d_daily_baseline": {
+    "day_count_nonzero": 6,
+    "mean_daily_volume_usd": "47600.00",
+    "std_daily_volume_usd": "3500.00",
+    "volume_multiplier_observed": "0.88",
+    "volume_z_score": "-0.4"
+  },
+  "signal_a_round_trips": [],
+  "pool_total_volume_1h_usd": "41000.00",
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No static honeypot signals."
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "LP 100% burned. effective_safe=100%>=70%."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "top10_now~0.24. prior=0.27. Delta~-0.030. All signals below threshold."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "vol_multiplier=0.88 < 5.0. price_change=1.8% < 30%."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No round-trip events. Organic buyer diversity."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "mint_authority=null."
+    }
+  }
+}

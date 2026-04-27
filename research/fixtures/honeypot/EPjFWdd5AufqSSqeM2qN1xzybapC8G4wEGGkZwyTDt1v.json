@@ -1,0 +1,40 @@
+{
+  "_fixture_meta": {
+    "label": "negative",
+    "detector": "honeypot_sim",
+    "expected_confidence_max": 0.30,
+    "expected_severity": "Info",
+    "capture_date": "2026-04-21",
+    "notes": "USD Coin (USDC) on Solana. Has active freeze authority (7dGbd2QZcCKcTndnHcTL8q7SMVXAkp688NTQYwrRCrar — Circle's compliance authority). This is the canonical negative example demonstrating that freeze authority ALONE does not make a token a honeypot: USDC has freeze authority for regulatory compliance (OFAC blacklisting) but is jup_verified=true, jup_strict=true, score=1. Expected: static signal fires for freeze_authority_active at low weight (0.25 contribution) → confidence ~0.25 from static path. Simulation expected to PASS (sells work). The scoring crate should ultimately discount this via jup_verified and score=1 contextual signals. This fixture validates that the static signal fires but is correctly attenuated. Developer note: confidence should not exceed 0.30 for a jup_strict token with score=1.",
+    "signals_expected": {
+      "freeze_authority_active": true,
+      "freeze_authority_address": "7dGbd2QZcCKcTndnHcTL8q7SMVXAkp688NTQYwrRCrar",
+      "transfer_fee_bps": 0,
+      "permanent_delegate_active": false,
+      "transfer_hook_present": false,
+      "buy_sell_ratio_above_sentinel": false,
+      "simulation_fail": false
+    }
+  },
+  "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  "mintAuthority": null,
+  "freezeAuthority": "7dGbd2QZcCKcTndnHcTL8q7SMVXAkp688NTQYwrRCrar",
+  "transferFee": {
+    "pct": 0,
+    "maxAmount": 0,
+    "authority": "11111111111111111111111111111111"
+  },
+  "permanentDelegate": null,
+  "transferHook": null,
+  "rugged": false,
+  "risks": [],
+  "score": 1,
+  "tokenProgram": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  "verification": {
+    "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    "name": "USD Coin",
+    "symbol": "usdc",
+    "jup_verified": true,
+    "jup_strict": true
+  }
+}

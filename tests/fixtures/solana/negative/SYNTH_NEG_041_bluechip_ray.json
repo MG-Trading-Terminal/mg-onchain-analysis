@@ -1,0 +1,79 @@
+{
+  "_fixture_meta": {
+    "mint": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
+    "symbol": "RAY",
+    "label": "negative",
+    "category": "bluechip",
+    "source_url": "synthetic/bluechip/ray_raydium_protocol",
+    "fetched_at": "2026-04-21T20:55:00Z",
+    "synthetic": true,
+    "notes": "Raydium protocol token (RAY). jup_verified=true. mint_authority=null. Protocol governance token. Prior Phase 1 FP: RAY fired D02 on Phase 1 corpus because lp_burned_pct=0% and lp_provider_count=1 was incorrectly assessed. Fix: is_established_protocol=true suppresses D02. This is the corrected negative fixture confirming FP remediation."
+  },
+  "token_meta": {
+    "mint": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "Raydium",
+    "symbol": "RAY",
+    "decimals": 6,
+    "supply_raw": "555000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": false,
+    "update_authority": null,
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": true, "jup_strict": false },
+    "rugcheck_score": 280,
+    "rugcheck_score_normalised": 12,
+    "risks": [],
+    "markets": [
+      { "pool_address": "RAYPool01111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "liquidity_usd": "3200000.00", "lp_provider_count": 185 }
+    ],
+    "lockers": {},
+    "creator": "RaydiumProtocol1111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "3200000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 78000,
+    "total_supply_raw": 555000000000000,
+    "balances": {
+      "RAYStakingPDA11111111111111111111111111111": 88000000000000,
+      "RAYEcosystemFund1111111111111111111111111": 72000000000000,
+      "RAYTeamVesting11111111111111111111111111111": 55000000000000,
+      "RAYHolder0111111111111111111111111111111": 9200000000000,
+      "RAYHolder0211111111111111111111111111111": 7800000000000,
+      "RAYHolder0311111111111111111111111111111": 6200000000000,
+      "RAYHolder0411111111111111111111111111111": 4900000000000,
+      "RAYHolder0511111111111111111111111111111": 3800000000000,
+      "RAYHolder0611111111111111111111111111111": 2900000000000,
+      "RAYHolder0711111111111111111111111111111": 2200000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 77600,
+    "total_supply_raw": 555000000000000,
+    "top10_pct_liquid_after_exclusion": "0.14",
+    "gini_liquid_after_exclusion": "0.61"
+  },
+  "holder_classifications": [
+    { "address": "RAYStakingPDA11111111111111111111111111111", "type": "program_pda", "label": "Raydium Staking PDA" },
+    { "address": "RAYEcosystemFund1111111111111111111111111", "type": "ecosystem_fund", "label": "Raydium Ecosystem Fund" },
+    { "address": "RAYTeamVesting11111111111111111111111111111", "type": "vesting_contract", "label": "Raydium Team Vesting" }
+  ],
+  "pool_rows": [ { "pool_address": "RAYPool01111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "lp_locked_pct": "0.00", "effective_safe_pct": "0.00", "lp_provider_count": 185, "liquidity_usd": "3200000.00" } ],
+  "swaps_1h": { "volume_usd": "2800000.00", "trade_count": 8400, "unique_buyers": 4200, "price_start": "1.82", "price_end": "1.83", "price_change_pct": "0.005" },
+  "swaps_7d_daily_baseline": { "day_count_nonzero": 7, "mean_daily_volume_usd": "2600000.00", "std_daily_volume_usd": "550000.00", "volume_multiplier_observed": "1.08", "volume_z_score": "0.4" },
+  "signal_a_round_trips": [],
+  "pool_total_volume_1h_usd": "2800000.00",
+  "expected": {
+    "d01_honeypot": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "No static honeypot signals." },
+    "d02_rug_pull": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "is_established_protocol=true (jup_verified=true). D02 suppressed per P4-0. This is the corrected RAY fixture — prior Phase 1 FP was this exact case." },
+    "d03_concentration": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.08], "severity": "Info", "reason": "After staking/ecosystem exclusion: top10_pct_liquid=0.14. gini_delta~0. No signal." },
+    "d04_pump_dump": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "vol_multiplier=1.08. price_change=+0.5%. Normal." },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "No round-trip events. 4.2k unique buyers." },
+    "d06_mint_burn_anomaly": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "mint_authority=null." }
+  }
+}

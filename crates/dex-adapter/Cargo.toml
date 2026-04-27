@@ -1,0 +1,48 @@
+[package]
+name        = "mg-onchain-dex-adapter"
+version.workspace     = true
+edition.workspace     = true
+rust-version.workspace = true
+license.workspace     = true
+repository.workspace  = true
+description = "DexAdapter trait and per-DEX instruction decoders: Raydium AMM v4, Raydium CPMM (Sprint 2). Orca Whirlpool, Meteora DLMM, EVM DEXes deferred to Sprint 3+."
+
+[dependencies]
+# Workspace-shared
+anyhow.workspace      = true
+tracing.workspace     = true
+serde.workspace       = true
+thiserror.workspace   = true
+chrono.workspace      = true
+bs58.workspace        = true
+rust_decimal.workspace = true
+async-trait.workspace = true
+
+# Internal
+mg-onchain-common        = { path = "../common" }
+# token-registry: provides SolanaRpc trait and RawAccount for HttpPoolAccountProvider (B1.5).
+mg-onchain-token-registry = { path = "../token-registry" }
+
+# bytemuck: zero-copy casting for Raydium AMM v4 packed C-struct layouts.
+# AMM v4 pool state + instruction data are NOT Borsh — they use raw little-endian
+# packed structs. bytemuck::from_bytes lets us cast &[u8] slices safely.
+bytemuck = { version = "1", features = ["derive"] }
+
+# solana-sdk: canonical Pubkey + Keypair + Instruction + Transaction types used by
+# simulation instruction builders (Phase A/B, Sprint 7, P6-4). Pinned to workspace
+# version to stay in lock-step with chain-adapter.
+solana-sdk.workspace  = true
+
+# sha2: SHA-256 for deterministic simulation keypair derivation (B3 §DG3).
+# Transitively provided by solana-sdk but listed explicitly for clarity.
+sha2 = "0.10"
+
+[features]
+# Expose MockPoolAccountProvider to downstream crates' test suites.
+test-utils = []
+
+[dev-dependencies]
+serde_json.workspace  = true
+bincode = "1"
+tokio = { workspace = true, features = ["full"] }
+mg-onchain-token-registry = { path = "../token-registry", features = ["test-utils"] }

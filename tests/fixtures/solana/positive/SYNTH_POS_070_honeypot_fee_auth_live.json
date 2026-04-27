@@ -1,0 +1,79 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthHonP070tttttttttttttttttttttttttttttttt",
+    "symbol": "HON070",
+    "label": "positive",
+    "category": "honeypot_active",
+    "source_url": "synthetic/honeypot/s2_fee_authority_high_rate",
+    "fetched_at": "2026-04-21T20:19:00Z",
+    "synthetic": true,
+    "notes": "D01 S2 via fee_authority sub-signal: transfer_fee at 200bps with live fee_authority capable of raising to 10000. fee_authority=active is the signal. Moderate confidence. This tests the 'live authority can raise fee' sub-variant of S2."
+  },
+  "token_meta": {
+    "mint": "SynthHonP070tttttttttttttttttttttttttttttttt",
+    "token_program": "TokenzQdBNbLqP5VgrHUCemXgAJa2LJKQ74wMRsqBMBP",
+    "name": "FeeAuth070",
+    "symbol": "HON070",
+    "decimals": 6,
+    "supply_raw": "800000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevFeeAuth070111111111111111111111111111111",
+    "transfer_fee": { "fee_bps": 200, "max_amount": 100000000000, "authority": "DevFeeAuth070111111111111111111111111111111" },
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 3100,
+    "rugcheck_score_normalised": 61,
+    "risks": [
+      { "name": "Transfer fee authority enabled", "level": "warn", "description": "Fee can be raised up to 100%" }
+    ],
+    "markets": [
+      { "pool_address": "FeeAuthPool070111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "88.00", "liquidity_usd": "26000.00", "lp_provider_count": 2 }
+    ],
+    "lockers": {},
+    "creator": "DevFeeAuth070111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "26000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 340,
+    "total_supply_raw": 800000000000000,
+    "balances": {
+      "FeeAuthHolder070_0111111111111111111111111": 58000000000000,
+      "FeeAuthHolder070_0211111111111111111111111": 42000000000000,
+      "FeeAuthHolder070_0311111111111111111111111": 30000000000000,
+      "FeeAuthHolder070_0411111111111111111111111": 20000000000000,
+      "FeeAuthHolder070_0511111111111111111111111": 13000000000000,
+      "FeeAuthHolder070_0611111111111111111111111": 8500000000000,
+      "FeeAuthHolder070_0711111111111111111111111": 5500000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 335,
+    "total_supply_raw": 800000000000000,
+    "top10_pct_liquid_after_exclusion": "0.22",
+    "gini_liquid_after_exclusion": "0.51"
+  },
+  "holder_classifications": [],
+  "pool_rows": [
+    { "pool_address": "FeeAuthPool070111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "88.00", "lp_locked_pct": "0.00", "effective_safe_pct": "88.00", "lp_provider_count": 2, "liquidity_usd": "26000.00" }
+  ],
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "FIRES",
+      "confidence_band": [0.35, 0.50],
+      "severity": "Low",
+      "reason": "S2 sub-signal fee_authority=live fires at partial weight (fee_bps=200 < sell_tax_threshold but fee_authority active enables escalation). Phase 1 notes: fee_auth sub-signal weight ~0.20. raw=0.20. sigmoid(0.20/0.55-1.0)=sigmoid(-0.636)=0.346. Low severity.",
+      "calibration_flag": true,
+      "calibration_note": "fee_authority sub-signal at 200bps current fee. Exact weight depends on D01 spec §5.1 fee_authority sub-signal formula. Predicted Low. Flag for Sprint 5 sub-signal calibration."
+    },
+    "d02_rug_pull": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "LP 88% burned. D02 does not fire." },
+    "d03_concentration": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.15], "severity": "Info", "reason": "top10=0.22; no D03 signals." },
+    "d04_pump_dump": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No volume spike." },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No self-dealing." },
+    "d06_mint_burn_anomaly": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "mint_authority=null." }
+  }
+}

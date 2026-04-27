@@ -1,0 +1,188 @@
+{
+  "_fixture_meta": {
+    "mint": "SYNTH_NEG_001_dao_locked_lp_placeholder",
+    "symbol": "DAOTKN",
+    "label": "negative",
+    "category": "meme_distributed",
+    "source_url": "synthetic",
+    "fetched_at": "2026-04-21T20:00:00Z",
+    "synthetic": true,
+    "notes": "Synthetic: DAO governance token with 100% LP burned via Raydium locker, 3500 holders, wide distribution (top-10 liquid pct=18%). Models well-governed community DAO launched on Raydium v4. All D01/D02/D03 signals absent."
+  },
+  "token_meta": {
+    "mint": "SYNTH_NEG_001_dao_locked_lp_placeholder",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "DAO Token",
+    "symbol": "DAOTKN",
+    "decimals": 6,
+    "supply_raw": "1000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": false,
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": {
+      "jup_verified": false,
+      "jup_strict": false
+    },
+    "rugcheck_score": 50,
+    "rugcheck_score_normalised": 3,
+    "risks": [],
+    "markets": [
+      {
+        "pool_address": "DAOpool111111111111111111111111111111111111",
+        "dex": "raydium",
+        "lp_burned_pct": "100.00",
+        "liquidity_usd": "85000.00",
+        "lp_provider_count": 1
+      }
+    ],
+    "lockers": {},
+    "creator": "DAOcreator1111111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "top_holders": [
+      {
+        "address": "DAOholder1_11111111111111111111111111111111",
+        "amount_raw": "35000000000",
+        "pct": "3.50"
+      },
+      {
+        "address": "DAOholder2_11111111111111111111111111111111",
+        "amount_raw": "28000000000",
+        "pct": "2.80"
+      },
+      {
+        "address": "DAOholder3_11111111111111111111111111111111",
+        "amount_raw": "22000000000",
+        "pct": "2.20"
+      },
+      {
+        "address": "DAOholder4_11111111111111111111111111111111",
+        "amount_raw": "18000000000",
+        "pct": "1.80"
+      },
+      {
+        "address": "DAOholder5_11111111111111111111111111111111",
+        "amount_raw": "15000000000",
+        "pct": "1.50"
+      },
+      {
+        "address": "DAOholder6_11111111111111111111111111111111",
+        "amount_raw": "12000000000",
+        "pct": "1.20"
+      },
+      {
+        "address": "DAOholder7_11111111111111111111111111111111",
+        "amount_raw": "10000000000",
+        "pct": "1.00"
+      },
+      {
+        "address": "DAOholder8_11111111111111111111111111111111",
+        "amount_raw": "8000000000",
+        "pct": "0.80"
+      },
+      {
+        "address": "DAOholder9_11111111111111111111111111111111",
+        "amount_raw": "6500000000",
+        "pct": "0.65"
+      },
+      {
+        "address": "DAOholder10_1111111111111111111111111111111",
+        "amount_raw": "5000000000",
+        "pct": "0.50"
+      }
+    ]
+  },
+  "holder_snapshot_now": {
+    "total_holders": 3500,
+    "balances": {
+      "DAOholder1_11111111111111111111111111111111": 35000000000,
+      "DAOholder2_11111111111111111111111111111111": 28000000000,
+      "DAOholder3_11111111111111111111111111111111": 22000000000,
+      "DAOholder4_11111111111111111111111111111111": 18000000000,
+      "DAOholder5_11111111111111111111111111111111": 15000000000,
+      "DAOholder6_11111111111111111111111111111111": 12000000000,
+      "DAOholder7_11111111111111111111111111111111": 10000000000,
+      "DAOholder8_11111111111111111111111111111111": 8000000000,
+      "DAOholder9_11111111111111111111111111111111": 6500000000,
+      "DAOholder10_1111111111111111111111111111111": 5000000000
+    },
+    "total_supply_raw": 1000000000000
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 3470,
+    "total_supply_raw": 1000000000000,
+    "top10_pct_liquid_after_exclusion": "0.1590",
+    "gini_liquid_after_exclusion": "0.5800"
+  },
+  "holder_classifications": [],
+  "pool_rows": [
+    {
+      "pool_address": "DAOpool111111111111111111111111111111111111",
+      "dex": "raydium",
+      "lp_burned_pct": "100.00",
+      "lp_locked_pct": "100.00",
+      "effective_safe_pct": "100.00",
+      "lp_provider_count": 1,
+      "liquidity_usd": "85000.00"
+    }
+  ],
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "All D01 signals absent. Standard SPL token with burned LP."
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "lp_burned_pct=100% \u2192 effective_safe_pct=100% >> 70%. Signal B suppressed."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "Top-10 liquid pct=16% << 80%. gini_delta=0.008 << 0.05. No signals fire."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No swaps_1h data in fixture (Phase 1 fixture). No volume spike. D04 BELOW."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No round-trip data in fixture (Phase 1 fixture). D05 BELOW."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "mint_authority=null. D06 BELOW."
+    }
+  }
+}

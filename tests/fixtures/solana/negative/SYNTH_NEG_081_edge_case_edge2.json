@@ -1,0 +1,172 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthNeg081EdgeEEEEEEEEEEEEEEEEEEEEEEEEEEEE",
+    "symbol": "EDGE281",
+    "label": "negative",
+    "category": "edge_case",
+    "source_url": "synthetic/edge_case/edge2_boundary",
+    "fetched_at": "2026-04-21T21:47:00Z",
+    "synthetic": true,
+    "notes": "Edge case: 2 round-trips detected (below min_repetitions=3 threshold for D05 Signal A). vol_diff=2.1%<5%. Count is 2, not 3. Tests that D05 does not fire below count threshold."
+  },
+  "token_meta": {
+    "mint": "SynthNeg081EdgeEEEEEEEEEEEEEEEEEEEEEEEEEEEE",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "EdgeWashNearMiss081",
+    "symbol": "EDGE281",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevEdge0811111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": {
+      "jup_verified": false,
+      "jup_strict": false
+    },
+    "rugcheck_score": 900,
+    "rugcheck_score_normalised": 22,
+    "risks": [],
+    "markets": [
+      {
+        "pool_address": "EdgePool081111111111111111111111111111111",
+        "dex": "raydium",
+        "lp_burned_pct": "100.00",
+        "liquidity_usd": "52000.00",
+        "lp_provider_count": 1
+      }
+    ],
+    "lockers": {},
+    "creator": "DevEdge0811111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "52000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 580,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "EdgeHolder081_001111111111111111111111": 50000000000000,
+      "EdgeHolder081_011111111111111111111111": 45000000000000,
+      "EdgeHolder081_021111111111111111111111": 40000000000000,
+      "EdgeHolder081_031111111111111111111111": 35000000000000,
+      "EdgeHolder081_041111111111111111111111": 30000000000000,
+      "EdgeHolder081_051111111111111111111111": 25000000000000,
+      "EdgeHolder081_061111111111111111111111": 20000000000000,
+      "EdgeHolder081_071111111111111111111111": 15000000000000,
+      "EdgeHolder081_081111111111111111111111": 10000000000000,
+      "EdgeHolder081_091111111111111111111111": 5000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 570,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.29",
+    "gini_liquid_after_exclusion": "0.58"
+  },
+  "holder_classifications": [],
+  "pool_rows": [
+    {
+      "pool_address": "EdgePool081111111111111111111111111111111",
+      "dex": "raydium",
+      "lp_burned_pct": "100.00",
+      "lp_locked_pct": "0.00",
+      "effective_safe_pct": "100.00",
+      "lp_provider_count": 1,
+      "liquidity_usd": "52000.00"
+    }
+  ],
+  "swaps_1h": {
+    "volume_usd": "11040.00",
+    "trade_count": 55,
+    "unique_buyers": 48,
+    "price_start": "0.000052",
+    "price_end": "0.00005299",
+    "price_change_pct": "0.019"
+  },
+  "swaps_7d_daily_baseline": {
+    "day_count_nonzero": 6,
+    "mean_daily_volume_usd": "12000.00",
+    "std_daily_volume_usd": "2500.00",
+    "volume_multiplier_observed": "0.92",
+    "volume_z_score": "-0.6"
+  },
+  "signal_a_round_trips": [
+    {
+      "sender": "NearMissBot081_111111111111111111111111111",
+      "pool": "NearMissPool0811111111111111111111111111111",
+      "round_trip_count": 2,
+      "avg_volume_diff_pct": "0.021",
+      "first_seen_block": 285400000,
+      "last_seen_block": 285400500,
+      "wash_volume_usd": "8000.00",
+      "direction": "buy_first"
+    }
+  ],
+  "pool_total_volume_1h_usd": "11040.00",
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No static honeypot signals."
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "LP 100.00% burned. effective_safe=100.00%."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "top10_now~0.29. prior=0.29. Stable. No D03 signals.",
+      "calibration_flag": true,
+      "calibration_note": "2 round-trips from same wallet. If the threshold were 2 (not 3), this would fire. Tests that count=2 is correctly filtered. Monitor for repeat: if this wallet appears again next hour, combined count could breach threshold."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.15
+      ],
+      "severity": "Info",
+      "reason": "vol_multiplier=0.92 < 5.0. price_change=1.9% < 30%.",
+      "calibration_flag": true,
+      "calibration_note": "2 round-trips from same wallet. If the threshold were 2 (not 3), this would fire. Tests that count=2 is correctly filtered. Monitor for repeat: if this wallet appears again next hour, combined count could breach threshold."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "round_trip_count=2 < min_repetitions=3. D05 Signal A does not fire even though vol_diff=2.1% passes the vol-diff condition.",
+      "calibration_flag": true,
+      "calibration_note": "2 round-trips from same wallet. If the threshold were 2 (not 3), this would fire. Tests that count=2 is correctly filtered. Monitor for repeat: if this wallet appears again next hour, combined count could breach threshold."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "mint_authority=null."
+    }
+  }
+}

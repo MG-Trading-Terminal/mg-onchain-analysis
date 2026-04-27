@@ -1,0 +1,66 @@
+{
+  "_fixture_meta": {
+    "mint": "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So",
+    "symbol": "mSOL",
+    "label": "negative",
+    "category": "bluechip",
+    "source_url": "synthetic/bluechip/msol_marinade",
+    "fetched_at": "2026-04-21T20:50:00Z",
+    "synthetic": true,
+    "notes": "Marinade staked SOL (mSOL). Established liquid staking protocol. jup_verified=true. mint_authority is Marinade's program PDA — legitimate rebasing mechanism. No LP pool (it's a receipt token, not a DEX pair). D06 Signal A: mint_authority present but is_established_protocol suppresses to 0.10. D02: no pool data, effectively BELOW."
+  },
+  "token_meta": {
+    "mint": "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "Marinade staked SOL (mSOL)",
+    "symbol": "mSOL",
+    "decimals": 9,
+    "supply_raw": "10200000000000000",
+    "mint_authority": "3JLPCS1qM2zRw3Dp6V4hAFjo7HRzGB3ycRCyAhBdFcJr",
+    "freeze_authority": null,
+    "mutable": false,
+    "update_authority": null,
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": true, "jup_strict": false },
+    "rugcheck_score": 180,
+    "rugcheck_score_normalised": 8,
+    "risks": [],
+    "markets": [],
+    "lockers": {},
+    "creator": "MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "0.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 85000,
+    "total_supply_raw": 10200000000000000,
+    "balances": {
+      "7GgPYjS5Dza89wV6FpZ23kUJRG5vbQ1GM25ezspYFSoE": 420000000000000,
+      "Fqm16TjfEVgVTkGUWaqFVAi2vPkBZGMDUhXtRJmAYQP4": 380000000000000,
+      "9YzfCCE67HFdFsTfkbzFa3LJLM2PJMv5wHWg2XJkxALQ": 290000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 84800,
+    "total_supply_raw": 10150000000000000,
+    "top10_pct_liquid_after_exclusion": "0.12",
+    "gini_liquid_after_exclusion": "0.58"
+  },
+  "holder_classifications": [ { "address": "3JLPCS1qM2zRw3Dp6V4hAFjo7HRzGB3ycRCyAhBdFcJr", "type": "program_pda", "label": "Marinade mint authority PDA" } ],
+  "pool_rows": [],
+  "swaps_1h": { "volume_usd": "8200000.00", "trade_count": 4200, "unique_buyers": 2100, "price_start": "0.8820", "price_end": "0.8821", "price_change_pct": "0.001" },
+  "swaps_7d_daily_baseline": { "day_count_nonzero": 7, "mean_daily_volume_usd": "7800000.00", "std_daily_volume_usd": "900000.00", "volume_multiplier_observed": "1.05", "volume_z_score": "0.4" },
+  "signal_a_round_trips": [],
+  "pool_total_volume_1h_usd": "8200000.00",
+  "expected": {
+    "d01_honeypot": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "No freeze_authority, no transfer_fee, no permanent_delegate, no transfer_hook. jup_verified=true further confirms legitimacy." },
+    "d02_rug_pull": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "No pool data. D02 requires pool_rows to evaluate LP safety. No signal possible." },
+    "d03_concentration": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "top10_pct=0.12 far below 0.80. gini_delta~0 (stable large protocol). No signal." },
+    "d04_pump_dump": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "vol_multiplier=1.05 << 5.0. price_change=+0.1% << 30%. No signal." },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "No round-trip events. High trade volume is organic (staking/unstaking flows)." },
+    "d06_mint_burn_anomaly": { "verdict": "SUPPRESSED_INFO", "confidence_band": [0.08, 0.12], "severity": "Info", "reason": "Signal A: mint_authority active (Marinade PDA). is_established_protocol=true (jup_verified). D06 Signal A dampened to conf=0.10. Not suppressed — returns Info-level signal so consumer can audit if desired. No Signal B (no large non-LP mint events). No Signal C (established protocol suppresses)." }
+  }
+}

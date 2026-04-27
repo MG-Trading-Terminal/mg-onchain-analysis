@@ -1,0 +1,152 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthNeg067T22TTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+    "symbol": "T22C67",
+    "label": "negative",
+    "category": "token2022_legit",
+    "source_url": "synthetic/token2022_legit/t22c_safe",
+    "fetched_at": "2026-04-21T21:33:00Z",
+    "synthetic": true,
+    "notes": "Token-2022 with non-transferable extension (event tickets, soul-bound). Transfer always reverts for non-allowlisted destinations. D01: non-transferable is a known-safe extension if announced. This is a calibration edge case: sell_simulation would show revert but it is by design."
+  },
+  "token_meta": {
+    "mint": "SynthNeg067T22TTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+    "token_program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+    "name": "T22NonTransferable067",
+    "symbol": "T22C67",
+    "decimals": 6,
+    "supply_raw": "500000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevT22_C671111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": {
+      "jup_verified": false,
+      "jup_strict": false
+    },
+    "rugcheck_score": 520,
+    "rugcheck_score_normalised": 16,
+    "risks": [],
+    "markets": [
+      {
+        "pool_address": "T22Pool067111111111111111111111111111111",
+        "dex": "raydium",
+        "lp_burned_pct": "100.00",
+        "liquidity_usd": "68200.00",
+        "lp_provider_count": 1
+      }
+    ],
+    "lockers": {},
+    "creator": "DevT22_C671111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "68200.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 1120,
+    "total_supply_raw": 500000000000000,
+    "balances": {
+      "T22Holder067_011111111111111111111111": 28000000000000,
+      "T22Holder067_021111111111111111111111": 22000000000000,
+      "T22Holder067_031111111111111111111111": 16000000000000,
+      "T22Holder067_041111111111111111111111": 12000000000000,
+      "T22Holder067_051111111111111111111111": 8000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 1110,
+    "total_supply_raw": 500000000000000,
+    "top10_pct_liquid_after_exclusion": "0.18",
+    "gini_liquid_after_exclusion": "0.55"
+  },
+  "holder_classifications": [],
+  "pool_rows": [
+    {
+      "pool_address": "T22Pool067111111111111111111111111111111",
+      "dex": "raydium",
+      "lp_burned_pct": "100.00",
+      "lp_locked_pct": "0.00",
+      "effective_safe_pct": "100.00",
+      "lp_provider_count": 1,
+      "liquidity_usd": "68200.00"
+    }
+  ],
+  "swaps_1h": {
+    "volume_usd": "32100.00",
+    "trade_count": 42,
+    "unique_buyers": 35,
+    "price_start": "0.000056",
+    "price_end": "0.000057",
+    "price_change_pct": "0.018"
+  },
+  "swaps_7d_daily_baseline": {
+    "day_count_nonzero": 5,
+    "mean_daily_volume_usd": "37450.00",
+    "std_daily_volume_usd": "2500.00",
+    "volume_multiplier_observed": "0.86",
+    "volume_z_score": "-0.4"
+  },
+  "signal_a_round_trips": [],
+  "pool_total_volume_1h_usd": "32100.00",
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No transfer_fee, no freeze, no delegate, no hook. Non-transferable extension not captured in current D01 static signals \u2014 a limitation noted for Sprint 5.",
+      "calibration_flag": true,
+      "calibration_note": "Non-transferable T22 tokens will show all-zero sell-side swap events. D01 Signal 5 (buy/sell ratio) would fire if swap data is present. However these are by design non-tradeable on DEXes. Sprint 5: add non_transferable extension to known-safe list to suppress D01 Signal 5."
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "LP 100% burned. effective_safe=100%."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "top10_now~0.18. prior=0.18. Stable. No D03 signals."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "vol_multiplier=0.86 < 5.0. price_change=+1.8% < 30%."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No round-trip events detected."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "mint_authority=null. No mint events."
+    }
+  }
+}

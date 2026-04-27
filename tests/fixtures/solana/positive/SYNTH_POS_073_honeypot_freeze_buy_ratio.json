@@ -1,0 +1,77 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthHonP073wwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
+    "symbol": "HON073",
+    "label": "positive",
+    "category": "honeypot_active",
+    "source_url": "synthetic/honeypot/s1_s5_freeze_plus_ratio",
+    "fetched_at": "2026-04-21T20:22:00Z",
+    "synthetic": true,
+    "notes": "D01 S1 (freeze) + S5 (buy/sell ratio 30 buys, 1 sell — very lopsided). raw=0.25+0.20=0.45. sigmoid(0.45/0.55-1.0)=sigmoid(-0.182)=0.455. Medium. Tests combined static+behavioral."
+  },
+  "token_meta": {
+    "mint": "SynthHonP073wwwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "FreezeRatio073",
+    "symbol": "HON073",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": "FreezeAuth073111111111111111111111111111111",
+    "mutable": true,
+    "update_authority": "DevFreeze073111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 3500,
+    "rugcheck_score_normalised": 64,
+    "risks": [ { "name": "Freeze authority enabled", "level": "danger" } ],
+    "markets": [
+      { "pool_address": "FreezePool073111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "75.00", "liquidity_usd": "42000.00", "lp_provider_count": 2 }
+    ],
+    "lockers": {},
+    "creator": "DevFreeze073111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "42000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 195,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "FreezeHolder073_011111111111111111111111": 68000000000000,
+      "FreezeHolder073_021111111111111111111111": 48000000000000,
+      "FreezeHolder073_031111111111111111111111": 34000000000000,
+      "FreezeHolder073_041111111111111111111111": 23000000000000,
+      "FreezeHolder073_051111111111111111111111": 15000000000000,
+      "FreezeHolder073_061111111111111111111111": 10000000000000,
+      "FreezeHolder073_071111111111111111111111": 6500000000000,
+      "FreezeHolder073_081111111111111111111111": 4200000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 165,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.21",
+    "gini_liquid_after_exclusion": "0.50"
+  },
+  "holder_classifications": [],
+  "pool_rows": [
+    { "pool_address": "FreezePool073111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "75.00", "lp_locked_pct": "0.00", "effective_safe_pct": "75.00", "lp_provider_count": 2, "liquidity_usd": "42000.00" }
+  ],
+  "pool_trade_window": { "buy_count": 30, "sell_count": 1, "observation_slots": 500 },
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "FIRES",
+      "confidence_band": [0.40, 0.52],
+      "severity": "Low",
+      "reason": "S1 freeze (0.25) + S5 ratio=30:1 fires (weight 0.20). raw=0.45. sigmoid(-0.182)=0.455. Low severity."
+    },
+    "d02_rug_pull": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "LP 75% burned. D02 boundary: 75% >= 70% threshold -> BELOW." },
+    "d03_concentration": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.15], "severity": "Info", "reason": "top10=0.21; stable." },
+    "d04_pump_dump": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No volume spike data." },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No round-trips. Lopsided buy/sell is honeypot pattern not wash pattern." },
+    "d06_mint_burn_anomaly": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "mint_authority=null." }
+  }
+}

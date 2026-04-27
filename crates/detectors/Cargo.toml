@@ -1,0 +1,65 @@
+[package]
+name        = "mg-onchain-detectors"
+version.workspace     = true
+edition.workspace     = true
+rust-version.workspace = true
+license.workspace     = true
+repository.workspace  = true
+description = "Detector trait and individual anomaly detectors (one file per signal)"
+
+[features]
+# Expose mock helpers to downstream crates' test suites.
+test-utils = []
+
+[dependencies]
+anyhow.workspace        = true
+tokio.workspace         = true
+tracing.workspace       = true
+serde.workspace         = true
+serde_json.workspace    = true
+rust_decimal.workspace  = true
+chrono.workspace        = true
+thiserror.workspace     = true
+toml                    = "0.8"
+
+sqlx.workspace              = true
+
+mg-onchain-common          = { path = "../common" }
+mg-onchain-storage         = { path = "../storage" }
+mg-onchain-token-registry  = { path = "../token-registry" }
+mg-onchain-dex-adapter     = { path = "../dex-adapter" }
+# graph: ClusterStore + GraphLabelStore consumed by D08 Sybil detector (Sprint 11).
+mg-onchain-graph           = { path = "../graph" }
+# indexer: PoolInitializeHook + IndexerError trait import for D09IndexerHook adapter.
+# No cycle: indexer has detectors only in [dev-dependencies].
+mg-onchain-indexer         = { path = "../indexer" }
+# chain-adapter: RawLog + per-protocol EVM decoder functions used by D13 decode_swap_for_chain.
+# D13 needs to decode raw chain-adapter logs into NormalizedSwap for the live streaming path.
+mg-onchain-chain-adapter   = { path = "../chain-adapter" }
+# alloy: Address / I256 / U256 types used in D13 decode_swap_for_chain helper.
+alloy.workspace            = true
+# uuid: Uuid keys used in D08 BTreeMap grouping (ClusterRef.cluster_id type).
+uuid.workspace             = true
+
+# base64: decode SPL token account data from simulateTransaction response.
+base64 = "0.22"
+# bincode: serialize Transaction for base64-encoding before simulate RPC call.
+bincode = "1"
+# async-trait: required for dyn PoolAccountProvider.
+async-trait.workspace = true
+# solana-sdk: Pubkey needed in simulate_sell orchestrator.
+solana-sdk.workspace = true
+# statrs: Student-t log-PDF for D09 BOCPD Normal-Gamma posterior predictive (§3.4).
+statrs = { workspace = true }
+
+[dev-dependencies]
+tokio    = { workspace = true, features = ["full"] }
+tempfile = "3"
+# Enable MockSolanaRpc for d01_honeypot tests.
+mg-onchain-token-registry = { path = "../token-registry", features = ["test-utils"] }
+# Enable MockPoolAccountProvider for d01_honeypot tests.
+mg-onchain-dex-adapter = { path = "../dex-adapter", features = ["test-utils"] }
+# Enable MockClusterStore + MockGraphLabelStore for d08_sybil tests.
+mg-onchain-graph = { path = "../graph", features = ["test-utils"] }
+# dec!() macro for readable Decimal literals in tests (d03 and beyond).
+rust_decimal_macros = "1"

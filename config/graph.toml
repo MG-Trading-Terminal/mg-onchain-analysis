@@ -1,0 +1,104 @@
+# config/graph.toml
+#
+# Threshold configuration for crates/graph (wallet clustering + graph indexing).
+#
+# Format:
+#   Every threshold is a TOML table with three required keys:
+#     value     — the numeric threshold value
+#     rationale — human-readable justification, citing primary source
+#     refs      — list of REFERENCES.md entry IDs (format: "graph/<slug>")
+#
+# Rule: no threshold ships without a non-empty rationale and at least one ref.
+# Missing keys cause a hard error at startup (via serde Deserialize).
+#
+# Design reference: docs/designs/0013-graph.md §3.1 + §10
+# ADR references: ADR 0001 §D5, ADR 0002 (Postgres-only storage), ADR 0003.
+#
+# Primary literature:
+#   - Liu et al. (2025) arxiv:2505.09313 — Sybil detection via subgraph features
+#   - Messias, Yaish & Livshits (2023) arxiv:2312.02752 — Airdrop farming tactics
+#   - Chainalysis (2025) Wash Trading report — Heuristic 2: common-funder clusters
+#   - Solana documentation — rent-exempt minimum per account (~890,880 lamports)
+#
+# ---------------------------------------------------------------------------
+# [graph] — Common-funder clustering algorithm thresholds
+# ---------------------------------------------------------------------------
+
+[graph.cofunding_window_hours]
+value     = 24
+rationale = """
+Hours within which two wallets funded by the same source are considered co-funded.
+Liu et al. (2025) uses a 1-hour temporal clustering window for Sybil addresses.
+Extended to 24h here because SOL funding (for gas budget / rent) typically
+precedes on-chain activity by up to 1 day in practice — Sybil farmers pre-fund
+wallets in bulk, then deploy bots hours later. The 24h window was chosen as the
+outer bound of this preparation window; tighten to 6h after empirical calibration
+on a populated dataset. See docs/designs/0013-graph.md §10.
+"""
+refs      = ["graph/common_funder"]
+
+[graph.amount_similarity_pct]
+value     = 0.20
+rationale = """
+Maximum fractional difference in funding amounts for two wallets to be in the
+same amount-bucket. Messias et al. (2023) document that airdrop farmers fund
+wallets with near-identical SOL amounts to minimize fingerprint variance. 20%
+tolerance accounts for gas price variation and slot timing differences without
+grouping wallets with materially different funding levels. No published threshold
+exists — calibrate against real Sybil clusters in Sprint 8 corpus data.
+Log-scale bucketing formula: bucket = floor(ln(lamports) / ln(1.0 + 0.20)).
+See docs/designs/0013-graph.md §4.3.
+"""
+refs      = ["graph/common_funder"]
+
+[graph.min_cluster_size]
+value     = 3
+rationale = """
+Minimum number of wallets in a cluster to emit a cluster record.
+Chainalysis (2025) Heuristic 2 uses ≥5 funded addresses as the threshold for
+reporting wash-trading clusters in their $1.87B wash-volume study. 3 is chosen
+as the MVP lower bound to maximize recall at cost of precision — catching smaller
+Sybil farms early. False positives at size 3 are cheap (one review click);
+false negatives (missed clusters) allow scams through to consumers. Adjust
+upward to 5 after empirical FP measurement in Sprint 8. See design §10.
+"""
+refs      = ["graph/common_funder"]
+
+[graph.min_funder_sol_amount]
+value     = 10_000_000
+rationale = """
+Minimum SOL amount (in lamports) sent by a funder for the transfer to be
+considered a funding event. Dust filter to exclude noise.
+Solana rent-exempt minimum per account is ~890,880 lamports (~0.00089 SOL).
+10,000,000 lamports (0.01 SOL) is ~11× the rent-exempt minimum — it represents
+a meaningful funding intent sufficient to make the recipient wallet operational.
+Common airdrop farm funding amounts are ≥0.05 SOL (5× this threshold); the
+0.01 SOL floor is permissive but eliminates pure dust spam. See design §10.
+"""
+refs      = ["graph/common_funder"]
+
+[graph.indexer_batch_size]
+value     = 10_000
+rationale = """
+Batch size for reading transfers from Postgres during edge indexing.
+Tuned for approximately 100ms query latency on a populated `transfers` table
+with the (chain, token, block_time DESC) index (V00002 migration). Larger
+batches reduce round-trip overhead but increase peak memory. At 10k rows per
+batch and ~200 bytes per row, memory peak is ~2MB per batch — acceptable.
+Tune based on EXPLAIN ANALYZE output when the transfers table reaches >10M rows.
+No published reference — empirical baseline.
+"""
+refs      = ["graph/common_funder"]
+
+[graph.cluster_ttl_hours]
+value     = 168
+rationale = """
+How long (hours) before a cluster record is considered stale and re-computation
+is triggered. 168 hours = 7 days. Chainalysis publishes wallet cluster label
+updates on a weekly cadence (per their 2025 Crypto Crime report methodology
+section). Clusters change slowly — new funding edges accumulate, but the
+funder→recipient pattern stabilises within hours. Weekly re-computation is
+adequate for MVP; reduce to 24h in Phase 3 when near-real-time detector
+integration requires fresher cluster data. See design §10.
+"""
+refs      = ["graph/common_funder"]

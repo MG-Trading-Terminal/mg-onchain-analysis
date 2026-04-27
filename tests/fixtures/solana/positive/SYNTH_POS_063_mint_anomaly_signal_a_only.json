@@ -1,0 +1,130 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthMint063mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+    "symbol": "MINT063",
+    "label": "positive",
+    "category": "mint_anomaly",
+    "source_url": "synthetic/mint_burn/signal_a_active_authority",
+    "fetched_at": "2026-04-21T20:12:00Z",
+    "synthetic": true,
+    "notes": "D06 Signal A only: mint_authority active, token age 45 days (well past 7d grace). No mint events in 30d window (no Signal B or C). Latent structural risk. Confidence=0.20, severity Info. Tests the 'silent authority' case."
+  },
+  "token_meta": {
+    "mint": "SynthMint063mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "SilentAuth063",
+    "symbol": "MINT063",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": "SilentAuth063111111111111111111111111111111",
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "SilentAuth063111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 3800,
+    "rugcheck_score_normalised": 68,
+    "risks": [
+      { "name": "Mint Authority still enabled", "level": "danger" }
+    ],
+    "markets": [
+      {
+        "pool_address": "SilentPool063111111111111111111111111111111",
+        "dex": "raydium",
+        "lp_burned_pct": "90.00",
+        "liquidity_usd": "32000.00",
+        "lp_provider_count": 2
+      }
+    ],
+    "lockers": {},
+    "creator": "SilentAuth063111111111111111111111111111111",
+    "creator_balance_raw": "15000000000000",
+    "total_market_liquidity_usd": "32000.00",
+    "detected_at": "2026-03-07T10:00:00Z"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 520,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "SilentHolder063_011111111111111111111111": 62000000000000,
+      "SilentHolder063_021111111111111111111111": 44000000000000,
+      "SilentHolder063_031111111111111111111111": 31000000000000,
+      "SilentHolder063_041111111111111111111111": 22000000000000,
+      "SilentHolder063_051111111111111111111111": 15000000000000,
+      "SilentHolder063_061111111111111111111111": 10500000000000,
+      "SilentHolder063_071111111111111111111111": 7200000000000,
+      "SilentHolder063_081111111111111111111111": 5000000000000,
+      "SilentHolder063_091111111111111111111111": 3400000000000,
+      "SilentHolder063_101111111111111111111111": 2300000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 518,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.20",
+    "gini_liquid_after_exclusion": "0.49"
+  },
+  "holder_classifications": [
+    { "address": "SilentAuth063111111111111111111111111111111", "kind": "deployer" }
+  ],
+  "pool_rows": [
+    {
+      "pool_address": "SilentPool063111111111111111111111111111111",
+      "dex": "raydium",
+      "lp_burned_pct": "90.00",
+      "lp_locked_pct": "0.00",
+      "effective_safe_pct": "90.00",
+      "lp_provider_count": 2,
+      "liquidity_usd": "32000.00"
+    }
+  ],
+  "mint_events_30d": [],
+  "signal_c_data": {
+    "cumulative_supply_change_30d_pct": "0.00",
+    "mint_event_count_30d": 0,
+    "token_age_days": 45,
+    "mint_authority": "SilentAuth063111111111111111111111111111111",
+    "supply_base": "circulating"
+  },
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.15],
+      "severity": "Info",
+      "reason": "No honeypot signals. No freeze_authority, no transfer_fee."
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.10],
+      "severity": "Info",
+      "reason": "LP 90% burned. effective_safe=90%. D02 does not fire."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.10],
+      "severity": "Info",
+      "reason": "top10=0.20, prior=0.20. No change. Well-distributed token."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.10],
+      "severity": "Info",
+      "reason": "No volume spike. Normal 45-day-old token."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.10],
+      "severity": "Info",
+      "reason": "No self-dealing patterns. 520 diverse holders."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "FIRES",
+      "confidence_band": [0.17, 0.23],
+      "severity": "Info",
+      "reason": "Signal A fires: mint_authority active ('SilentAuth063...'), token_age=45d > 7d grace. No Signal B/C (no mint events in 30d, cumulative=0%). conf=0.20, severity=Info. is_established_protocol=false (score=68, not jup_strict, not jup_verified) -> full 0.20, not dampened."
+    }
+  }
+}

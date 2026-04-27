@@ -1,0 +1,76 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthHonP067qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq",
+    "symbol": "HON067",
+    "label": "positive",
+    "category": "honeypot_active",
+    "source_url": "synthetic/honeypot/t22_fee_9500_plus_freeze",
+    "fetched_at": "2026-04-21T20:16:00Z",
+    "synthetic": true,
+    "notes": "D01 S1 (freeze) + S2 (transfer_fee 9500bps). High-confidence honeypot. Token-2022. raw_weight=0.25+0.45=0.70. sigmoid(0.70/0.55-1.0)=sigmoid(0.273)=0.568. Well above threshold."
+  },
+  "token_meta": {
+    "mint": "SynthHonP067qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq",
+    "token_program": "TokenzQdBNbLqP5VgrHUCemXgAJa2LJKQ74wMRsqBMBP",
+    "name": "HonT22Fee067",
+    "symbol": "HON067",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": "HonFreeze067111111111111111111111111111111",
+    "mutable": true,
+    "update_authority": "DevHon067111111111111111111111111111111111",
+    "transfer_fee": { "fee_bps": 9500, "max_amount": 999999999999999, "authority": "DevHon067111111111111111111111111111111111" },
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 7800,
+    "rugcheck_score_normalised": 92,
+    "risks": [
+      { "name": "Freeze authority enabled", "level": "danger" },
+      { "name": "High transfer fee", "value": "9500bps", "level": "danger" }
+    ],
+    "markets": [
+      {
+        "pool_address": "HonPool067111111111111111111111111111111111",
+        "dex": "raydium",
+        "lp_burned_pct": "0.00",
+        "liquidity_usd": "5200.00",
+        "lp_provider_count": 1
+      }
+    ],
+    "lockers": {},
+    "creator": "DevHon067111111111111111111111111111111111",
+    "creator_balance_raw": "800000000000000",
+    "total_market_liquidity_usd": "5200.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 18,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "DevHon067111111111111111111111111111111111": 800000000000000,
+      "HonHolder067_011111111111111111111111111": 120000000000000,
+      "HonHolder067_021111111111111111111111111": 50000000000000,
+      "HonHolder067_031111111111111111111111111": 18000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": null,
+  "holder_classifications": [{ "address": "DevHon067111111111111111111111111111111111", "kind": "deployer" }],
+  "pool_rows": [
+    { "pool_address": "HonPool067111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "lp_locked_pct": "0.0", "effective_safe_pct": "0.0", "lp_provider_count": 1, "liquidity_usd": "5200.00" }
+  ],
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "FIRES",
+      "confidence_band": [0.53, 0.65],
+      "severity": "Medium",
+      "reason": "S1 freeze_authority=live (weight 0.25) + S2 transfer_fee=9500bps (weight 0.45). raw=0.70. sigmoid(0.70/0.55-1.0)=sigmoid(0.273)=0.568. Band [0.53,0.65]."
+    },
+    "d02_rug_pull": { "verdict": "FIRES", "confidence_band": [0.70, 0.75], "severity": "High", "reason": "LP 0% burned, single provider. Signal B fires at 0.75." },
+    "d03_concentration": { "verdict": "FIRES", "confidence_band": [0.65, 0.85], "severity": "High", "reason": "Signal 3: deployer 80%+holders = 98.8% >> 80%. fires." },
+    "d04_pump_dump": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No swap activity data. New token, insufficient baseline." },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "Pool liquidity $5.2k; insufficient activity." },
+    "d06_mint_burn_anomaly": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "mint_authority=null. No supply events." }
+  }
+}

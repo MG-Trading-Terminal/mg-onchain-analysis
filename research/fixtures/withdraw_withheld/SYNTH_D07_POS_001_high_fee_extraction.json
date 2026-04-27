@@ -1,0 +1,154 @@
+{
+  "_fixture_meta": {
+    "label": "positive",
+    "detector": "withdraw_withheld_drain",
+    "signal": "A_extraction_event",
+    "synthetic": true,
+    "expected_signals": ["extraction_event"],
+    "expected_confidence_gte": "0.72",
+    "expected_confidence_lte": "0.90",
+    "expected_severity": "High",
+    "combined_with_d01_s2": true,
+    "rationale": "Token-2022 mint with 5000 bps (50%) transfer fee. 5 WithdrawWithheldTokensFromAccounts instructions executed by the deployer wallet within a 24-hour window. Cumulative extraction: $2,000 USD. transfer_fee_bps (5000) > sell_tax_threshold_bps (3000), so combined_with_d01_s2=1. No authority rotation in window, so Signal B does not fire. Signal A fires at High severity.",
+    "confidence_calculation": "conf = min(0.90, 0.60 + min(0.15, (5-3)*0.03) + ln(2000/1000)*0.10) = min(0.90, 0.60 + 0.06 + 0.069) = 0.729",
+    "captured_at": "2026-04-21T00:00:00Z"
+  },
+  "mint": "SYNTH_D07_POS_001_REPLACE_WITH_REAL_RUGGED_TOKEN",
+  "chain": "solana",
+  "symbol": "TAXD",
+  "name": "SyntheticHighFeeToken",
+  "decimals": 6,
+  "token_program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+  "total_supply_raw": "1000000000000",
+  "circulating_supply_raw": "900000000000",
+  "mint_authority": null,
+  "freeze_authority": null,
+  "creator": "DeployerWalletAAAA1111111111111111111111111",
+  "creator_balance_raw": "50000000000",
+  "transfer_fee": {
+    "feeBps": 5000,
+    "maxFeeRaw": "999999999999",
+    "authority": "DeployerWalletAAAA1111111111111111111111111"
+  },
+  "permanent_delegate": null,
+  "transfer_hook_program": null,
+  "top_holders": [
+    {
+      "address": "DeployerWalletAAAA1111111111111111111111111",
+      "pct": "5.00",
+      "amount_raw": "50000000000",
+      "is_insider": true
+    },
+    {
+      "address": "HolderWallet0001111111111111111111111111111",
+      "pct": "3.20",
+      "amount_raw": "32000000000",
+      "is_insider": false
+    }
+  ],
+  "total_holders": 487,
+  "markets": [
+    {
+      "pool_address": "RaydiumPoolAAAA11111111111111111111111111111",
+      "dex": "raydium_v4",
+      "lp_burned_pct": "0.00",
+      "liquidity_usd": "45000.00",
+      "lp_provider_count": 1
+    }
+  ],
+  "total_market_liquidity_usd": "45000.00",
+  "lockers": [],
+  "graph_insiders_detected": true,
+  "insider_networks": [
+    {
+      "members": ["DeployerWalletAAAA1111111111111111111111111"],
+      "supply_pct": "5.00",
+      "is_bundler": false
+    }
+  ],
+  "launchpad": null,
+  "deploy_platform": null,
+  "detected_at": "2026-04-14T12:00:00Z",
+  "rugged": false,
+  "verification": { "jup_verified": false, "jup_strict": false },
+  "rugcheck_score": 88,
+  "_d07_token2022_instructions": {
+    "note": "Simulated token2022_instructions rows for Signal A evaluation. In production these are fetched from the Postgres token2022_instructions table by Query W1.",
+    "withdraw_events": [
+      {
+        "id": 1001,
+        "tx_hash": "EXTRACT_TX_001_PLACEHOLDER_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "block_height": 310000001,
+        "block_time": "2026-04-21T00:00:00Z",
+        "instruction_kind": "withdraw_withheld_from_accounts",
+        "authority": "DeployerWalletAAAA1111111111111111111111111",
+        "destination": "DeployerTokenAcctAAAA111111111111111111111",
+        "amount_raw": "200000000",
+        "amount_usd": "400.00"
+      },
+      {
+        "id": 1002,
+        "tx_hash": "EXTRACT_TX_002_PLACEHOLDER_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+        "block_height": 310007201,
+        "block_time": "2026-04-21T02:00:00Z",
+        "instruction_kind": "withdraw_withheld_from_accounts",
+        "authority": "DeployerWalletAAAA1111111111111111111111111",
+        "destination": "DeployerTokenAcctAAAA111111111111111111111",
+        "amount_raw": "200000000",
+        "amount_usd": "400.00"
+      },
+      {
+        "id": 1003,
+        "tx_hash": "EXTRACT_TX_003_PLACEHOLDER_CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+        "block_height": 310014401,
+        "block_time": "2026-04-21T04:00:00Z",
+        "instruction_kind": "withdraw_withheld_from_accounts",
+        "authority": "DeployerWalletAAAA1111111111111111111111111",
+        "destination": "DeployerTokenAcctAAAA111111111111111111111",
+        "amount_raw": "200000000",
+        "amount_usd": "400.00"
+      },
+      {
+        "id": 1004,
+        "tx_hash": "EXTRACT_TX_004_PLACEHOLDER_DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+        "block_height": 310021601,
+        "block_time": "2026-04-21T06:00:00Z",
+        "instruction_kind": "withdraw_withheld_from_accounts",
+        "authority": "DeployerWalletAAAA1111111111111111111111111",
+        "destination": "DeployerTokenAcctAAAA111111111111111111111",
+        "amount_raw": "200000000",
+        "amount_usd": "400.00"
+      },
+      {
+        "id": 1005,
+        "tx_hash": "EXTRACT_TX_005_PLACEHOLDER_EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE",
+        "block_height": 310028801,
+        "block_time": "2026-04-21T08:00:00Z",
+        "instruction_kind": "withdraw_withheld_from_accounts",
+        "authority": "DeployerWalletAAAA1111111111111111111111111",
+        "destination": "DeployerTokenAcctAAAA111111111111111111111",
+        "amount_raw": "200000000",
+        "amount_usd": "400.00"
+      }
+    ],
+    "rotation_events": [],
+    "w3_aggregate": {
+      "event_count": 5,
+      "cumulative_raw": "1000000000",
+      "cumulative_usd": "2000.00"
+    }
+  },
+  "_d07_expected_output": {
+    "signal_a": {
+      "fires": true,
+      "confidence": "0.729",
+      "severity": "High",
+      "authority_match": "exact",
+      "combined_with_d01_s2": "1",
+      "rotation_detected": "0"
+    },
+    "signal_b": {
+      "fires": false
+    }
+  }
+}

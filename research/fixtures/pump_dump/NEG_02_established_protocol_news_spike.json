@@ -1,0 +1,120 @@
+{
+  "fixture_id": "NEG_02_established_protocol_news_spike",
+  "synthetic": true,
+  "detector": "pump_dump",
+  "category": "established_protocol_news_spike",
+  "label": "negative",
+  "source": "Synthetic construction based on WET probe (research/token-probes/wet-WETZjtp.md) and RAY/PYTH corpus (research/fixtures/solana-corpus-phase1.md)",
+  "chain": "solana",
+
+  "note_on_two_variants": "This fixture contains two variant sub-cases: VARIANT_A (PYTH) and VARIANT_B (RAY). VARIANT_A tests Signal A fires + Signal C correctly suppressed. VARIANT_B documents the known outstanding FP gap where Signal C is NOT suppressed for RAY.",
+
+  "variant_a": {
+    "label": "VARIANT_A_PYTH_signal_c_suppressed",
+    "mint": "HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3",
+    "token_name": "Pyth Network",
+    "token_symbol": "PYTH",
+    "expected_correct": true,
+    "token_meta": {
+      "jup_verified": true,
+      "jup_strict": false,
+      "rugcheck_score": 23,
+      "note": "jup_verified=true AND rugcheck_score=23 < 40 → is_established_protocol = true (Branch 2)"
+    },
+    "observation_window": {
+      "start": "2026-04-20T09:00:00Z",
+      "end": "2026-04-20T10:00:00Z",
+      "window_hours": 1
+    },
+    "baseline_7d": {
+      "days_with_nonzero_volume": 7,
+      "mean_volume_usd": "5000000",
+      "note": "PYTH has sustained ~$5M/day DEX volume as an oracle protocol token"
+    },
+    "swaps_1h": {
+      "volume_usd": "28000000",
+      "note": "News event: Pyth oracle expands to new chain. 28M in 1h."
+    },
+    "price_data": {
+      "price_change_pct_1h": "0.38",
+      "note": "+38% on news — above 30% threshold"
+    },
+    "market_cap": {
+      "market_cap_usd": "2100000000",
+      "above_filter": true,
+      "note": "PYTH FDV >> $60M. Market cap filter triggers. Signal A/B/C not evaluated."
+    },
+    "signal_evaluation": {
+      "market_cap_filter_triggers": true,
+      "signal_a_evaluated": false,
+      "signal_c_suppressed_by_established_protocol": "N/A — market cap filter triggers first",
+      "is_established_protocol": true
+    },
+    "expected_output": {
+      "fires_anomaly_event": false,
+      "fires_info_event": true,
+      "info_signal": "market_cap_above_filter",
+      "signal_c_suppressed": "market_cap_filter_prevented_evaluation",
+      "note": "PYTH market cap >> $60M. Detector exits at market cap check. For the purpose of validating Signal C suppression logic specifically, the developer should construct a lower-cap variant (see unit_test_note below)."
+    },
+    "unit_test_note": "To test Signal C suppression for PYTH specifically (bypassing the market cap filter in unit tests), construct a test with is_established_protocol=true and assert Signal C amplifier is not applied. The evidence key pump_dump/established_protocol_suppressed_signal_c should equal '1' when Signal A or B fires on an established protocol."
+  },
+
+  "variant_b": {
+    "label": "VARIANT_B_RAY_known_fp_gap",
+    "mint": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
+    "token_name": "Raydium",
+    "token_symbol": "RAY",
+    "expected_correct": false,
+    "known_gap": true,
+    "known_gap_description": "RAY is not suppressed by is_established_protocol (jup_verified=false, not jup_strict, rugcheck_score=56 >= 40). Signal C fires on RAY treasury sells. This is a documented FP requiring Sprint 5 calibration task to extend the predicate.",
+    "token_meta": {
+      "jup_verified": false,
+      "jup_strict": false,
+      "rugcheck_score": 56,
+      "note": "Neither jup_strict nor (jup_verified && score < 40) → is_established_protocol = false. Same pattern as documented in token_status.rs module doc."
+    },
+    "observation_window": {
+      "start": "2026-04-18T15:00:00Z",
+      "end": "2026-04-18T16:00:00Z",
+      "window_hours": 1
+    },
+    "baseline_7d": {
+      "days_with_nonzero_volume": 7,
+      "mean_volume_usd": "25000000",
+      "note": "Synthetic baseline: RAY has ~$25M/day DEX volume"
+    },
+    "swaps_1h": {
+      "volume_usd": "200000000",
+      "note": "Synthetic: Raydium governance vote triggers 8× volume spike in 1h"
+    },
+    "price_data": {
+      "price_change_pct_1h": "0.35",
+      "note": "+35% on governance news — above 30% threshold"
+    },
+    "market_cap": {
+      "market_cap_usd": "1800000000",
+      "above_filter": true,
+      "note": "RAY FDV >> $60M. Market cap filter triggers. Provided for completeness."
+    },
+    "treasury_sell_post_spike": {
+      "note": "Raydium treasury sells RAY for operational expenses following the governance vote",
+      "treasury_wallet": "RAY_TREASURY_WALLET",
+      "sold_pct_of_treasury_holdings": "0.45"
+    },
+    "signal_evaluation": {
+      "market_cap_filter_triggers": true,
+      "is_established_protocol": false,
+      "signal_c_suppressed": false,
+      "known_fp": true,
+      "resolution": "Extend is_established_protocol predicate in Sprint 5 to include RAY. Options: (a) manual allowlist of known established tokens; (b) third branch based on token age > 180 days + minimum holder count + minimum CEX listing count."
+    },
+    "expected_output": {
+      "fires_anomaly_event": false,
+      "fires_info_event": true,
+      "info_signal": "market_cap_above_filter",
+      "note": "Market cap filter prevents evaluation. In a hypothetical unit test where the filter is bypassed: Signal A fires, Signal C fires (FP), established_protocol_suppressed_signal_c is NOT set (gap). expected_correct=false documents this gap."
+    },
+    "todo": "Sprint 5 calibration task: extend is_established_protocol predicate for RAY pattern (jup_verified=false, established-in-practice). Reference: token_status.rs module doc outstanding FP note."
+  }
+}

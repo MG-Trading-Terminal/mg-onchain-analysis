@@ -1,0 +1,55 @@
+{
+  "_fixture_meta": {
+    "label": "negative",
+    "detector": "withdraw_withheld_drain",
+    "expected_signals": [],
+    "expected_result": "InsufficientBaseline",
+    "synthetic": false,
+    "source": "wSOL — standard SPL Token (legacy), Solana mainnet, live-verified 2026-04-21",
+    "rationale": "Wrapped SOL (wSOL) uses the standard SPL Token program (TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA), NOT Token-2022. TokenMeta.transfer_fee = null. D07 must return Err(InsufficientBaseline) immediately. This fixture tests the most fundamental gate: any non-Token-2022 token (or Token-2022 without TransferFeeConfig) is rejected before any database query. Confirms that D07 does not accidentally query token2022_instructions for 99%+ of the token universe that uses standard SPL.",
+    "test_assertion": "result.is_err() and error is DetectorError::InsufficientBaseline { reason: 'not a Token-2022 mint with TransferFeeConfig' }. Zero events in output. No token2022_instructions query issued.",
+    "captured_at": "2026-04-21T00:00:00Z"
+  },
+  "mint": "So11111111111111111111111111111111111111112",
+  "chain": "solana",
+  "symbol": "SOL",
+  "name": "Wrapped SOL",
+  "decimals": 9,
+  "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  "total_supply_raw": "0",
+  "circulating_supply_raw": null,
+  "mint_authority": "11111111111111111111111111111111",
+  "freeze_authority": null,
+  "creator": null,
+  "creator_balance_raw": "0",
+  "transfer_fee": null,
+  "permanent_delegate": null,
+  "transfer_hook_program": null,
+  "top_holders": [],
+  "total_holders": 2500000,
+  "markets": [
+    {
+      "pool_address": "58oQChx4yWmvKec8rEWzHFJZwfUwxSE6YmaCSaezMDef",
+      "dex": "orca_whirlpool",
+      "lp_burned_pct": "0.00",
+      "liquidity_usd": "50000000.00",
+      "lp_provider_count": 1200
+    }
+  ],
+  "total_market_liquidity_usd": "50000000.00",
+  "lockers": [],
+  "graph_insiders_detected": false,
+  "insider_networks": [],
+  "launchpad": null,
+  "deploy_platform": null,
+  "detected_at": null,
+  "rugged": false,
+  "verification": { "jup_verified": true, "jup_strict": true },
+  "rugcheck_score": 0,
+  "_d07_expected_output": {
+    "result": "Err(InsufficientBaseline)",
+    "reason": "not a Token-2022 mint with TransferFeeConfig",
+    "signal_a": { "fires": false },
+    "signal_b": { "fires": false }
+  }
+}

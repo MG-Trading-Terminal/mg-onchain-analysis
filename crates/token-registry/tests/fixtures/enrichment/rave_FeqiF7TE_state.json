@@ -1,0 +1,33 @@
+{
+  "_source": "rave-FeqiF7TE.md probe \u2014 live RugCheck + DEXScreener data 2026-04-21",
+  "_use": "positive fixture for D3 concentration (81.47% single holder), D4 pump-and-dump; negative for D1 honeypot, D6 mint anomaly",
+  "mint_address": "FeqiF7TEVmpYuuj4goD8WgmgyhFgFnZiWtw226wF4hNm",
+  "chain": "solana",
+  "mock_mint_account": {
+    "supply": 999999659959557,
+    "decimals": 6,
+    "mint_authority": null,
+    "freeze_authority": null,
+    "is_token2022": false
+  },
+  "mock_largest_accounts": [
+    {
+      "address": "TD8eiyUN1111111111111111111111111111111111111",
+      "amount": "999999659959557",
+      "decimals": 6
+    },
+    {
+      "address": "9CbNrmTyc4o11111111111111111111111111111111111",
+      "amount": "814700000000000",
+      "decimals": 6
+    },
+    {
+      "address": "Gb5HDncVp11111111111111111111111111111111111",
+      "amount": "65800000000000",
+      "decimals": 6
+    }
+  ],
+  "expected_top_holder_pct_approx": "81.47",
+  "expected_mint_authority_renounced": true,
+  "expected_freeze_authority_renounced": true
+}

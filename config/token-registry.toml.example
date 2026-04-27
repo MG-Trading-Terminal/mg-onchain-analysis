@@ -1,0 +1,57 @@
+# token-registry.toml.example — configuration for mg-onchain-token-registry
+#
+# Copy to token-registry.toml (gitignored) and fill in your API keys.
+# All values shown are the defaults from RegistryConfig::default().
+
+# RPC endpoints in priority order.
+# - First entry is the primary (Helius when available — fastest, structured, higher rate limits).
+# - Subsequent entries are fallbacks (public mainnet, secondary Helius cluster, etc.).
+# - On RPC error or 429, the client rotates to the next endpoint (round-robin by attempt).
+#
+# Helius endpoint format: https://mainnet.helius-rpc.com/?api-key=YOUR_KEY
+# Triton endpoint format: https://YOUR_INSTANCE.mainnet.rpcpool.com/YOUR_TOKEN
+rpc_endpoints = [
+    "https://mainnet.helius-rpc.com/?api-key=REPLACE_WITH_YOUR_KEY",
+    "https://api.mainnet-beta.solana.com",
+]
+
+# Metadata TTL — re-enrich from RPC if record is older than this.
+# Covers: total_supply, mint_authority, freeze_authority, decimals.
+# Default: 15 minutes (900 seconds).
+ttl_metadata_secs = 900
+
+# Holder data TTL — re-fetch top-holders if record is older than this.
+# getTokenLargestAccounts is the most expensive call; runs less frequently.
+# Default: 1 hour (3600 seconds).
+ttl_holders_secs = 3600
+
+# Holder snapshot job interval in hours.
+# The periodic job writes full holder_snapshots + holder_snapshots_history.
+# Default: 6 hours.
+snapshot_interval_hours = 6
+
+# Maximum concurrent enrichments.
+# Controls the semaphore bound — prevents thundering herd on the RPC endpoint.
+# Increase if using Helius Business/Professional tier (higher rate limits).
+# Default: 8.
+concurrency_limit = 8
+
+# Maximum top holders fetched per token.
+# Solana getTokenLargestAccounts hard limit is 20. Keep at 20 for MVP.
+top_holders_limit = 20
+
+# Retry policy for RPC calls.
+[retry]
+# Initial delay before the first retry (milliseconds). Full-jitter applied.
+# Reference: AWS exponential backoff and jitter (2015).
+base_delay_ms = 250
+
+# Maximum delay cap per attempt (milliseconds).
+max_delay_ms = 30000
+
+# Total attempts (1 = no retry; 5 = 1 initial + 4 retries).
+max_attempts = 5
+
+# Backoff multiplier applied on each attempt.
+# Delay doubles each attempt (250ms → 500ms → 1000ms → 2000ms → cap).
+backoff_factor = 2.0

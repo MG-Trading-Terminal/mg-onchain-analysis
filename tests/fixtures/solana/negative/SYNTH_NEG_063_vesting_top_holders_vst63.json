@@ -1,0 +1,162 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthNeg063VestVVVVVVVVVVVVVVVVVVVVVVVVVVVVV",
+    "symbol": "VST63",
+    "label": "negative",
+    "category": "vesting_top_holders",
+    "source_url": "synthetic/vesting_top_holders/vst_vesting_safe",
+    "fetched_at": "2026-04-21T21:29:00Z",
+    "synthetic": true,
+    "notes": "Liquidity mining rewards 48% in program PDA. liquid top10=23%. Program PDA classified."
+  },
+  "token_meta": {
+    "mint": "SynthNeg063VestVVVVVVVVVVVVVVVVVVVVVVVVVVVVV",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "VestToken063",
+    "symbol": "VST63",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevVest06311111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": {
+      "jup_verified": false,
+      "jup_strict": false
+    },
+    "rugcheck_score": 840,
+    "rugcheck_score_normalised": 24,
+    "risks": [],
+    "markets": [
+      {
+        "pool_address": "VestPool0631111111111111111111111111111",
+        "dex": "raydium",
+        "lp_burned_pct": "100.00",
+        "liquidity_usd": "90400.00",
+        "lp_provider_count": 2
+      }
+    ],
+    "lockers": {},
+    "creator": "DevVest06311111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "90400.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 890,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "Vesting063Contract111111111111111111111111": 480000000000000,
+      "LiqHolder063_0011111111111111111111111": 46000000000000,
+      "LiqHolder063_0111111111111111111111111": 36800000000000,
+      "LiqHolder063_0211111111111111111111111": 29900000000000,
+      "LiqHolder063_0311111111111111111111111": 25300000000000,
+      "LiqHolder063_0411111111111111111111111": 20700000000000,
+      "LiqHolder063_0511111111111111111111111": 18400000000000,
+      "LiqHolder063_0611111111111111111111111": 16100000000000,
+      "LiqHolder063_0711111111111111111111111": 13800000000000,
+      "LiqHolder063_0811111111111111111111111": 11500000000000,
+      "LiqHolder063_0911111111111111111111111": 11500000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 875,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.23",
+    "gini_liquid_after_exclusion": "0.58"
+  },
+  "holder_classifications": [
+    {
+      "address": "Vesting063Contract111111111111111111111111",
+      "type": "vesting_contract",
+      "label": "Project 63 Vesting Contract"
+    }
+  ],
+  "pool_rows": [
+    {
+      "pool_address": "VestPool0631111111111111111111111111111",
+      "dex": "raydium",
+      "lp_burned_pct": "100.00",
+      "lp_locked_pct": "0.00",
+      "effective_safe_pct": "100.00",
+      "lp_provider_count": 2,
+      "liquidity_usd": "90400.00"
+    }
+  ],
+  "swaps_1h": {
+    "volume_usd": "40200.00",
+    "trade_count": 52,
+    "unique_buyers": 44,
+    "price_start": "0.000040",
+    "price_end": "0.000041",
+    "price_change_pct": "0.018"
+  },
+  "swaps_7d_daily_baseline": {
+    "day_count_nonzero": 5,
+    "mean_daily_volume_usd": "48500.00",
+    "std_daily_volume_usd": "3000.00",
+    "volume_multiplier_observed": "0.88",
+    "volume_z_score": "-0.4"
+  },
+  "signal_a_round_trips": [],
+  "pool_total_volume_1h_usd": "40200.00",
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No static honeypot signals."
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "LP 100% burned. effective_safe=100%."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "After vesting/team exclusion: top10_pct_liquid=0.23. Vesting contract 48% excluded as classified address. No D03 signals fire."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "vol_multiplier=0.88 < 5.0. price_change=+1.8% < 30%."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No round-trip events."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "mint_authority=null."
+    }
+  }
+}

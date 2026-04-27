@@ -1,0 +1,178 @@
+{
+  "_fixture_meta": {
+    "mint": "HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3",
+    "symbol": "PYTH",
+    "label": "negative",
+    "category": "bluechip",
+    "source_url": "https://api.rugcheck.xyz/v1/tokens/HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3/report",
+    "fetched_at": "2026-04-21T19:44:00Z",
+    "synthetic": false,
+    "notes": "Pyth Network (PYTH) — oracle protocol token. Score=1121 raw / 23 normalised. No mint/freeze authorities. High holder concentration (>50% top-10) flagged at warn level — oracle foundation/team wallets. Negative for all detectors. P5-0 calibration: D02 Signal B now SUPPRESSED via is_established_protocol Branch 2b (rugcheck_score_normalised=23 < 30). This closes the PYTH D02 FP that was outstanding since P4-0 (Branch 2 required jup_verified=true which PYTH lacks; Branch 2b requires only score < 30)."
+  },
+  "token_meta": {
+    "mint": "HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "Pyth Network",
+    "symbol": "PYTH",
+    "decimals": 6,
+    "supply_raw": "9999982174569775",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": null,
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": {
+      "jup_verified": false,
+      "jup_strict": false
+    },
+    "rugcheck_score": 1121,
+    "rugcheck_score_normalised": 23,
+    "risks": [
+      {
+        "name": "High holder concentration",
+        "level": "warn",
+        "score": 1020
+      },
+      {
+        "name": "Mutable metadata",
+        "level": "warn",
+        "score": 100
+      }
+    ],
+    "markets": [
+      {
+        "pool_address": "9n3dSLrERZQp95dHXywft7xV8D8xnGFLaUHtEhQVaXaC",
+        "dex": "raydium_clmm",
+        "lp_burned_pct": "0.00",
+        "liquidity_usd": "245572.00",
+        "lp_provider_count": 5
+      }
+    ],
+    "lockers": {},
+    "creator": null,
+    "creator_balance_raw": "0",
+    "top_holders": [
+      {
+        "address": "23KfDBTdpaBqfn8aUeoEDgfGJ5368gpnyYGfNkKcECqM",
+        "amount_raw": "1307277439389439",
+        "pct": "13.07",
+        "owner": "5WumPYv4jDPRqWjWr3EeybLczpcohHrMPShK9WQ85qfY",
+        "insider": false
+      },
+      {
+        "address": "Eq9dm4pHewdSVaKdpVJogjLW6upd9hNkiboX2eSncmFV",
+        "amount_raw": "684291664997500",
+        "pct": "6.84",
+        "owner": "5cz3Jz3QnDmTsQiw5MwkfV9tq4zf2yCzWcH7tXq5BxCw",
+        "insider": false
+      }
+    ]
+  },
+  "holder_snapshot_now": {
+    "total_holders": 210000,
+    "balances": {
+      "23KfDBTdpaBqfn8aUeoEDgfGJ5368gpnyYGfNkKcECqM": 1307277439389439,
+      "Eq9dm4pHewdSVaKdpVJogjLW6upd9hNkiboX2eSncmFV": 684291664997500,
+      "Fr0enXwBjOcQK3pHqSaeNtIvW2mZhA8fpCuYtBkZDnS": 399999286982791,
+      "Gs1foYxCkPdRL4qIrTbfOuJwX3nAiB9gqDvZuClAEoT": 299999465237093,
+      "Ht2gpZyDlQeMM5rJSuCgPvKxY4oBjC0hrEwAvDmBFpU": 199999643491395,
+      "Iu3hqAzEmRfNN6sKTvDhQwLyZ5pCkD1irFxBwEnCGqV": 149999732618547,
+      "Jv4irBaFnSgOO7tLUwEiRxMa6qDlE2jsFyGyXFoDHrW": 99999821745698,
+      "Kw5jsCAGoThPP8uMVxFjSyNb7rEmF3ktGzHzYGGpIisX": 74999866309273,
+      "Lx6ktDBHpUiQQ9vNWyGkTzOc8sEnG4luHAIzZHHqJjtY": 49999910872849,
+      "My7luECIqVjRR0wOXzHlUaP09tFoH5mvIBJaAIIrKkuZ": 37499933154636
+    },
+    "total_supply_raw": 9999982174569775
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 209500,
+    "total_supply_raw": 9999982174569775,
+    "top10_pct_liquid_after_exclusion": "0.3120",
+    "gini_liquid_after_exclusion": "0.8700"
+  },
+  "holder_classifications": [
+    {
+      "address": "23KfDBTdpaBqfn8aUeoEDgfGJ5368gpnyYGfNkKcECqM",
+      "kind": "VestingContract",
+      "subkind": "foundation_reserve",
+      "confidence": 0.75
+    },
+    {
+      "address": "Eq9dm4pHewdSVaKdpVJogjLW6upd9hNkiboX2eSncmFV",
+      "kind": "VestingContract",
+      "subkind": "foundation_reserve",
+      "confidence": 0.75
+    }
+  ],
+  "pool_rows": [
+    {
+      "pool_address": "9n3dSLrERZQp95dHXywft7xV8D8xnGFLaUHtEhQVaXaC",
+      "dex": "raydium_clmm",
+      "lp_burned_pct": "0.00",
+      "lp_locked_pct": "0.00",
+      "effective_safe_pct": "0.00",
+      "lp_provider_count": 5,
+      "liquidity_usd": "245572.00"
+    }
+  ],
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "All D01 signals absent."
+    },
+    "d02_rug_pull": {
+      "verdict": "SUPPRESSED_INFO",
+      "confidence_band": [
+        0.02,
+        0.12
+      ],
+      "severity": "Info",
+      "reason": "Signal B suppressed by is_established_protocol Branch 2b: rugcheck_score_normalised=23 < 30 threshold. An INFO audit event is emitted at confidence=0.10 with signal_b_suppressed=1. Pyth Network oracle governance token — unlocked LP reflects oracle-operator design, not latent rug risk. Suppression closes the D02 FP on PYTH (P5-0 calibration).",
+      "calibration_flag": false
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.15
+      ],
+      "severity": "Info",
+      "reason": "After sidecar exclusion: liquid top-10 drops to ~31.2% << 80%. gini_delta minimal. No signals fire."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No swaps_1h data in fixture (Phase 1 fixture). No volume spike. D04 BELOW."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No round-trip data in fixture (Phase 1 fixture). D05 BELOW."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "mint_authority=null. D06 BELOW."
+    }
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthHonP072vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv",
+    "symbol": "HON072",
+    "label": "positive",
+    "category": "honeypot_active",
+    "source_url": "synthetic/honeypot/s2_6000bps_mid_cap_evasion",
+    "fetched_at": "2026-04-21T20:21:00Z",
+    "synthetic": true,
+    "notes": "D01 S2 at 6000bps. Mid-cap token (market_cap ~$2.1M) below D04 market_cap_filter. Evasion E-D01-3: attacker uses 'lower' fee than maximum to stay under detection radar while still taxing sells heavily. Still above sell_tax_threshold_bps."
+  },
+  "token_meta": {
+    "mint": "SynthHonP072vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv",
+    "token_program": "TokenzQdBNbLqP5VgrHUCemXgAJa2LJKQ74wMRsqBMBP",
+    "name": "MidCapFee072",
+    "symbol": "HON072",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevMid072111111111111111111111111111111111",
+    "transfer_fee": { "fee_bps": 6000, "max_amount": 999999999999, "authority": null },
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 5400,
+    "rugcheck_score_normalised": 80,
+    "risks": [
+      { "name": "High transfer fee", "value": "6000bps", "level": "danger" }
+    ],
+    "markets": [
+      { "pool_address": "MidPool072111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "95.00", "liquidity_usd": "2100000.00", "lp_provider_count": 3 }
+    ],
+    "lockers": {},
+    "creator": "DevMid072111111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "2100000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 4200,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "MidHolder072_001111111111111111111111111": 42000000000000,
+      "MidHolder072_011111111111111111111111111": 31000000000000,
+      "MidHolder072_021111111111111111111111111": 22000000000000,
+      "MidHolder072_031111111111111111111111111": 15000000000000,
+      "MidHolder072_041111111111111111111111111": 10000000000000,
+      "MidHolder072_051111111111111111111111111": 6800000000000,
+      "MidHolder072_061111111111111111111111111": 4500000000000,
+      "MidHolder072_071111111111111111111111111": 3000000000000,
+      "MidHolder072_081111111111111111111111111": 2000000000000,
+      "MidHolder072_091111111111111111111111111": 1400000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 4100,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.138",
+    "gini_liquid_after_exclusion": "0.42"
+  },
+  "holder_classifications": [],
+  "pool_rows": [
+    { "pool_address": "MidPool072111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "95.00", "lp_locked_pct": "0.00", "effective_safe_pct": "95.00", "lp_provider_count": 3, "liquidity_usd": "2100000.00" }
+  ],
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "FIRES",
+      "confidence_band": [0.50, 0.62],
+      "severity": "Medium",
+      "reason": "S2 fires: transfer_fee=6000bps >= sell_tax_threshold_bps. weight=0.45. raw=0.45. sigmoid(0.45/0.55-1.0)=sigmoid(-0.182)=0.455. Medium severity. fee_authority=null so sub-signal not active."
+    },
+    "d02_rug_pull": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "LP 95% burned. D02 does not fire." },
+    "d03_concentration": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "top10=0.138; well-distributed 4200-holder token. No D03 signals." },
+    "d04_pump_dump": {
+      "verdict": "SUPPRESSED_INFO",
+      "confidence_band": [0.02, 0.05],
+      "severity": "Info",
+      "reason": "market_cap_usd=$2.1M is below market_cap_filter_usd=$60M -> D04 evaluates normally. But if a spike occurred, it would be captured. No spike data in fixture. D04 returns Info (no spike detected)."
+    },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "4200 holders, diverse. No self-dealing." },
+    "d06_mint_burn_anomaly": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "mint_authority=null." }
+  }
+}

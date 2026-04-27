@@ -1,0 +1,79 @@
+{
+  "_fixture_meta": {
+    "mint": "nosXBVoaCTtYdLvKY6Csb4AC8JCdQKKAaWYtx2ZMoo7",
+    "symbol": "NOS",
+    "label": "negative",
+    "category": "bluechip",
+    "source_url": "synthetic/bluechip/nos_nosana_protocol",
+    "fetched_at": "2026-04-21T20:57:00Z",
+    "synthetic": true,
+    "notes": "Nosana (NOS) — GPU compute marketplace token. jup_verified=true. mint_authority=null. Active trading, stable volume. Protocol utility token with staking. Tests mid-tier protocol token with no alerts. lp_provider_count=62 across Raydium pool — not concentrated."
+  },
+  "token_meta": {
+    "mint": "nosXBVoaCTtYdLvKY6Csb4AC8JCdQKKAaWYtx2ZMoo7",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "Nosana",
+    "symbol": "NOS",
+    "decimals": 6,
+    "supply_raw": "100000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": false,
+    "update_authority": null,
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": true, "jup_strict": false },
+    "rugcheck_score": 350,
+    "rugcheck_score_normalised": 16,
+    "risks": [],
+    "markets": [
+      { "pool_address": "NOSPool01111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "liquidity_usd": "920000.00", "lp_provider_count": 62 }
+    ],
+    "lockers": {},
+    "creator": "NosanaProtocol11111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "920000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 28000,
+    "total_supply_raw": 100000000000000,
+    "balances": {
+      "NOSEcosystemFund11111111111111111111111111": 16000000000000,
+      "NOSTeamVesting111111111111111111111111111": 12000000000000,
+      "NOSStakingPDA1111111111111111111111111111": 9500000000000,
+      "NOSHolder011111111111111111111111111111": 980000000000,
+      "NOSHolder021111111111111111111111111111": 780000000000,
+      "NOSHolder031111111111111111111111111111": 620000000000,
+      "NOSHolder041111111111111111111111111111": 480000000000,
+      "NOSHolder051111111111111111111111111111": 380000000000,
+      "NOSHolder061111111111111111111111111111": 290000000000,
+      "NOSHolder071111111111111111111111111111": 220000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 27800,
+    "total_supply_raw": 100000000000000,
+    "top10_pct_liquid_after_exclusion": "0.18",
+    "gini_liquid_after_exclusion": "0.62"
+  },
+  "holder_classifications": [
+    { "address": "NOSEcosystemFund11111111111111111111111111", "type": "ecosystem_fund", "label": "Nosana Ecosystem Fund" },
+    { "address": "NOSTeamVesting111111111111111111111111111", "type": "vesting_contract", "label": "Nosana Team Vesting" },
+    { "address": "NOSStakingPDA1111111111111111111111111111", "type": "program_pda", "label": "Nosana Staking PDA" }
+  ],
+  "pool_rows": [ { "pool_address": "NOSPool01111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "lp_locked_pct": "0.00", "effective_safe_pct": "0.00", "lp_provider_count": 62, "liquidity_usd": "920000.00" } ],
+  "swaps_1h": { "volume_usd": "380000.00", "trade_count": 1800, "unique_buyers": 900, "price_start": "0.185", "price_end": "0.186", "price_change_pct": "0.005" },
+  "swaps_7d_daily_baseline": { "day_count_nonzero": 7, "mean_daily_volume_usd": "360000.00", "std_daily_volume_usd": "65000.00", "volume_multiplier_observed": "1.06", "volume_z_score": "0.3" },
+  "signal_a_round_trips": [],
+  "pool_total_volume_1h_usd": "380000.00",
+  "expected": {
+    "d01_honeypot": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "No static honeypot signals." },
+    "d02_rug_pull": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "is_established_protocol=true (jup_verified=true). D02 suppressed." },
+    "d03_concentration": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.08], "severity": "Info", "reason": "After fund/vesting/staking exclusion: top10_pct_liquid=0.18. gini_delta~0." },
+    "d04_pump_dump": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "vol_multiplier=1.06. price_change=+0.5%." },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "No round-trip events. 900 unique buyers." },
+    "d06_mint_burn_anomaly": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "mint_authority=null." }
+  }
+}

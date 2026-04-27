@@ -1,0 +1,43 @@
+{
+  "_fixture": "d05_b_negative_02_oneway_chain",
+  "_detector": "wash_trading_h1 / Signal B (graph cycles)",
+  "_signal": "One-directional chain A→B→C→D with no return path. DAG — no cycles possible. Expected: Signal B does NOT fire.",
+  "_design": "docs/designs/0017-d05-signal-b-graph-cycles.md §5 (negative case: DAG)",
+  "chain": "solana",
+  "token": "NEGToken2222222222222222222222222222222222",
+  "transfers": [
+    {
+      "from_address": "WALLET_A_1111111111111111111111111111111111111",
+      "to_address":   "WALLET_B_2222222222222222222222222222222222222",
+      "amount_raw": "10000000000",
+      "block_time": "2024-01-16T08:00:00Z",
+      "block_height": 260000
+    },
+    {
+      "from_address": "WALLET_B_2222222222222222222222222222222222222",
+      "to_address":   "WALLET_C_3333333333333333333333333333333333333",
+      "amount_raw": "9800000000",
+      "block_time": "2024-01-16T08:15:00Z",
+      "block_height": 260100
+    },
+    {
+      "from_address": "WALLET_C_3333333333333333333333333333333333333",
+      "to_address":   "WALLET_D_4444444444444444444444444444444444444",
+      "amount_raw": "9600000000",
+      "block_time": "2024-01-16T08:30:00Z",
+      "block_height": 260200
+    },
+    {
+      "from_address": "WALLET_D_4444444444444444444444444444444444444",
+      "to_address":   "WALLET_E_5555555555555555555555555555555555555",
+      "amount_raw": "9400000000",
+      "block_time": "2024-01-16T08:45:00Z",
+      "block_height": 260300
+    }
+  ],
+  "expected": {
+    "signal_b_fires": false,
+    "cycle_count": 0,
+    "rationale": "A→B→C→D→E is a DAG (directed acyclic graph). Tarjan SCC on a DAG produces only singleton SCCs (size=1), all below min_scc_size=3. Johnson's algorithm is never invoked. No cycles are emitted."
+  }
+}

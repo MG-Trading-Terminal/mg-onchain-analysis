@@ -1,0 +1,192 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthConc04011111111111111111111111111111",
+    "symbol": "CONC040",
+    "label": "positive",
+    "category": "concentration_high",
+    "source_url": "synthetic/concentration_high/variant_040",
+    "fetched_at": "2026-04-21T19:00:00Z",
+    "synthetic": true,
+    "notes": "Synthetic concentration_high (sig1+2+3): gini_delta=0.14, top10_delta=0.17, abs=0.87. D03 fires."
+  },
+  "token_meta": {
+    "mint": "SynthConc04011111111111111111111111111111",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "ConcToken040",
+    "symbol": "CONC040",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevWalletC0401111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": {
+      "jup_verified": false,
+      "jup_strict": false
+    },
+    "rugcheck_score": 12000,
+    "rugcheck_score_normalised": 50,
+    "risks": [
+      {
+        "name": "Top 10 holders high ownership",
+        "level": "danger"
+      }
+    ],
+    "markets": [
+      {
+        "pool_address": "SafePool040111111111111111111111111111111",
+        "dex": "raydium",
+        "lp_burned_pct": "100.00",
+        "liquidity_usd": "35000.00",
+        "lp_provider_count": 1
+      }
+    ],
+    "lockers": {},
+    "creator": "DevWalletC0401111111111111111111111111",
+    "creator_balance_raw": "0"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 250,
+    "balances": {
+      "TopHolder040_001111111111111111111111111": 304500000000000,
+      "TopHolder040_011111111111111111111111111": 156600000000000,
+      "TopHolder040_021111111111111111111111111": 104400000000000,
+      "TopHolder040_031111111111111111111111111": 78300000000000,
+      "TopHolder040_041111111111111111111111111": 60900000000000,
+      "TopHolder040_051111111111111111111111111": 52200000000000,
+      "TopHolder040_061111111111111111111111111": 43500000000000,
+      "TopHolder040_071111111111111111111111111": 34800000000000,
+      "TopHolder040_081111111111111111111111111": 26100000000000,
+      "TopHolder040_091111111111111111111111111": 8700000000000,
+      "SmallHolder040_10111111111111111111111111": 2600000000000,
+      "SmallHolder040_11111111111111111111111111": 2600000000000,
+      "SmallHolder040_12111111111111111111111111": 2600000000000,
+      "SmallHolder040_13111111111111111111111111": 2600000000000,
+      "SmallHolder040_14111111111111111111111111": 2600000000000,
+      "SmallHolder040_15111111111111111111111111": 2600000000000,
+      "SmallHolder040_16111111111111111111111111": 2600000000000,
+      "SmallHolder040_17111111111111111111111111": 2600000000000,
+      "SmallHolder040_18111111111111111111111111": 2600000000000,
+      "SmallHolder040_19111111111111111111111111": 2600000000000,
+      "SmallHolder040_20111111111111111111111111": 2600000000000,
+      "SmallHolder040_21111111111111111111111111": 2600000000000,
+      "SmallHolder040_22111111111111111111111111": 2600000000000,
+      "SmallHolder040_23111111111111111111111111": 2600000000000,
+      "SmallHolder040_24111111111111111111111111": 2600000000000,
+      "SmallHolder040_25111111111111111111111111": 2600000000000,
+      "SmallHolder040_26111111111111111111111111": 2600000000000,
+      "SmallHolder040_27111111111111111111111111": 2600000000000,
+      "SmallHolder040_28111111111111111111111111": 2600000000000,
+      "SmallHolder040_29111111111111111111111111": 2600000000000,
+      "SmallHolder040_30111111111111111111111111": 2600000000000,
+      "SmallHolder040_31111111111111111111111111": 2600000000000,
+      "SmallHolder040_32111111111111111111111111": 2600000000000,
+      "SmallHolder040_33111111111111111111111111": 2600000000000,
+      "SmallHolder040_34111111111111111111111111": 2600000000000,
+      "SmallHolder040_35111111111111111111111111": 2600000000000,
+      "SmallHolder040_36111111111111111111111111": 2600000000000,
+      "SmallHolder040_37111111111111111111111111": 2600000000000,
+      "SmallHolder040_38111111111111111111111111": 2600000000000,
+      "SmallHolder040_39111111111111111111111111": 2600000000000,
+      "SmallHolder040_40111111111111111111111111": 2600000000000,
+      "SmallHolder040_41111111111111111111111111": 2600000000000,
+      "SmallHolder040_42111111111111111111111111": 2600000000000,
+      "SmallHolder040_43111111111111111111111111": 2600000000000,
+      "SmallHolder040_44111111111111111111111111": 2600000000000,
+      "SmallHolder040_45111111111111111111111111": 2600000000000,
+      "SmallHolder040_46111111111111111111111111": 2600000000000,
+      "SmallHolder040_47111111111111111111111111": 2600000000000,
+      "SmallHolder040_48111111111111111111111111": 2600000000000,
+      "SmallHolder040_49111111111111111111111111": 2600000000000,
+      "SmallHolder040_50111111111111111111111111": 2600000000000,
+      "SmallHolder040_51111111111111111111111111": 2600000000000,
+      "SmallHolder040_52111111111111111111111111": 2600000000000,
+      "SmallHolder040_53111111111111111111111111": 2600000000000,
+      "SmallHolder040_54111111111111111111111111": 2600000000000,
+      "SmallHolder040_55111111111111111111111111": 2600000000000,
+      "SmallHolder040_56111111111111111111111111": 2600000000000,
+      "SmallHolder040_57111111111111111111111111": 2600000000000,
+      "SmallHolder040_58111111111111111111111111": 2600000000000,
+      "SmallHolder040_59111111111111111111111111": 2600000000000
+    },
+    "total_supply_raw": 1000000000000000
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 240,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.7",
+    "gini_liquid_after_exclusion": "0.77"
+  },
+  "holder_classifications": [],
+  "pool_rows": [
+    {
+      "pool_address": "SafePool040111111111111111111111111111111",
+      "dex": "raydium",
+      "lp_burned_pct": "100.00",
+      "lp_locked_pct": "0.00",
+      "effective_safe_pct": "100.00",
+      "lp_provider_count": 1,
+      "liquidity_usd": "35000.00"
+    }
+  ],
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No honeypot signals. D01 does not fire."
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.15
+      ],
+      "severity": "Info",
+      "reason": "LP 100% burned \u2192 effective_safe_pct=100%. Signal B does not fire."
+    },
+    "d03_concentration": {
+      "verdict": "FIRES",
+      "confidence_band": [
+        0.855,
+        0.995
+      ],
+      "severity": "Critical",
+      "reason": "Signal 1 (Gini delta=0.14) fires at confidence=0.8. Signal 2 (top10 delta=0.17) fires at confidence=0.925. Signal 3 (absolute top10=0.87) fires at confidence=0.72. Max confidence=0.925."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No swaps_1h data in fixture (Phase 1 fixture predates D04). No volume spike detectable. D04 INCONCLUSIVE \u2014 treated as BELOW for calibration."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No signal_a_round_trips data in fixture (Phase 1 fixture predates D05). D05 INCONCLUSIVE \u2014 treated as BELOW for calibration."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "mint_authority=null. No mint/burn events in fixture (Phase 1 fixture predates D06)."
+    }
+  }
+}

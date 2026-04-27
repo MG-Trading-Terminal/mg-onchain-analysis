@@ -1,0 +1,98 @@
+{
+  "_label": "SYNTH_NEG_D11_01",
+  "_description": "8 wallets buying the same token spread across 45 seconds. Temporal spread (45s) exceeds delta (30s), so tightness=0.0 < threshold=0.50. D11 must NOT fire.",
+  "_chain": "Solana",
+  "_source": "Synthetic — design 0018 §12.2. Organic community launch after Telegram announcement.",
+  "_algorithm": "jaccard_dbscan; delta_seconds=30; action_source=swap_buy",
+  "token_mint": "SYNTH_TOKEN_D11_NEG_01",
+  "is_established_protocol": false,
+  "observed_at_block_time": "2026-04-24T11:00:00Z",
+  "lambda_token_per_second": 0.002,
+  "baseline_events_7d": 1200,
+  "swaps": [
+    {
+      "wallet": "WALLET_D11_N01_A",
+      "tx_hash": "TX_D11_N01_A001",
+      "block_time": "2026-04-24T10:59:15Z",
+      "block_height": 110000,
+      "is_buy": true,
+      "amount_raw": "500000000",
+      "pool": "POOL_D11_NEG_01"
+    },
+    {
+      "wallet": "WALLET_D11_N01_B",
+      "tx_hash": "TX_D11_N01_B001",
+      "block_time": "2026-04-24T10:59:23Z",
+      "block_height": 110020,
+      "is_buy": true,
+      "amount_raw": "700000000",
+      "pool": "POOL_D11_NEG_01"
+    },
+    {
+      "wallet": "WALLET_D11_N01_C",
+      "tx_hash": "TX_D11_N01_C001",
+      "block_time": "2026-04-24T10:59:31Z",
+      "block_height": 110040,
+      "is_buy": true,
+      "amount_raw": "300000000",
+      "pool": "POOL_D11_NEG_01"
+    },
+    {
+      "wallet": "WALLET_D11_N01_D",
+      "tx_hash": "TX_D11_N01_D001",
+      "block_time": "2026-04-24T10:59:38Z",
+      "block_height": 110056,
+      "is_buy": true,
+      "amount_raw": "1000000000",
+      "pool": "POOL_D11_NEG_01"
+    },
+    {
+      "wallet": "WALLET_D11_N01_E",
+      "tx_hash": "TX_D11_N01_E001",
+      "block_time": "2026-04-24T10:59:44Z",
+      "block_height": 110068,
+      "is_buy": true,
+      "amount_raw": "600000000",
+      "pool": "POOL_D11_NEG_01"
+    },
+    {
+      "wallet": "WALLET_D11_N01_F",
+      "tx_hash": "TX_D11_N01_F001",
+      "block_time": "2026-04-24T10:59:51Z",
+      "block_height": 110082,
+      "is_buy": true,
+      "amount_raw": "400000000",
+      "pool": "POOL_D11_NEG_01"
+    },
+    {
+      "wallet": "WALLET_D11_N01_G",
+      "tx_hash": "TX_D11_N01_G001",
+      "block_time": "2026-04-24T10:59:55Z",
+      "block_height": 110090,
+      "is_buy": true,
+      "amount_raw": "800000000",
+      "pool": "POOL_D11_NEG_01"
+    },
+    {
+      "wallet": "WALLET_D11_N01_H",
+      "tx_hash": "TX_D11_N01_H001",
+      "block_time": "2026-04-24T11:00:00Z",
+      "block_height": 111000,
+      "is_buy": true,
+      "amount_raw": "900000000",
+      "pool": "POOL_D11_NEG_01"
+    }
+  ],
+  "_math_verification": {
+    "temporal_spread_seconds": 45,
+    "delta_seconds": 30,
+    "temporal_tightness": "max(0, 1 - 45/30) = max(0, -0.5) = 0.0",
+    "tightness_threshold": 0.50,
+    "result": "tightness=0.0 < threshold=0.50 → cluster discarded → no event"
+  },
+  "_expected": {
+    "detector_id": "synchronized_activity_v1",
+    "fires": false,
+    "reason": "temporal_tightness below threshold (spread 45s > window 30s)"
+  }
+}

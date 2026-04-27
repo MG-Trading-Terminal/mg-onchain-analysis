@@ -1,0 +1,70 @@
+{
+  "meta": {
+    "fixture_id": "POS_03_synth_high_volume_signal_c",
+    "synthetic": true,
+    "calibration_flag": false,
+    "expected_correct": true,
+    "description": "Single wallet, 7 buy->sell round-trips, $90K wash volume, wash/pool ratio 0.45 (>= severity_amplifier_ratio 0.30). Tests Signal A saturation at confidence=0.95 AND Signal C severity upgrade.",
+    "expected_signal": "signal_a",
+    "expected_confidence_min": 0.94,
+    "expected_confidence_max": 0.95,
+    "expected_severity_before_signal_c": "critical",
+    "expected_severity_after_signal_c": "critical",
+    "note_on_severity": "Signal A at 0.95 is already Critical; Signal C upgrade is Critical->Critical (no change). Test should assert signal_c_amplifier_applied=1 even when severity is unchanged at ceiling.",
+    "expected_signal_c_applies": true,
+    "source": "synthetic",
+    "created": "2026-04-21",
+    "spec_ref": "docs/designs/0008-detector-05-wash-trading.md §10 POS_03"
+  },
+  "token": {
+    "chain": "solana",
+    "mint": "SYNTH333333333333333333333333333333333333333",
+    "symbol": "WASH3",
+    "decimals": 6,
+    "total_supply_raw": "500000000000000",
+    "total_market_liquidity_usd": "200000.00",
+    "rugcheck_score": 90,
+    "verification": {
+      "jup_verified": false,
+      "jup_strict": false
+    }
+  },
+  "pool": {
+    "address": "POOL333333333333333333333333333333333333333",
+    "dex": "orca_whirlpool",
+    "liquidity_usd": "200000.00"
+  },
+  "round_trip_summary": {
+    "sender": "WASH_WALLET_HIGH_VOL_1111111111111111111111",
+    "round_trip_count": 7,
+    "avg_volume_diff_pct": 0.0028,
+    "per_round_trip_wash_vol_usd": "12857.14",
+    "total_wash_volume_usd": "90000.00",
+    "block_gaps": [8, 12, 9, 15, 7, 11, 20],
+    "all_gaps_within_25_slots": true
+  },
+  "expected_query_result": {
+    "sender": "WASH_WALLET_HIGH_VOL_1111111111111111111111",
+    "pool": "POOL333333333333333333333333333333333333333",
+    "round_trip_count": 7,
+    "avg_volume_diff_pct": 0.0028,
+    "wash_volume_usd": "90000.00"
+  },
+  "expected_confidence_derivation": {
+    "rep_term": "(7 - 3) * 0.05 = 0.20",
+    "vol_term": "ln(90000 / 500) * 0.10 = ln(180) * 0.10 = 5.193 * 0.10 = 0.5193",
+    "raw": "0.60 + 0.20 + 0.5193 = 1.3193",
+    "capped": "min(0.95, 1.3193) = 0.95"
+  },
+  "total_pool_volume_usd_in_window": "200000.00",
+  "wash_volume_ratio": 0.45,
+  "signal_c_expected": true,
+  "signal_c_derivation": {
+    "wash_ratio": 0.45,
+    "threshold": 0.30,
+    "above_threshold": true,
+    "severity_before": "critical",
+    "severity_after": "critical",
+    "note": "Critical is ceiling; upgrade is no-op but evidence key signal_c_amplifier_applied must still be set to 1"
+  }
+}

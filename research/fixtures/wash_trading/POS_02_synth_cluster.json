@@ -1,0 +1,102 @@
+{
+  "meta": {
+    "fixture_id": "POS_02_synth_cluster",
+    "synthetic": true,
+    "calibration_flag": false,
+    "expected_correct": true,
+    "description": "3 wallets with approximately zero net flows (buy-heavy A offsets sell-heavy B and C), total cluster volume $52,000. Signal A does NOT fire (no individual wallet has >=3 round-trips). Signal B fires via cluster detection.",
+    "expected_signal": "signal_b",
+    "expected_confidence_min": 0.50,
+    "expected_confidence_max": 0.55,
+    "expected_severity_min": "medium",
+    "expected_signal_c_applies": false,
+    "source": "synthetic",
+    "created": "2026-04-21",
+    "spec_ref": "docs/designs/0008-detector-05-wash-trading.md §10 POS_02"
+  },
+  "token": {
+    "chain": "solana",
+    "mint": "SYNTH222222222222222222222222222222222222222",
+    "symbol": "WASH2",
+    "decimals": 6,
+    "total_supply_raw": "1000000000000000",
+    "total_market_liquidity_usd": "120000.00",
+    "rugcheck_score": 78,
+    "verification": {
+      "jup_verified": false,
+      "jup_strict": false
+    }
+  },
+  "pool": {
+    "address": "POOL222222222222222222222222222222222222222",
+    "dex": "raydium_cpmm",
+    "liquidity_usd": "120000.00"
+  },
+  "sender_flow_summary": {
+    "note": "These are the per-sender aggregated flows used by fetch_pool_senders query. Actual swap rows omitted for brevity; fixture tests the compute_cluster_flows() pure function.",
+    "senders": [
+      {
+        "sender": "CLUSTER_WALLET_A_11111111111111111111111111",
+        "net_token_in": "26000000000000",
+        "net_token_out": "2000000000000",
+        "net_flow": "24000000000000",
+        "volume_usd": "26000.00",
+        "role": "net_buyer"
+      },
+      {
+        "sender": "CLUSTER_WALLET_B_11111111111111111111111111",
+        "net_token_in": "5000000000000",
+        "net_token_out": "18000000000000",
+        "net_flow": "-13000000000000",
+        "volume_usd": "16500.00",
+        "role": "net_seller"
+      },
+      {
+        "sender": "CLUSTER_WALLET_C_11111111111111111111111111",
+        "net_token_in": "3000000000000",
+        "net_token_out": "13500000000000",
+        "net_flow": "-10500000000000",
+        "volume_usd": "11000.00",
+        "role": "net_seller"
+      },
+      {
+        "sender": "INNOCENT_WALLET_D_1111111111111111111111111",
+        "net_token_in": "8000000000000",
+        "net_token_out": "1000000000000",
+        "net_flow": "7000000000000",
+        "volume_usd": "5200.00",
+        "role": "genuine_buyer",
+        "note": "This wallet is a genuine buyer not part of the cluster; cluster algorithm should NOT include it"
+      }
+    ],
+    "cluster_detection_analysis": {
+      "wallets_abc_combined_net_flow": "24000 - 13000 - 10500 = +500 raw units (from token amounts)",
+      "combined_magnitude": "max(|24000|, |13000 + 10500|) = max(24000, 23500) = 24000",
+      "imbalance": "500 / 24000 = 0.0208 = 2.1%",
+      "below_tolerance": "2.1% <= 5.0% (cluster_balance_tolerance_pct) — cluster detected",
+      "cluster_volume_usd": "26000 + 16500 + 11000 = 53500 >= 5000 (min_cluster_volume_usd) — passes",
+      "cluster_size": "3 >= 3 (min_cluster_size) — passes"
+    }
+  },
+  "expected_cluster_result": {
+    "cluster_found": true,
+    "cluster_wallets": [
+      "CLUSTER_WALLET_A_11111111111111111111111111",
+      "CLUSTER_WALLET_B_11111111111111111111111111",
+      "CLUSTER_WALLET_C_11111111111111111111111111"
+    ],
+    "cluster_size": 3,
+    "cluster_volume_usd": "53500.00",
+    "cluster_balance_deviation_pct": 0.0208
+  },
+  "expected_confidence_derivation": {
+    "cluster_size": 3,
+    "min_size": 3,
+    "formula": "min(0.60, 0.50 + (3 - 3) / 10.0 * 0.10) = 0.50",
+    "result": 0.50
+  },
+  "total_pool_volume_usd_in_window": "62000.00",
+  "wash_volume_ratio_if_amplified": 0.863,
+  "signal_c_expected": false,
+  "note": "Even though wash_ratio=0.863 >> 0.30, Signal C requires Signal A or B confidence event; it will apply when Signal B fires. This fixture tests that Signal B fires correctly. Signal C WILL apply here (severity Medium -> High), but the primary assertion is Signal B confidence=0.50."
+}

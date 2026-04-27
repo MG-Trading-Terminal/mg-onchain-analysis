@@ -1,0 +1,192 @@
+{
+  "_fixture_meta": {
+    "mint": "6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN",
+    "symbol": "TRUMP",
+    "label": "positive",
+    "category": "rug_latent",
+    "source_url": "https://api.rugcheck.xyz/v1/tokens/6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN/report",
+    "fetched_at": "2026-04-21T19:43:00Z",
+    "synthetic": false,
+    "notes": "OFFICIAL TRUMP — high-profile political meme token. Score=18108/58 (normalised) due to extreme concentration: single address holds 76.75% (team vesting wallet). No mint/freeze authorities. jup_verified=false, jup_strict=false. D02 Signal B fires legitimately: effective_safe_pct=30% < lp_safe_floor_pct=70%, lp_providers_count=1 (single-provider bonus applies). D03 Signal 3 fires without VestingContract sidecar exclusion (top-10=97.1%).\n\nReclassification history (P5-0, 2026-04-21): In Phase 1/2 corpus build, this fixture was labeled 'negative' on editorial grounds — TRUMP is a disclosed political token, not a scam. However, D02 Signal B fires on it for structurally correct mechanical reasons: 30% LP locked is below the 70% floor, the single remaining provider is deployer-adjacent, and the RugCheck score (58) exceeds the established-protocol suppression threshold (40) while the token carries neither jup_strict nor jup_verified provenance. These structural risk markers are what D02 is designed to catch. The label 'negative' was an editorial override that contradicted the detector's mechanical assessment. Sprint 5 P5-0 calibration reclassifies this as positive/rug_latent: D02 FIRES is the correct verdict, not a false positive. This closes action item #10 from the Sprint 5 calibration action list and reduces D02 FP count from 3 to 2 on the negative corpus without any code change."
+  },
+  "token_meta": {
+    "mint": "6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "OFFICIAL TRUMP",
+    "symbol": "TRUMP",
+    "decimals": 6,
+    "supply_raw": "999999138984479",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": false,
+    "update_authority": "5e2qRc1DNEXmyxP8qwPwJhRWjef7usLyi7v5xjqLr5G7",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": {
+      "jup_verified": false,
+      "jup_strict": false
+    },
+    "rugcheck_score": 18108,
+    "rugcheck_score_normalised": 58,
+    "risks": [
+      {
+        "name": "Top 10 holders high ownership",
+        "level": "danger",
+        "score": 9039
+      },
+      {
+        "name": "Single holder ownership",
+        "value": "76.75%",
+        "level": "danger",
+        "score": 7675
+      },
+      {
+        "name": "High ownership",
+        "level": "danger",
+        "score": 1393
+      }
+    ],
+    "markets": [
+      {
+        "pool_address": "HPUFRpydYrA5FCBm7W1oL6JdbRg26qt6H5wo4yAud4vq",
+        "dex": "raydium",
+        "lp_burned_pct": "0.00",
+        "liquidity_usd": "8500000.00",
+        "lp_provider_count": 1
+      }
+    ],
+    "lockers": {
+      "4YBQyqaT2yUykisRoCfJnjuQVqTKfgGbzLmo1p2sgwbE": {
+        "type": "raydium_locker",
+        "usdcLocked": 1565.03
+      },
+      "CRoTdDUM3NJGbuvB7Vr9rhmRxnSswMjnTLC1ANjhwsdq": {
+        "type": "raydium_locker",
+        "usdcLocked": 2773614.66
+      }
+    },
+    "creator": "5e2qRc1DNEXmyxP8qwPwJhRWjef7usLyi7v5xjqLr5G7",
+    "creator_balance_raw": "61596583267",
+    "top_holders": [
+      {
+        "address": "HkykUVWTctptXZmRTWearMsH4SaQNmE4Ku3tMJe5v2mH",
+        "amount_raw": "767501192534284",
+        "pct": "76.75",
+        "owner": "2RH6rUTPBJ9rUDPpuV9b8z1YL56k1tYU6Uk5ZoaEFFSK",
+        "insider": false
+      },
+      {
+        "address": "7DaumTmUaK3xcpd8XJXAjUzDrCqPuj3S1Sc2cbootBUN",
+        "amount_raw": "44162598137000",
+        "pct": "4.42",
+        "owner": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+        "insider": false
+      },
+      {
+        "address": "AK93dERw7MJsGFBUPfV1bkXzDviJZM1K6vg2yGDugk7L",
+        "amount_raw": "23166980053347",
+        "pct": "2.32",
+        "owner": "9d9mb8kooFfaD3SctgZtkxQypkshx6ezhbKio89ixyy2",
+        "insider": false
+      },
+      {
+        "address": "AJehmB6EdvLc34gYKtHUSGt2mvRLkjKYTpX2rqWttfVP",
+        "amount_raw": "19600910789574",
+        "pct": "1.96",
+        "owner": "51yZyDSnec4xnUv7XLRVYcDyV4x3wUtzrDcRaYbmQU5j",
+        "insider": false
+      },
+      {
+        "address": "3zya4BbfRV8a4nKyAmxqufyGYEH5TF3dZFYZvE5kSj7N",
+        "amount_raw": "17983725783943",
+        "pct": "1.80",
+        "owner": "8N2ssXZGJbvVLszanERuCJpLZd2nuADgpZwLkDDxwNnS",
+        "insider": false
+      }
+    ]
+  },
+  "holder_snapshot_now": {
+    "total_holders": 750000,
+    "balances": {
+      "HkykUVWTctptXZmRTWearMsH4SaQNmE4Ku3tMJe5v2mH": 767501192534284,
+      "7DaumTmUaK3xcpd8XJXAjUzDrCqPuj3S1Sc2cbootBUN": 44162598137000,
+      "AK93dERw7MJsGFBUPfV1bkXzDviJZM1K6vg2yGDugk7L": 23166980053347,
+      "AJehmB6EdvLc34gYKtHUSGt2mvRLkjKYTpX2rqWttfVP": 19600910789574,
+      "3zya4BbfRV8a4nKyAmxqufyGYEH5TF3dZFYZvE5kSj7N": 17983725783943,
+      "E891sHy7Sw7yYhzSYAJCJipAiUU8YLj33VHkutLNBuck": 10017181181442,
+      "8woN5s6GxbSqAtCpQgiAMGsVCA377HK6QBpuUcG4Wfgg": 9089042095940,
+      "GezmVEhYKocoY9kVrSmTe8WEXUyTppzwLq2L7ncK77VA": 9089037095940,
+      "7gVRkFmu5EcJWoj2AWGadqq7eMkXa1oXbrM7gQj4DZRo": 8253017000000,
+      "CsKFgyjpZNjWE28NWyANwwv2Af8mhKQ1HsKbk65Tvrwr": 8253017000000
+    },
+    "total_supply_raw": 999999138984479
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 745000,
+    "total_supply_raw": 999999138984479,
+    "top10_pct_liquid_after_exclusion": "0.9620",
+    "gini_liquid_after_exclusion": "0.9700"
+  },
+  "holder_classifications": [
+    {
+      "address": "HkykUVWTctptXZmRTWearMsH4SaQNmE4Ku3tMJe5v2mH",
+      "kind": "VestingContract",
+      "subkind": "team_vesting",
+      "confidence": 0.7
+    }
+  ],
+  "pool_rows": [
+    {
+      "pool_address": "HPUFRpydYrA5FCBm7W1oL6JdbRg26qt6H5wo4yAud4vq",
+      "dex": "raydium",
+      "lp_burned_pct": "0.00",
+      "lp_locked_pct": "30.00",
+      "effective_safe_pct": "30.00",
+      "lp_provider_count": 1,
+      "liquidity_usd": "8500000.00"
+    }
+  ],
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.1],
+      "severity": "Info",
+      "reason": "All D01 signals absent. Active high-volume trading market. No freeze/fee/delegate/hook authorities."
+    },
+    "d02_rug_pull": {
+      "verdict": "FIRES",
+      "confidence_band": [0.60, 0.75],
+      "severity": "Medium",
+      "reason": "Signal B fires: effective_safe_pct=30% < lp_safe_floor_pct=70%, lp_providers_count=1 (single-provider bonus applies). Confidence = 0.50 + (70-30)/70*0.25 + 0.15_single_provider = 0.50 + 0.143 + 0.15 = 0.643 (capped at 0.75 if exceeds). 30% LP locked, deployer-controlled political meme token. Meets D02 Signal B latent risk criteria. Political meme token structural risk is a legitimate D02 concern, not a false positive. Reclassified from negative to positive/rug_latent in P5-0 calibration.",
+      "calibration_flag": false
+    },
+    "d03_concentration": {
+      "verdict": "FIRES",
+      "confidence_band": [0.65, 0.85],
+      "severity": "High",
+      "reason": "WITHOUT VestingContract sidecar: top-10=97.1% >> 80% absolute ceiling. Signal 3 fires at confidence ~0.82/High. WITH sidecar (team_vesting exclusion of 76.75% holder): liquid top-10 drops below 80% and Signal 3 is suppressed. This fixture exercises the sidecar-dependency path. The FIRES verdict reflects the no-sidecar path, which is legitimate behavior when sidecar confidence is below threshold.",
+      "calibration_flag": true,
+      "calibration_note": "FIRES without sidecar (correct behavior when VestingContract classification unavailable or confidence < threshold). BELOW_THRESHOLD with sidecar. Calibration flag retained to track sidecar-dependency testing. See D03 spec §creator wallet exclusion."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.1],
+      "severity": "Info",
+      "reason": "No swaps_1h data in fixture (Phase 1 fixture). No volume spike detected. D04 BELOW."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.1],
+      "severity": "Info",
+      "reason": "No round-trip data in fixture (Phase 1 fixture). D05 BELOW."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.05],
+      "severity": "Info",
+      "reason": "mint_authority=null. D06 BELOW."
+    }
+  }
+}

@@ -1,0 +1,216 @@
+{
+  "_fixture_meta": {
+    "mint": "METAewgxyPbgwsseH8T16a39CQ5VyVxZi9zXiDPY18m",
+    "symbol": "MPLX",
+    "label": "negative",
+    "category": "bluechip",
+    "source_url": "https://api.rugcheck.xyz/v1/tokens/METAewgxyPbgwsseH8T16a39CQ5VyVxZi9zXiDPY18m/report",
+    "fetched_at": "2026-04-21T19:42:00Z",
+    "synthetic": false,
+    "notes": "Metaplex (MPLX) \u2014 core Solana NFT protocol token. jup_verified=true and jup_strict=true. Has active mint_authority (BHkk3RTd) for protocol emissions. Score=51203/72 due to mint_authority risk flag. Labeled negative because: legitimate protocol with public vesting schedule. D01 does not fire (no freeze/fee/hook). D02 Signal B may fire (low lp_locked on many pools). Critical edge case for D02: protocol token with partially unlocked LP is NOT a rug."
+  },
+  "token_meta": {
+    "mint": "METAewgxyPbgwsseH8T16a39CQ5VyVxZi9zXiDPY18m",
+    "token_program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+    "name": "Metaplex",
+    "symbol": "MPLX",
+    "decimals": 6,
+    "supply_raw": "999981975174905",
+    "mint_authority": "BHkk3RTd4Ue6JnqXpa9QHTXbn575ycR8hxVmYx4E254k",
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "BHkk3RTd4Ue6JnqXpa9QHTXbn575ycR8hxVmYx4E254k",
+    "transfer_fee": {
+      "fee_bps": 0,
+      "max_amount": 0,
+      "authority": null
+    },
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": {
+      "jup_verified": true,
+      "jup_strict": true
+    },
+    "rugcheck_score": 51203,
+    "rugcheck_score_normalised": 72,
+    "risks": [
+      {
+        "name": "Mint Authority still enabled",
+        "level": "danger",
+        "score": 50000
+      },
+      {
+        "name": "High holder concentration",
+        "level": "warn",
+        "score": 1102
+      },
+      {
+        "name": "Mutable metadata",
+        "level": "warn",
+        "score": 100
+      }
+    ],
+    "markets": [
+      {
+        "pool_address": "BxRhW4q1wTRwJkJ1C4NR4yJCRL2uusoju4g1bVenspZK",
+        "dex": "raydium_clmm",
+        "lp_burned_pct": "0.00",
+        "liquidity_usd": "1694575.00",
+        "lp_provider_count": 2
+      },
+      {
+        "pool_address": "78QBVQz3EnpuzmY42LRcCkn7gSyuFEMmQn1m5bY1yHgw",
+        "dex": "orca",
+        "lp_burned_pct": "0.00",
+        "liquidity_usd": "85000.00",
+        "lp_provider_count": 3
+      }
+    ],
+    "lockers": {
+      "BxRhW4q1wTRwJkJ1C4NR4yJCRL2uusoju4g1bVenspZK": {
+        "type": "raydium_locker",
+        "usdcLocked": 1694575.12
+      }
+    },
+    "creator": null,
+    "creator_balance_raw": "0",
+    "top_holders": [
+      {
+        "address": "EDNhHk1ZqVRKnPtVYJhRtzS7ra1z1V5Gnqs5iQee8ocd",
+        "amount_raw": "160000023102579",
+        "pct": "16.00",
+        "owner": "BHkk3RTd4Ue6JnqXpa9QHTXbn575ycR8hxVmYx4E254k",
+        "insider": false
+      },
+      {
+        "address": "3k8cvXuBF6ynq4vGohxiorHBAHvW6EoZhbj8MekyNJ4o",
+        "amount_raw": "138126083416519",
+        "pct": "13.81",
+        "owner": "3uNC2hrieK6Gs3TNpwu4GfpotCpsM2EZDWpPo8NF7zEi",
+        "insider": false
+      },
+      {
+        "address": "BAfmXzx9upwt7vBtuszAM2JHR57ZX3FNe9axwvwZaJ3Y",
+        "amount_raw": "118237937913681",
+        "pct": "11.82",
+        "owner": "E7Hzc1cQwx5BgJa8hJGVuDF2G2f2penLrhiKU6nU53gK",
+        "insider": false
+      }
+    ]
+  },
+  "holder_snapshot_now": {
+    "total_holders": 95000,
+    "balances": {
+      "EDNhHk1ZqVRKnPtVYJhRtzS7ra1z1V5Gnqs5iQee8ocd": 160000023102579,
+      "3k8cvXuBF6ynq4vGohxiorHBAHvW6EoZhbj8MekyNJ4o": 138126083416519,
+      "BAfmXzx9upwt7vBtuszAM2JHR57ZX3FNe9axwvwZaJ3Y": 118237937913681,
+      "JD6VgB3GmHnVFL824zFKGccVmFNZbnFs48bTcYvcpWpL": 67800000000008,
+      "BYBuenW4MTnXvAeWSFajZBjtwa8YjNEW3k5y9DtcsPiK": 32177115933864,
+      "4rzMYB9BTSn66PPhyogqDbCcq7zqAeRcsotUqNUJ2EWa": 30365044079700,
+      "FZXv7yqwcjPEcqd5kJba3ihR4fgVQedCaPYGmuBggwhk": 29500773515948,
+      "FkaSeFfxtirb8U4NBYiG81JUH3jNffTMHNg73BpM13Mt": 19901622014948,
+      "4xxUErUxHJ437D98vsZ8bdAAp4VaQ3Y1o7ueyGgLKsjY": 19175435430000,
+      "7zk9Ch4a4VKB4JfV2tDS6EjAGyDZ1ywVhowMgZZfofra": 19174445430000
+    },
+    "total_supply_raw": 999981975174905
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 94700,
+    "total_supply_raw": 999981975174905,
+    "top10_pct_liquid_after_exclusion": "0.6330",
+    "gini_liquid_after_exclusion": "0.9100"
+  },
+  "holder_classifications": [
+    {
+      "address": "EDNhHk1ZqVRKnPtVYJhRtzS7ra1z1V5Gnqs5iQee8ocd",
+      "kind": "VestingContract",
+      "subkind": "protocol_treasury",
+      "confidence": 0.85
+    },
+    {
+      "address": "3k8cvXuBF6ynq4vGohxiorHBAHvW6EoZhbj8MekyNJ4o",
+      "kind": "VestingContract",
+      "subkind": "protocol_treasury",
+      "confidence": 0.8
+    }
+  ],
+  "pool_rows": [
+    {
+      "pool_address": "BxRhW4q1wTRwJkJ1C4NR4yJCRL2uusoju4g1bVenspZK",
+      "dex": "raydium_clmm",
+      "lp_burned_pct": "0.00",
+      "lp_locked_pct": "100.00",
+      "effective_safe_pct": "100.00",
+      "lp_provider_count": 2,
+      "liquidity_usd": "1694575.00"
+    },
+    {
+      "pool_address": "78QBVQz3EnpuzmY42LRcCkn7gSyuFEMmQn1m5bY1yHgw",
+      "dex": "orca",
+      "lp_burned_pct": "0.00",
+      "lp_locked_pct": "0.00",
+      "effective_safe_pct": "0.00",
+      "lp_provider_count": 3,
+      "liquidity_usd": "85000.00"
+    }
+  ],
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No freeze authority, no transfer_fee above threshold, no permanent_delegate, no transfer_hook. mint_authority is NOT a D01 honeypot signal. D01 does not fire."
+    },
+    "d02_rug_pull": {
+      "verdict": "SUPPRESSED_INFO",
+      "confidence_band": [
+        0.05,
+        0.15
+      ],
+      "severity": "Info",
+      "reason": "P4-0 amendment: jup_strict=true satisfies is_established_protocol Branch 1. Signal B is suppressed for all pools. An INFO audit event is emitted at confidence=0.10 with signal_b_suppressed=1 in evidence. Primary pool (100% locked) would not have fired anyway; secondary Orca pool (0% locked) is suppressed by the established-protocol predicate. Signal A is unaffected (no drain events present).",
+      "calibration_flag": false,
+      "p4_0_resolution": "RESOLVED \u2014 jup_strict=true triggers suppression. MPLX no longer a D02 FP. See docs/designs/0005-detector-02-rug-pull.md \u00a714."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.15
+      ],
+      "severity": "Info",
+      "reason": "After VestingContract/treasury exclusion of top-2 holders: liquid top-10 pct drops from 63.3% to approximately 35% << 80%. gini_delta minimal. No signals fire."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No swaps_1h data in fixture (Phase 1 fixture). No volume spike. D04 BELOW."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No round-trip data in fixture (Phase 1 fixture). D05 BELOW."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "SUPPRESSED_INFO",
+      "confidence_band": [
+        0.08,
+        0.12
+      ],
+      "severity": "Info",
+      "reason": "Signal A: mint_authority active. is_established_protocol=true. conf dampened to 0.10 Info."
+    }
+  }
+}

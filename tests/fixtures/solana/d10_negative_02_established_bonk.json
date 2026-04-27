@@ -1,0 +1,39 @@
+{
+  "_label": "NEG_D10_02",
+  "_description": "Synthetic fixture: BONK token (jup_strict=true) with 0% LP locked. D10 suppresses on is_established_protocol. Expected: empty events (suppressed).",
+  "_chain": "solana",
+  "_token": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+  "_pool": "BonkPool1111111111111111111111111111111111111",
+  "_deployer": "BonkDeployer11111111111111111111111111111111",
+  "_source": "Synthetic — research/03-feature-gap-2026-04-24.md §T1-1; SESSION-KICKOFF.md gotcha #42.",
+  "_note": "BONK is jup_strict=true → is_established_protocol returns true → D10 suppresses immediately. Even with 0% locked and $100 USD < $750 threshold, the event must not fire. Established tokens have legitimate initial-liquidity histories.",
+
+  "pool_initialize": {
+    "initial_liquidity_usd": "100.000000",
+    "_sol_equivalent_at_150": "0.667000",
+    "initial_liquidity_usd_threshold": "750.000000"
+  },
+
+  "lp_state": {
+    "lockers": [],
+    "lp_locked_pct": "0.000000",
+    "lp_burned_pct": "0.000000",
+    "lp_safe_floor_pct": "0.700000"
+  },
+
+  "token_meta": {
+    "mint": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+    "symbol": "BONK",
+    "jup_verified": true,
+    "jup_strict": true,
+    "rugcheck_score": 5
+  },
+
+  "_expected": {
+    "detector_id": "launch_audit",
+    "fires": false,
+    "suppressed": true,
+    "suppression_reason": "is_established_protocol(meta) = true (jup_strict=true)",
+    "events": []
+  }
+}

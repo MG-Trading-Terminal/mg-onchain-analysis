@@ -1,0 +1,497 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus",
+      "description": "Prometheus data source for Solana validator metrics",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
+  ],
+  "__requires": [
+    { "type": "grafana", "id": "grafana", "name": "Grafana", "version": "10.0.0" },
+    { "type": "datasource", "id": "prometheus", "name": "Prometheus", "version": "1.0.0" },
+    { "type": "panel", "id": "timeseries", "name": "Time series", "version": "" },
+    { "type": "panel", "id": "stat", "name": "Stat", "version": "" },
+    { "type": "panel", "id": "gauge", "name": "Gauge", "version": "" }
+  ],
+  "annotations": {
+    "list": []
+  },
+  "description": "mg-onchain-analysis — Solana Agave validator + Yellowstone gRPC plugin monitoring. Authored from scratch for this runbook; panel metric names cross-referenced against community dashboard https://grafana.com/grafana/dashboards/19236-solana-validator-dashboard/ (attribution: Grafana Labs community, MIT).",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 100,
+      "title": "Chain Health",
+      "type": "row"
+    },
+
+    {
+      "id": 1,
+      "title": "Confirmed Slot (local)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null }
+            ]
+          },
+          "unit": "none",
+          "noValue": "syncing..."
+        }
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "orientation": "auto",
+        "textMode": "value_and_name",
+        "colorMode": "value",
+        "graphMode": "none"
+      },
+      "targets": [
+        {
+          "expr": "solana_validator_root_slot{job=\"agave-validator\"}",
+          "legendFormat": "Confirmed Slot",
+          "refId": "A"
+        }
+      ]
+    },
+
+    {
+      "id": 2,
+      "title": "Slot Lag vs Tip",
+      "description": "Difference between local confirmed slot and a reference RPC. Alert fires at >50 slots (see alerts.yml).",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 4, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "unit": "short",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "thresholdsStyle": { "mode": "area" }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 50 },
+              { "color": "red", "value": 150 }
+            ]
+          }
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "single" }
+      },
+      "targets": [
+        {
+          "expr": "solana_validator_root_slot{job=\"agave-validator\"}",
+          "legendFormat": "local confirmed slot",
+          "refId": "A"
+        }
+      ]
+    },
+
+    {
+      "id": 3,
+      "title": "Validator Status",
+      "description": "1 = metrics endpoint up (validator running). 0 = down.",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 5 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 1 }
+            ]
+          },
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }
+          ],
+          "unit": "none"
+        }
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "background"
+      },
+      "targets": [
+        {
+          "expr": "up{job=\"agave-validator\"}",
+          "legendFormat": "Validator",
+          "refId": "A"
+        }
+      ]
+    },
+
+    {
+      "id": 4,
+      "title": "gRPC Plugin Status",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 1 }
+            ]
+          },
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }
+          ]
+        }
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "background"
+      },
+      "targets": [
+        {
+          "expr": "up{job=\"yellowstone-grpc\"}",
+          "legendFormat": "gRPC Plugin",
+          "refId": "A"
+        }
+      ]
+    },
+
+    {
+      "id": 5,
+      "title": "Active gRPC Subscribers",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "yellow", "value": null },
+              { "color": "green", "value": 1 }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "background"
+      },
+      "targets": [
+        {
+          "expr": "yellowstone_grpc_subscribers_total{job=\"yellowstone-grpc\"}",
+          "legendFormat": "Subscribers",
+          "refId": "A"
+        }
+      ]
+    },
+
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 9 },
+      "id": 101,
+      "title": "gRPC Stream",
+      "type": "row"
+    },
+
+    {
+      "id": 6,
+      "title": "gRPC Messages Sent Rate",
+      "description": "Events per second delivered to subscribers. Drop in rate may indicate backpressure.",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 10 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "targets": [
+        {
+          "expr": "rate(yellowstone_grpc_sent_total{job=\"yellowstone-grpc\"}[1m])",
+          "legendFormat": "sent msgs/s",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(yellowstone_grpc_channel_overflow_total{job=\"yellowstone-grpc\"}[1m])",
+          "legendFormat": "channel overflow/s (drops)",
+          "refId": "B"
+        }
+      ]
+    },
+
+    {
+      "id": 7,
+      "title": "gRPC Channel Overflow (drops)",
+      "description": "Should be 0 at all times. Overflow means consumer is too slow or channel_capacity too small.",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 10 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          },
+          "custom": { "lineWidth": 2, "fillOpacity": 30 }
+        }
+      },
+      "targets": [
+        {
+          "expr": "increase(yellowstone_grpc_channel_overflow_total{job=\"yellowstone-grpc\"}[5m])",
+          "legendFormat": "overflows (5m window)",
+          "refId": "A"
+        }
+      ]
+    },
+
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 18 },
+      "id": 102,
+      "title": "RPC Performance",
+      "type": "row"
+    },
+
+    {
+      "id": 8,
+      "title": "RPC Request Rate",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 19 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(solana_rpc_requests_total{job=\"agave-validator\"}[1m])",
+          "legendFormat": "RPC req/s",
+          "refId": "A"
+        }
+      ]
+    },
+
+    {
+      "id": 9,
+      "title": "RPC Request Duration p50 / p99",
+      "description": "p99 > 500ms may cause chain-adapter timeout on backfill getBlock calls.",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 19 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2 },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.2 },
+              { "color": "red", "value": 0.5 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, rate(solana_rpc_request_duration_seconds_bucket{job=\"agave-validator\"}[5m]))",
+          "legendFormat": "p50",
+          "refId": "A"
+        },
+        {
+          "expr": "histogram_quantile(0.99, rate(solana_rpc_request_duration_seconds_bucket{job=\"agave-validator\"}[5m]))",
+          "legendFormat": "p99",
+          "refId": "B"
+        }
+      ]
+    },
+
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 27 },
+      "id": 103,
+      "title": "System Resources",
+      "type": "row"
+    },
+
+    {
+      "id": 10,
+      "title": "Disk I/O — Accounts NVMe (reads + writes)",
+      "description": "Sustained random write IOPS on /mnt/accounts should not exceed NVMe spec (see BOM). Sustained saturation indicates bottleneck.",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 28 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "iops",
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(node_disk_reads_completed_total{job=\"node-exporter\", device=~\"nvme.*\"}[1m])",
+          "legendFormat": "{{ device }} reads/s",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(node_disk_writes_completed_total{job=\"node-exporter\", device=~\"nvme.*\"}[1m])",
+          "legendFormat": "{{ device }} writes/s",
+          "refId": "B"
+        }
+      ]
+    },
+
+    {
+      "id": 11,
+      "title": "Memory Pressure",
+      "description": "% of RAM in use. Alert fires at 90%. OOM kill likely above 95%.",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 28 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.8 },
+              { "color": "red", "value": 0.9 }
+            ]
+          }
+        }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "targets": [
+        {
+          "expr": "1 - (node_memory_MemAvailable_bytes{job=\"node-exporter\"} / node_memory_MemTotal_bytes{job=\"node-exporter\"})",
+          "legendFormat": "RAM used",
+          "refId": "A"
+        }
+      ]
+    },
+
+    {
+      "id": 12,
+      "title": "OOM Kill Events",
+      "description": "Any value > 0 means the OOM killer fired. The validator may have been the victim.",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 28 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          },
+          "custom": { "lineWidth": 2, "fillOpacity": 40 }
+        }
+      },
+      "targets": [
+        {
+          "expr": "increase(node_vmstat_oom_kill{job=\"node-exporter\"}[5m])",
+          "legendFormat": "OOM kills (5m)",
+          "refId": "A"
+        }
+      ]
+    },
+
+    {
+      "id": 13,
+      "title": "Disk Space Remaining — Validator Mounts",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 36 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2 },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.85 },
+              { "color": "red", "value": 0.95 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "node_filesystem_avail_bytes{job=\"node-exporter\", mountpoint=~\"/mnt/(accounts|ledger|snapshots)\"} / node_filesystem_size_bytes{job=\"node-exporter\", mountpoint=~\"/mnt/(accounts|ledger|snapshots)\"}",
+          "legendFormat": "{{ mountpoint }} free",
+          "refId": "A"
+        }
+      ]
+    }
+
+  ],
+
+  "refresh": "30s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["solana", "validator", "yellowstone-grpc", "mg-onchain-analysis"],
+  "templating": {
+    "list": []
+  },
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Solana Validator — mg-onchain-analysis",
+  "uid": "mg-solana-validator-v1",
+  "version": 1
+}

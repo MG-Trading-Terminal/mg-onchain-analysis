@@ -1,0 +1,142 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthPumpD054ddddddddddddddddddddddddddddddd",
+    "symbol": "PUMP054",
+    "label": "positive",
+    "category": "pump_dump",
+    "source_url": "synthetic/pump_dump/signal_b_burst_with_insider_sell",
+    "fetched_at": "2026-04-21T20:03:00Z",
+    "synthetic": true,
+    "notes": "D04 Signal B burst fallback + Signal C insider amplifier. Zero baseline new token. burst_ratio=0.96. Deployer sold 55% within 12h. Signal B base conf=0.65, +0.15 => 0.80 (capped at 0.85 for B+C). High severity."
+  },
+  "token_meta": {
+    "mint": "SynthPumpD054ddddddddddddddddddddddddddddddd",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "BurstDump054",
+    "symbol": "PUMP054",
+    "decimals": 6,
+    "supply_raw": "500000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevBurst054111111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 2900,
+    "rugcheck_score_normalised": 60,
+    "risks": [],
+    "markets": [
+      {
+        "pool_address": "BurstPool05411111111111111111111111111111111",
+        "dex": "pump_fun_amm",
+        "lp_burned_pct": "0.00",
+        "liquidity_usd": "11400.00",
+        "lp_provider_count": 1
+      }
+    ],
+    "lockers": {},
+    "creator": "DevBurst054111111111111111111111111111111111",
+    "creator_balance_raw": "100000000000000",
+    "total_market_liquidity_usd": "11400.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 62,
+    "total_supply_raw": 500000000000000,
+    "balances": {
+      "DevBurst054111111111111111111111111111111111": 100000000000000,
+      "BurstHolder054_0111111111111111111111111111": 95000000000000,
+      "BurstHolder054_0211111111111111111111111111": 55000000000000,
+      "BurstHolder054_0311111111111111111111111111": 35000000000000,
+      "BurstHolder054_0411111111111111111111111111": 22000000000000,
+      "BurstHolder054_0511111111111111111111111111": 14000000000000,
+      "BurstHolder054_0611111111111111111111111111": 9000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": null,
+  "holder_classifications": [
+    { "address": "DevBurst054111111111111111111111111111111111", "kind": "deployer" }
+  ],
+  "pool_rows": [
+    {
+      "pool_address": "BurstPool05411111111111111111111111111111111",
+      "dex": "pump_fun_amm",
+      "lp_burned_pct": "0.00",
+      "lp_locked_pct": "0.0",
+      "effective_safe_pct": "0.0",
+      "lp_provider_count": 1,
+      "liquidity_usd": "11400.00"
+    }
+  ],
+  "swaps_1h": {
+    "volume_usd": "68000.00",
+    "trade_count": 91,
+    "unique_buyers": 59,
+    "price_start": "0.0000228",
+    "price_end": "0.0000697",
+    "price_change_pct": "2.057"
+  },
+  "swaps_24h": {
+    "volume_usd": "70833.00",
+    "trade_count": 98
+  },
+  "swaps_7d_daily_baseline": {
+    "day_count_nonzero": 0,
+    "mean_daily_volume_usd": "0.00",
+    "std_daily_volume_usd": "0.00",
+    "volume_multiplier_observed": null,
+    "volume_z_score": null
+  },
+  "insider_sell_data": {
+    "window_hours": 12,
+    "insider_wallets": ["DevBurst054111111111111111111111111111111111"],
+    "prior_balance_combined_raw": "335000000000000",
+    "sold_raw": "184250000000000",
+    "insider_sold_pct": "0.55",
+    "insider_source": "top_holders_proxy"
+  },
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.15],
+      "severity": "Info",
+      "reason": "No honeypot signals."
+    },
+    "d02_rug_pull": {
+      "verdict": "FIRES",
+      "confidence_band": [0.70, 0.75],
+      "severity": "High",
+      "reason": "effective_safe_pct=0.0%, lp_provider_count=1. D02 Signal B fires at 0.75."
+    },
+    "d03_concentration": {
+      "verdict": "FIRES",
+      "confidence_band": [0.65, 0.85],
+      "severity": "High",
+      "reason": "Signal 3: top holders = deployer 20% + BurstHolder054_01 19% + _02 11% + _03 7% + _04 4.4% + _05 2.8% + _06 1.8% = 66%. With deployer classified as insider, liquid concentration is high. Actually top10 liquid = 66%, below 80% threshold. Checking signal 3: 0.66 < 0.80 -> BELOW_THRESHOLD. Reclassify: BELOW_THRESHOLD.",
+      "calibration_flag": true,
+      "calibration_note": "D03 Signal 3 does not fire at 66% top-10. No prior snapshot so Signal 1/2 also inactive. BELOW_THRESHOLD is correct verdict."
+    },
+    "d04_pump_dump": {
+      "verdict": "FIRES",
+      "confidence_band": [0.76, 0.87],
+      "severity": "High",
+      "reason": "Signal B: baseline_days=0. vol_1h=68k > 5k dust filter. burst_ratio=68k/70.8k=0.960 >= 0.90 threshold. confidence=min(0.75, 0.50+(0.96-0.90)/0.10*0.25)=min(0.75,0.65)=0.65. Signal C: insider_sold_pct=0.55 >= 0.40. Amplified: 0.65+0.15=0.80. Cap for B+C=0.85 -> 0.80. Severity: 0.80 -> High (threshold 0.80 = Critical; band [0.76,0.87] spans High/Critical boundary).",
+      "calibration_flag": true,
+      "calibration_note": "Severity boundary: confidence=0.80 maps to Critical per D04 spec. Confidence band [0.76,0.87] spans High/Critical. Flag for Sprint 5 calibration."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.10],
+      "severity": "Info",
+      "reason": "59 unique buyers. Organic burst from new token launch. No self-dealing indicators."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.05],
+      "severity": "Info",
+      "reason": "mint_authority=null. No supply events."
+    }
+  }
+}

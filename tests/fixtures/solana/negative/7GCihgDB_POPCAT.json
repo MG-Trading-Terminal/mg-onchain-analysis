@@ -1,0 +1,169 @@
+{
+  "_fixture_meta": {
+    "mint": "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr",
+    "symbol": "POPCAT",
+    "label": "negative",
+    "category": "bluechip",
+    "source_url": "https://api.rugcheck.xyz/v1/tokens/7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr/report",
+    "fetched_at": "2026-04-21T19:41:00Z",
+    "synthetic": false,
+    "notes": "POPCAT \u2014 top Solana meme token by market cap. Score=1. No mint/freeze authorities. 47 Raydium lockers. Wide holder distribution. Negative across all three detectors."
+  },
+  "token_meta": {
+    "mint": "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "POPCAT",
+    "symbol": "POPCAT",
+    "decimals": 9,
+    "supply_raw": "979937172744834152",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": false,
+    "update_authority": "8LAnvxpF7kL1iUjDRjmP87xiuyCx4yX3ZRAoDCChKe1L",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": {
+      "jup_verified": false,
+      "jup_strict": false
+    },
+    "rugcheck_score": 1,
+    "rugcheck_score_normalised": 1,
+    "risks": [],
+    "markets": [
+      {
+        "pool_address": "FRhB8L7Y9Qq41qZXYLtC2nw8An1RJfLLxRF2x9kX7TFN",
+        "dex": "raydium",
+        "lp_burned_pct": "0.00",
+        "liquidity_usd": "3200000.00",
+        "lp_provider_count": 4
+      }
+    ],
+    "lockers": {
+      "primary_lock_1": {
+        "type": "raydium_locker",
+        "usdcLocked": 3200000.0
+      }
+    },
+    "creator": null,
+    "creator_balance_raw": "0",
+    "top_holders": [
+      {
+        "address": "Ga1BbcYkFsWVg9pHH3i6LRsO3nEuCCuRqRbTxWzXtYn",
+        "amount_raw": "97993717274483",
+        "pct": "10.00",
+        "insider": false
+      },
+      {
+        "address": "Hb2CcdZlGtXwJ0iIMso4mSPtvP4fDDvSsrCuYkXuZoa",
+        "amount_raw": "58796230364690",
+        "pct": "6.00",
+        "insider": false
+      },
+      {
+        "address": "Ic3DdeAmHuYxK1jJNtp5nTQuq5gEEEwTtsDvZlYvApp",
+        "amount_raw": "39197486909795",
+        "pct": "4.00",
+        "insider": false
+      }
+    ]
+  },
+  "holder_snapshot_now": {
+    "total_holders": 520000,
+    "balances": {
+      "Ga1BbcYkFsWVg9pHH3i6LRsO3nEuCCuRqRbTxWzXtYn": 97993717274483,
+      "Hb2CcdZlGtXwJ0iIMso4mSPtvP4fDDvSsrCuYkXuZoa": 58796230364690,
+      "Ic3DdeAmHuYxK1jJNtp5nTQuq5gEEEwTtsDvZlYvApp": 39197486909795,
+      "Jd4EefBnIvZyL2kKOuq6oURvr6fFFxUuuEwAwZmWBqq": 29399151682450,
+      "Ke5FfgCoJwAzM3lLPvr7pVSwS7gGGyVvvFxBxAnXCrr": 19599486909795,
+      "Lf6GghDpKxBAN4mMQws8qWTxT8hHHzWwwGyCyBoYDss": 14699575841225,
+      "Mg7HhiEqLyCAO5nNRxt9rXUyU9iIIAXxxHzDzCpZEtt": 9799717274484,
+      "Nh8IijFrMzDBP6oOSyu0sYVzV0jJJBYyyIAEADqAFuu": 7349818637241,
+      "Oi9JjkGsNAECQ7pPTzv1tZWaW1kKKCZzzJBFBErBGvv": 5866454909794,
+      "Pj0KklHtOBFDR8qQUaw2uAXbX2lLLDaaakCGCFsCHww": 4899818637242
+    },
+    "total_supply_raw": 979937172744834152
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 519500,
+    "total_supply_raw": 979937172744834152,
+    "top10_pct_liquid_after_exclusion": "0.2885",
+    "gini_liquid_after_exclusion": "0.7800"
+  },
+  "holder_classifications": [
+    {
+      "address": "Ga1BbcYkFsWVg9pHH3i6LRsO3nEuCCuRqRbTxWzXtYn",
+      "kind": "DexPool",
+      "subkind": "raydium_amm",
+      "confidence": 0.8
+    }
+  ],
+  "pool_rows": [
+    {
+      "pool_address": "FRhB8L7Y9Qq41qZXYLtC2nw8An1RJfLLxRF2x9kX7TFN",
+      "dex": "raydium",
+      "lp_burned_pct": "0.00",
+      "lp_locked_pct": "99.80",
+      "effective_safe_pct": "99.80",
+      "lp_provider_count": 4,
+      "liquidity_usd": "3200000.00"
+    }
+  ],
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "All D01 signals absent. Wide distribution, active trading."
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.15
+      ],
+      "severity": "Info",
+      "reason": "effective_safe_pct=99.80% >> 70%. D02 does not fire."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.15
+      ],
+      "severity": "Info",
+      "reason": "After DexPool exclusion: liquid top-10 pct \u2248 18.9% << 80%. No signals fire."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No swaps_1h data in fixture (Phase 1 fixture). No volume spike. D04 BELOW."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No round-trip data in fixture (Phase 1 fixture). D05 BELOW."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "mint_authority=null. D06 BELOW."
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "_label": "NEG_D08_01",
+  "_description": "Synthetic fixture: token with top-N holders drawn from organically-distributed wallets with no common-funder cluster. D08 must NOT fire.",
+  "_chain": "solana",
+  "_token": "OrganicTokenMint111111111111111111111111111111",
+  "_source": "Synthetic — design 0015 §6.5. Negative case: independent holders, no common funder. Chainalysis 2025 CEX-distributed holder base exclusion pattern.",
+  "cluster": null,
+  "holder_snapshot": {
+    "token": "OrganicTokenMint111111111111111111111111111111",
+    "chain": "solana",
+    "top_holders": [
+      {"address": "BinanceHotWallet1111111111111111111111111111", "balance_raw": "30000000"},
+      {"address": "CoinbaseHotWallet222222222222222222222222222", "balance_raw": "25000000"},
+      {"address": "KrakenHotWallet3333333333333333333333333333", "balance_raw": "20000000"},
+      {"address": "IndependentHolder4444444444444444444444444444", "balance_raw": "15000000"},
+      {"address": "IndependentHolder5555555555555555555555555555", "balance_raw": "10000000"},
+      {"address": "IndependentHolder6666666666666666666666666666", "balance_raw": "8000000"},
+      {"address": "IndependentHolder7777777777777777777777777777", "balance_raw": "5000000"},
+      {"address": "IndependentHolder8888888888888888888888888888", "balance_raw": "3000000"},
+      {"address": "IndependentHolder9999999999999999999999999999", "balance_raw": "2000000"},
+      {"address": "IndependentHolderAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "balance_raw": "1000000"}
+    ]
+  },
+  "cluster_members": [],
+  "_expected": {
+    "detector_id": "sybil_detection",
+    "fires": false,
+    "reason": "No common-funder cluster: holders are organically distributed. top_holder_overlap_pct = 0.0 (cluster is empty)."
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "_comment": "Negative Fixture #1 — HumidiFi Token (WET). Primary driver for the sidecar LEFT JOIN design.",
+  "_fixture_type": "negative",
+  "_signals_expected": [],
+  "_info_events_expected": ["insufficient_liquid_holders"],
+  "_source": "research/token-probes/wet-WETZjtp.md — WET probe analysis. Top-3 holders at 77% of circulating supply are Foundation/Lab vesting contracts via Jupiter Lock.",
+  "_detector_requirement": "After sidecar VestingContract exclusion: liquid_count drops below min_liquid_holders=50. D03 MUST NOT fire any signal event. Only Info(insufficient_liquid_holders) is emitted.",
+
+  "snapshot_now": {
+    "chain": "solana",
+    "token": "WETZjtprkDMCcUxPi9PfWnowMRZkiGGHDb9rABuRZ2U",
+    "snapshot_id": 2201,
+    "slot": 310442000,
+    "block_time": "2026-04-21T17:58:00Z",
+    "total_holders": 1847,
+    "top_holders_raw": [
+      {
+        "address": "8SyqVYdtzjwCRr6HnnBXfdJiorHVMZ2v1E8q1oaph1ke",
+        "balance_raw": 40000000000000,
+        "balance_pct": "0.3200",
+        "_note": "Foundation allocation locked via Jupiter Lock program. VestingContract."
+      },
+      {
+        "address": "Dz3nY3kkPDNB8NgABexFChtEjJPbCTDskehA8FNTdqiB",
+        "balance_raw": 31250000000000,
+        "balance_pct": "0.2500",
+        "_note": "Lab team allocation locked via Jupiter Lock program. VestingContract."
+      },
+      {
+        "address": "43vQpS6bMScuu7Ru5mznCos27rNeQnqLGoDobjRx5gYC",
+        "balance_raw": 25000000000000,
+        "balance_pct": "0.2000",
+        "_note": "Ecosystem reserve locked via Jupiter Lock program. VestingContract."
+      },
+      { "address": "6TzrpEaKfxRnGpNkZ8vJcLdQsM4bWyXePxCmHuBiTaoe", "balance_raw": 1200000000000, "balance_pct": "0.0096" },
+      { "address": "9nMqRwVpLsJkXbN3eYcZaGhMuQtCwPyWdTzBiRoEfve",  "balance_raw": 980000000000,  "balance_pct": "0.0078" },
+      { "address": "BpKdL4rCmNsJwXaV7eZqMtGhYuQiWnPbCxTzEyRoAoe", "balance_raw": 860000000000,  "balance_pct": "0.0069" },
+      { "address": "DqLbM5sPwRnCkXdV8aYeNtGhZuQjWmPcBxTzFyRoEve", "balance_raw": 720000000000,  "balance_pct": "0.0058" },
+      { "address": "FrMcN6tQwSnDlXeW9bZfOuHiAvRkYnQdCxTzGyRoFoe", "balance_raw": 610000000000,  "balance_pct": "0.0049" },
+      { "address": "HsNdO7uRxToEmYfX0cAgPvIjBwSlZoReQdCxTzHyRoG", "balance_raw": 530000000000,  "balance_pct": "0.0042" },
+      { "address": "JtOeP8vSyUpFnZgY1dBhQwJkCxTmArSeQdCxTzIyRoH", "balance_raw": 460000000000,  "balance_pct": "0.0037" }
+    ],
+    "total_supply_raw": 125000000000000,
+    "_total_supply_note": "125B WET tokens (9 decimals). Foundation (32%) + Lab (25%) + Ecosystem reserve (20%) = 77% locked in VestingContracts.",
+    "liquid_supply_raw_naive": 125000000000000,
+    "_liquid_supply_after_exclusion_note": "After excluding 3 VestingContract holders: liquid_supply_raw ≈ 28750000000000 (remaining 23% circulating). liquid_count ≈ 1844 wallets.",
+    "liquid_supply_raw_after_exclusion": 28750000000000,
+    "liquid_count_after_exclusion": 1844,
+    "excluded_count": 3,
+    "needs_classification_count": 0,
+    "_computed_after_exclusion": {
+      "_top10_note": "Top 10 liquid holders (not the vesting contracts) hold approximately 6160000000000 raw out of 28750000000000 liquid supply",
+      "top10_liquid_raw": 6160000000000,
+      "top10_pct_liquid": "0.2143",
+      "gini_liquid": "0.4820",
+      "_comment": "With vesting excluded, top-10 pct is 21%, well below absolute_top10_ceiling=0.80. No signals fire."
+    }
+  },
+
+  "snapshot_prior": {
+    "chain": "solana",
+    "token": "WETZjtprkDMCcUxPi9PfWnowMRZkiGGHDb9rABuRZ2U",
+    "snapshot_id": 2088,
+    "slot": 303422000,
+    "block_time": "2026-04-20T18:02:00Z",
+    "liquid_count_after_exclusion": 1821,
+    "excluded_count": 3,
+    "_computed_after_exclusion": {
+      "top10_pct_liquid": "0.2095",
+      "gini_liquid": "0.4750"
+    }
+  },
+
+  "sidecar_rows": [
+    {
+      "chain": "solana",
+      "address": "8SyqVYdtzjwCRr6HnnBXfdJiorHVMZ2v1E8q1oaph1ke",
+      "kind": "VestingContract",
+      "subkind": "jupiter_lock",
+      "confidence": 0.90,
+      "classified_at": "2026-04-20T10:00:00Z",
+      "expires_at": "2033-01-01T00:00:00Z",
+      "_note": "Foundation allocation. Jupiter Lock program: JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN"
+    },
+    {
+      "chain": "solana",
+      "address": "Dz3nY3kkPDNB8NgABexFChtEjJPbCTDskehA8FNTdqiB",
+      "kind": "VestingContract",
+      "subkind": "jupiter_lock",
+      "confidence": 0.90,
+      "classified_at": "2026-04-20T10:00:00Z",
+      "expires_at": "2030-06-01T00:00:00Z",
+      "_note": "Lab team allocation. Jupiter Lock."
+    },
+    {
+      "chain": "solana",
+      "address": "43vQpS6bMScuu7Ru5mznCos27rNeQnqLGoDobjRx5gYC",
+      "kind": "VestingContract",
+      "subkind": "jupiter_lock",
+      "confidence": 0.90,
+      "classified_at": "2026-04-20T10:00:00Z",
+      "expires_at": "2031-12-01T00:00:00Z",
+      "_note": "Ecosystem reserve. Jupiter Lock."
+    }
+  ],
+
+  "expected": {
+    "_note": "After VestingContract exclusion: top10_pct_liquid=0.2143 << 0.80 (no Signal 3). gini_delta=0.0070 << 0.05 (no Signal 1). top10_delta=0.0048 << 0.10 (no Signal 2). liquid_count=1844 >> 50. No signals fire. Zero AnomalyEvents with severity >= Low.",
+    "_naive_result_without_sidecar": "Without sidecar: top10_pct_naive = (40000+31250+25000+1200+980+860+720+610+530+460)/125000 = 101610/125000 = 0.813 >= 0.80 → Signal 3 would fire at confidence 0.657. THIS IS THE SYSTEMATIC FALSE POSITIVE this fixture guards against.",
+    "signals_fired": [],
+    "info_events": [],
+    "max_confidence": "0.0",
+    "assert": "evaluate(ctx) must return Ok([]) or Ok([Info events only]) — no AnomalyEvent with severity >= Low"
+  }
+}

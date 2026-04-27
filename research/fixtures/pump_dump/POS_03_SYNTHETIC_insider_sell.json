@@ -1,0 +1,185 @@
+{
+  "fixture_id": "POS_03_SYNTHETIC_insider_sell",
+  "synthetic": true,
+  "detector": "pump_dump",
+  "category": "spike_with_insider_sell",
+  "label": "positive",
+  "source": "Synthetic construction per docs/designs/0007-detector-04-pump-dump.md §11.1 Positive 3",
+  "mint": "SYNTH_POS_INSIDER_001",
+  "chain": "solana",
+  "token_name": "Synthetic Pump With Insider Sell",
+  "token_symbol": "SYNTH_PUMP",
+
+  "token_meta": {
+    "decimals": 6,
+    "total_supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "transfer_fee_bps": 0,
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "jup_verified": false,
+    "jup_strict": false,
+    "rugcheck_score": 78,
+    "total_holders": 892,
+    "total_market_liquidity_usd": "340000",
+    "launchpad": null,
+    "deploy_platform": null
+  },
+
+  "observation_window": {
+    "start": "2026-04-19T10:00:00Z",
+    "end": "2026-04-19T11:00:00Z",
+    "window_hours": 1,
+    "baseline_window_start": "2026-04-12T10:00:00Z",
+    "baseline_window_end": "2026-04-19T10:00:00Z"
+  },
+
+  "swaps_1h": {
+    "volume_usd": "8500",
+    "buy_count": 412,
+    "sell_count": 67,
+    "unique_wallets": 389,
+    "largest_buy_tx_hash": "SYNTH_TX_BUY_LARGEST_001"
+  },
+
+  "baseline_7d": {
+    "days_with_nonzero_volume": 5,
+    "daily_volumes_usd": [
+      { "day": "2026-04-12", "volume_usd": "1200" },
+      { "day": "2026-04-13", "volume_usd": "980" },
+      { "day": "2026-04-14", "volume_usd": "0" },
+      { "day": "2026-04-15", "volume_usd": "1100" },
+      { "day": "2026-04-16", "volume_usd": "850" },
+      { "day": "2026-04-17", "volume_usd": "0" },
+      { "day": "2026-04-18", "volume_usd": "870" }
+    ],
+    "sum_volume_usd": "5000",
+    "mean_volume_usd": "714.29",
+    "std_volume_usd": "436.12",
+    "median_volume_usd": "714.29",
+    "note": "AVG over 7 days used as median proxy per Query 1 pattern. 5 days non-zero >= min_baseline_days = 3."
+  },
+
+  "price_data": {
+    "price_at_window_start_usd": "0.000340",
+    "price_at_window_end_usd": "0.000493",
+    "price_change_pct_1h": "0.45",
+    "note": "45% price increase in 1h — above 30% threshold"
+  },
+
+  "market_cap": {
+    "fdv_usd": "493000",
+    "circulating_supply_pct": "100",
+    "market_cap_proxy": "fdv",
+    "market_cap_usd": "493000",
+    "above_filter": false,
+    "filter_threshold_usd": "60000000"
+  },
+
+  "deployer_clusters": {
+    "populated": true,
+    "note": "Phase 3 path: deployer_clusters table has entries for this token",
+    "addresses": [
+      "DEPLOYER_WALLET_01",
+      "DEPLOYER_WALLET_02"
+    ]
+  },
+
+  "insider_sell_data_24h_post_spike": {
+    "spike_time": "2026-04-19T11:00:00Z",
+    "window_end": "2026-04-20T11:00:00Z",
+    "DEPLOYER_WALLET_01": {
+      "holdings_at_spike_raw": "150000000000000",
+      "sold_raw": "97500000000000",
+      "sold_pct_of_holdings": "0.65",
+      "sell_tx_count": 8,
+      "largest_sell_tx_hash": "SYNTH_TX_SELL_LARGEST_001",
+      "note": "65% of holdings sold within 24h"
+    },
+    "DEPLOYER_WALLET_02": {
+      "holdings_at_spike_raw": "80000000000000",
+      "sold_raw": "48000000000000",
+      "sold_pct_of_holdings": "0.60",
+      "sell_tx_count": 5,
+      "note": "60% of holdings sold within 24h"
+    },
+    "total_cluster_holdings_at_spike_raw": "230000000000000",
+    "total_cluster_sold_raw": "145500000000000",
+    "total_insider_sold_pct": "0.632",
+    "note": "Aggregate: 63.2% of cluster holdings sold — above 40% threshold"
+  },
+
+  "confidence_formula_trace": {
+    "volume_ratio": "11.90",
+    "volume_multiplier": "5.0",
+    "price_change_pct": "0.45",
+    "price_spike_pct_threshold": "0.30",
+    "raw_score": "(11.90/5.0 - 1) * 0.5 + (0.45/0.30 - 1) * 0.3 = (1.38 * 0.5) + (0.50 * 0.3) = 0.69 + 0.15 = 0.84",
+    "sigmoid_raw": "1 / (1 + exp(-0.84)) = 0.698",
+    "signal_a_confidence_clamped": "0.698",
+    "clamp_bounds": "[0.60, 0.95]",
+    "signal_a_in_bounds": true,
+    "signal_c_amplifier": "0.15",
+    "amplified_confidence": "0.698 + 0.15 = 0.848",
+    "signal_a_cap": "0.95",
+    "final_confidence": "min(0.848, 0.95) = 0.848"
+  },
+
+  "signal_evaluation": {
+    "signal_a_applicable": true,
+    "volume_ratio_observed": "11.90",
+    "volume_ratio_threshold": "5.0",
+    "price_change_pct_observed": "0.45",
+    "price_spike_pct_threshold": "0.30",
+    "baseline_days_available": "5",
+    "volume_z_score": "17.84",
+    "signal_b_applicable": false,
+    "signal_b_reason": "Signal A applicable (valid baseline with >= 3 days)",
+    "signal_c_applicable": true,
+    "signal_c_source": "deployer_clusters",
+    "insider_sell_pct_observed": "0.632",
+    "insider_sell_pct_threshold": "0.40",
+    "signal_c_fires": true,
+    "is_established_protocol": false
+  },
+
+  "expected_output": {
+    "fires": true,
+    "signal_fired": "insider_amplified_spike",
+    "confidence_signal_a": "0.698",
+    "confidence_after_c": "0.848",
+    "severity": "Critical",
+    "evidence_keys": {
+      "pump_dump/volume_1h_usd": "8500",
+      "pump_dump/baseline_7d_median_usd": "714.29",
+      "pump_dump/volume_multiplier_observed": "11.90",
+      "pump_dump/price_change_pct_1h": "0.45",
+      "pump_dump/volume_z_score": "17.84",
+      "pump_dump/baseline_days_available": "5",
+      "pump_dump/insider_sold_pct": "0.632",
+      "pump_dump/market_cap_usd": "493000"
+    },
+    "evidence_notes": "signal=insider_amplified_spike insider_source=deployer_clusters",
+    "evidence_addresses": ["DEPLOYER_WALLET_01", "DEPLOYER_WALLET_02"],
+    "evidence_tx_hashes": ["SYNTH_TX_SELL_LARGEST_001", "SYNTH_TX_BUY_LARGEST_001"],
+    "signal_c_applied": true
+  },
+
+  "unit_test_assertions": [
+    "volume_ratio = 8500 / 714.29 == Decimal::from_str('11.90').unwrap() (approx)",
+    "raw_score = (11.90/5.0 - 1.0) * 0.5 + (0.45/0.30 - 1.0) * 0.3 == Decimal::from_str('0.84').unwrap() (approx)",
+    "compute_signal_a_confidence(volume_ratio=11.90, price_change=0.45, thresholds) is in [0.60, 0.95]",
+    "apply_signal_c_amplifier(base=0.698, amplifier=0.15, base_is_signal_a=true) == Decimal::from_str('0.848').unwrap()",
+    "min(0.848, 0.95) == Decimal::from_str('0.848').unwrap()",
+    "severity_from_confidence(0.848) == Severity::Critical"
+  ],
+
+  "notes": [
+    "Primary regression for Signal A + Signal C (full deployer_clusters path).",
+    "Tests the full confidence formula with non-trivial inputs.",
+    "volume_z_score = (8500 - 714.29) / 436.12 = 17.84 — extremely high; included in evidence.",
+    "Signal C uses deployer_clusters (Priority 1 path). Tests that degraded mode (Priority 2) is NOT triggered.",
+    "confidence 0.848 maps to Severity::Critical (>= 0.80 threshold).",
+    "Synthetic because no live token with clean deployer_clusters + Query 2 data is available in Phase 2."
+  ]
+}

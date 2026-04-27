@@ -1,0 +1,33 @@
+{
+  "_source": "wet-WETZjtp.md probe \u2014 live RugCheck + DEXScreener data 2026-04-21",
+  "_use": "negative fixture for D1 honeypot (sells work), D6 mint anomaly (renounced); D3 fires at medium confidence (vesting contracts misclassified)",
+  "mint_address": "WETZjtprkDMCcUxPi9PfWnowMRZkiGGHDb9rABuRZ2U",
+  "chain": "solana",
+  "mock_mint_account": {
+    "supply": 999999729218583,
+    "decimals": 6,
+    "mint_authority": null,
+    "freeze_authority": null,
+    "is_token2022": false
+  },
+  "mock_largest_accounts": [
+    {
+      "address": "8SyqVYdtzjwCRr6HnnBXfdJiorHVMZ2v1E8q1oaph1ke",
+      "amount": "320000000000000",
+      "decimals": 6
+    },
+    {
+      "address": "Dz3nY3kkPDNB8NgABexFChtEjJPbCTDskehA8FNTdqiB",
+      "amount": "250000000000000",
+      "decimals": 6
+    },
+    {
+      "address": "43vQpS6bMScuu7Ru5mznCos27rNeQnqLGoDobjRx5gYC",
+      "amount": "200000000000000",
+      "decimals": 6
+    }
+  ],
+  "expected_mint_authority_renounced": true,
+  "expected_freeze_authority_renounced": true,
+  "notes": "Top holders are likely Jupiter Lock vesting contracts (Foundation 40%, Lab 25%, Ecosystem ~20%)"
+}

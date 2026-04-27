@@ -1,0 +1,81 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthMulti091OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+    "symbol": "MULTI091",
+    "label": "positive",
+    "category": "multi_signal",
+    "source_url": "synthetic/multi_signal/d04_pump_plus_d05_wash",
+    "fetched_at": "2026-04-21T20:40:00Z",
+    "synthetic": true,
+    "notes": "D04 Signal A + D05 Signal A co-fire. Pump-and-dump accompanied by pre-pump wash trading to create artificial volume baseline illusion. The wash volume inflates the 7d median making Signal A ratio appear lower — evasion attempt caught by D05 simultaneously."
+  },
+  "token_meta": {
+    "mint": "SynthMulti091OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "PumpWash091",
+    "symbol": "MULTI091",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevPumpWash091111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 3100,
+    "rugcheck_score_normalised": 61,
+    "risks": [],
+    "markets": [ { "pool_address": "PumpWashPool09111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "88.00", "liquidity_usd": "68000.00", "lp_provider_count": 1 } ],
+    "lockers": {},
+    "creator": "DevPumpWash091111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "68000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 680,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "WashBot091_0111111111111111111111111111111": 220000000000000,
+      "PWHolder091_0211111111111111111111111111111": 88000000000000,
+      "PWHolder091_0311111111111111111111111111111": 61000000000000,
+      "PWHolder091_0411111111111111111111111111111": 42000000000000,
+      "PWHolder091_0511111111111111111111111111111": 28000000000000,
+      "PWHolder091_0611111111111111111111111111111": 18000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 240,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.46",
+    "gini_liquid_after_exclusion": "0.67"
+  },
+  "holder_classifications": [],
+  "pool_rows": [ { "pool_address": "PumpWashPool09111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "88.00", "lp_locked_pct": "0.00", "effective_safe_pct": "88.00", "lp_provider_count": 1, "liquidity_usd": "68000.00" } ],
+  "swaps_1h": { "volume_usd": "420000.00", "trade_count": 290, "unique_buyers": 265, "price_start": "0.000068", "price_end": "0.000105", "price_change_pct": "0.544" },
+  "swaps_7d_daily_baseline": { "day_count_nonzero": 5, "mean_daily_volume_usd": "58000.00", "std_daily_volume_usd": "14000.00", "volume_multiplier_observed": "7.24", "volume_z_score": "25.9" },
+  "signal_a_round_trips": [
+    { "sender": "WashBot091_0111111111111111111111111111111", "pool": "PumpWashPool09111111111111111111111111111111", "round_trip_count": 5, "avg_volume_diff_pct": "0.024", "first_seen_block": 285310000, "last_seen_block": 285311200, "wash_volume_usd": "38000.00", "direction": "buy_first" }
+  ],
+  "pool_total_volume_1h_usd": "420000.00",
+  "expected": {
+    "d01_honeypot": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.15], "severity": "Info", "reason": "No honeypot signals." },
+    "d02_rug_pull": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "LP 88% burned. D02 does not fire." },
+    "d03_concentration": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.15], "severity": "Info", "reason": "Holder count 240->680. Distribution occurred. top10 decreased. No concentration signals." },
+    "d04_pump_dump": {
+      "verdict": "FIRES",
+      "confidence_band": [0.60, 0.78],
+      "severity": "High",
+      "reason": "Signal A: vol_1h=420k vs baseline=58k, multiplier=7.24x>=5x. price=+54.4%>=30%. raw=(7.24/5-1)*0.5+(0.544/0.30-1)*0.3=0.224+0.244=0.468; sigmoid(0.468)=0.615; clamped to 0.615. No Signal C (insider data unavailable). Medium-High."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "FIRES",
+      "confidence_band": [0.60, 0.75],
+      "severity": "Medium",
+      "reason": "Signal A: WashBot091 5 round-trips, vol_diff=2.4%, count=5>=3. confidence=0.60+(5-3)/3*0.10+(0.05-0.024)/0.05*0.15=0.60+0.067+0.078=0.745. Signal C: wash_vol=38k/420k=9.0% < severity_amplifier_ratio (30%) -> Signal C does NOT amplify. Final: 0.745 -> High. Wait 0.745>0.65 = High."
+    },
+    "d06_mint_burn_anomaly": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "mint_authority=null." }
+  }
+}

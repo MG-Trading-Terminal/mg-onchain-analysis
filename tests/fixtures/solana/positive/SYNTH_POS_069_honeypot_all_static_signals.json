@@ -1,0 +1,74 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthHonP069ssssssssssssssssssssssssssssssss",
+    "symbol": "HON069",
+    "label": "positive",
+    "category": "honeypot_active",
+    "source_url": "synthetic/honeypot/all_static_signals_maximum",
+    "fetched_at": "2026-04-21T20:18:00Z",
+    "synthetic": true,
+    "notes": "D01 all 4 static signals fire simultaneously. S1+S2(8000)+S3+S4. raw=0.25+0.45+0.20+0.20=1.10. sigmoid(1.10/0.55-1.0)=sigmoid(1.0)=0.731. High severity. Maximum static confidence achievable without buy/sell ratio."
+  },
+  "token_meta": {
+    "mint": "SynthHonP069ssssssssssssssssssssssssssssssss",
+    "token_program": "TokenzQdBNbLqP5VgrHUCemXgAJa2LJKQ74wMRsqBMBP",
+    "name": "MaxHoneypot069",
+    "symbol": "HON069",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": "MaxFreeze069111111111111111111111111111111",
+    "mutable": true,
+    "update_authority": "DevMax069111111111111111111111111111111111",
+    "transfer_fee": { "fee_bps": 8000, "max_amount": 999999999, "authority": "DevMax069111111111111111111111111111111111" },
+    "permanent_delegate": "DevMax069111111111111111111111111111111111",
+    "transfer_hook": { "program_id": "HookMax069111111111111111111111111111111" },
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 9200,
+    "rugcheck_score_normalised": 98,
+    "risks": [
+      { "name": "Freeze authority enabled", "level": "danger" },
+      { "name": "High transfer fee", "value": "8000bps", "level": "danger" },
+      { "name": "Permanent delegate enabled", "level": "danger" },
+      { "name": "Transfer hook enabled", "level": "danger" }
+    ],
+    "markets": [
+      { "pool_address": "MaxPool069111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "liquidity_usd": "3800.00", "lp_provider_count": 1 }
+    ],
+    "lockers": {},
+    "creator": "DevMax069111111111111111111111111111111111",
+    "creator_balance_raw": "950000000000000",
+    "total_market_liquidity_usd": "3800.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 6,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "DevMax069111111111111111111111111111111111": 950000000000000,
+      "MaxHolder069_011111111111111111111111111": 30000000000000,
+      "MaxHolder069_021111111111111111111111111": 12000000000000,
+      "MaxHolder069_031111111111111111111111111": 5000000000000,
+      "MaxHolder069_041111111111111111111111111": 2000000000000,
+      "MaxHolder069_051111111111111111111111111": 1000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": null,
+  "holder_classifications": [{ "address": "DevMax069111111111111111111111111111111111", "kind": "deployer" }],
+  "pool_rows": [
+    { "pool_address": "MaxPool069111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "lp_locked_pct": "0.0", "effective_safe_pct": "0.0", "lp_provider_count": 1, "liquidity_usd": "3800.00" }
+  ],
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "FIRES",
+      "confidence_band": [0.70, 0.80],
+      "severity": "High",
+      "reason": "S1+S2(8000bps)+S3+S4 all fire. raw=0.25+0.45+0.20+0.20=1.10. sigmoid(1.10/0.55-1.0)=sigmoid(1.0)=0.731. Severity High (0.65-0.80)."
+    },
+    "d02_rug_pull": { "verdict": "FIRES", "confidence_band": [0.70, 0.75], "severity": "High", "reason": "LP 0%, single provider. Signal B fires." },
+    "d03_concentration": { "verdict": "FIRES", "confidence_band": [0.65, 0.85], "severity": "High", "reason": "Deployer 95% alone. Signal 3 fires." },
+    "d04_pump_dump": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No pool swap activity detected." },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No trading activity." },
+    "d06_mint_burn_anomaly": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "mint_authority=null. No supply events." }
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthMulti099WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "symbol": "MULTI099",
+    "label": "positive",
+    "category": "multi_signal",
+    "source_url": "synthetic/multi_signal/d02_rug_plus_d03_concentration_plus_d06_mint",
+    "fetched_at": "2026-04-21T20:48:00Z",
+    "synthetic": true,
+    "notes": "Triple-detector positive: D02 (LP not locked), D03 (top10 concentration high), D06 (mint authority + Signal B large mint event). Classic pre-rug setup: deployer holds LP + minted extra supply to own wallet + owns most of the tokens. D04/D05 not firing — no pump or wash detected yet. Tests that three detectors can fire independently without inflating each other's confidence."
+  },
+  "token_meta": {
+    "mint": "SynthMulti099WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "TripleRisk099",
+    "symbol": "MULTI099",
+    "decimals": 6,
+    "supply_raw": "1200000000000000",
+    "mint_authority": "DevTripleR099111111111111111111111111111111",
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevTripleR099111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 4800,
+    "rugcheck_score_normalised": 78,
+    "risks": [
+      { "name": "LP not burned or locked", "level": "danger" },
+      { "name": "Mint authority active", "level": "danger" },
+      { "name": "High holder concentration", "level": "danger" }
+    ],
+    "markets": [ { "pool_address": "TriplePool099111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "liquidity_usd": "78000.00", "lp_provider_count": 1 } ],
+    "lockers": {},
+    "creator": "DevTripleR099111111111111111111111111111111",
+    "creator_balance_raw": "480000000000000",
+    "total_market_liquidity_usd": "78000.00"
+  },
+  "token_age_days": 12,
+  "holder_snapshot_now": {
+    "total_holders": 88,
+    "total_supply_raw": 1200000000000000,
+    "balances": {
+      "DevTripleR099111111111111111111111111111111": 480000000000000,
+      "TripleRisk099_011111111111111111111111111": 168000000000000,
+      "TripleRisk099_021111111111111111111111111": 122000000000000,
+      "TripleRisk099_031111111111111111111111111": 88000000000000,
+      "TripleRisk099_041111111111111111111111111": 62000000000000,
+      "TripleRisk099_051111111111111111111111111": 44000000000000,
+      "TripleRisk099_061111111111111111111111111": 28000000000000,
+      "TripleRisk099_071111111111111111111111111": 18000000000000,
+      "TripleRisk099_081111111111111111111111111": 9000000000000,
+      "TripleRisk099_091111111111111111111111111": 6000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 72,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.68",
+    "gini_liquid_after_exclusion": "0.72"
+  },
+  "holder_classifications": [],
+  "pool_rows": [ { "pool_address": "TriplePool099111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "lp_locked_pct": "0.00", "effective_safe_pct": "0.00", "lp_provider_count": 1, "liquidity_usd": "78000.00" } ],
+  "mint_events_30d": [
+    { "block": 285100000, "to": "DevTripleR099111111111111111111111111111111", "amount_raw": "200000000000000", "is_lp_address": false }
+  ],
+  "swaps_1h": { "volume_usd": "12000.00", "trade_count": 28, "unique_buyers": 24, "price_start": "0.000065", "price_end": "0.000066", "price_change_pct": "0.015" },
+  "swaps_7d_daily_baseline": { "day_count_nonzero": 4, "mean_daily_volume_usd": "14000.00", "std_daily_volume_usd": "3000.00", "volume_multiplier_observed": "0.86", "volume_z_score": "-0.7" },
+  "signal_a_round_trips": [],
+  "pool_total_volume_1h_usd": "12000.00",
+  "expected": {
+    "d01_honeypot": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No freeze_authority, no transfer_fee, no transfer_hook, no permanent_delegate." },
+    "d02_rug_pull": {
+      "verdict": "FIRES",
+      "confidence_band": [0.75, 0.85],
+      "severity": "High",
+      "reason": "Signal B: effective_safe=0.0% (0% burned, 0% locked). conf=0.75. Single LP provider (deployer): +0.05 -> 0.80. High. $78k at full rug risk."
+    },
+    "d03_concentration": {
+      "verdict": "FIRES",
+      "confidence_band": [0.85, 1.00],
+      "severity": "Critical",
+      "reason": "Note: deployer wallet excluded from top10 exclusion logic? If deployer is excluded: top10_now=(168+122+88+62+44+28+18+9+6)e12/1200e12=545/1200=0.454. delta=0.454-0.68=-0.226 (decrease). But deployer holds 480/1200=40%. If deployer is NOT excluded (not classified as LP/known address): top10=(480+168+122+88+62+44+28+18+9+6)/1200=1025/1200=0.854>=0.80 -> Signal 3 fires. Signal 2: top10_now=0.854 vs prior=0.68. delta=0.174>=0.10 -> Signal 2 fires. conf_s2=min(1.0,0.50+0.174/0.10*0.25)=min(1.0,0.935)=0.935 Critical. Final: 0.935 Critical.",
+      "calibration_flag": true,
+      "calibration_note": "Deployer wallet classification matters: is creator_balance excluded from top10 liquid exclusion? The prior snapshot supply=1000e12, now=1200e12 (after mint event). The top10_pct_liquid_after_exclusion in prior may exclude deployer. Current approach: include deployer in top10 if they hold liquid (non-LP) tokens. Sprint 5: document exclusion logic for creator wallets in D03."
+    },
+    "d04_pump_dump": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "vol_multiplier=0.86 < 5.0. price_change=+1.5% < 30%. No signal." },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No round-trip events." },
+    "d06_mint_burn_anomaly": {
+      "verdict": "FIRES",
+      "confidence_band": [0.72, 0.90],
+      "severity": "High",
+      "reason": "Signal B: single mint of 200e12 to DevTripleR099 (non-LP). pct=200e12/1000e12=20%>=5%. conf=min(0.85, 0.55+(0.20-0.05)/0.05*0.30+0.30)=min(0.85,0.55+0.90+0.30)=min(0.85,1.75)=0.85. Signal A: mint_authority active, age=12d>7d, conf=0.20 (subsumed by Signal B at 0.85). Signal C: token_age=12d<14d -> Signal C does not apply. Final D06: 0.85 Critical. Note: prior supply was 1000e12, now 1200e12, confirming 200e12 minted."
+    }
+  }
+}

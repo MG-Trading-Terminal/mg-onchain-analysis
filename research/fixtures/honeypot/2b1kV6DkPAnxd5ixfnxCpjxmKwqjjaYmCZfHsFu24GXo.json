@@ -1,0 +1,47 @@
+{
+  "_fixture_meta": {
+    "label": "positive_static_freeze_authority",
+    "detector": "honeypot_sim",
+    "expected_confidence_range": [0.20, 0.35],
+    "expected_severity": "Low",
+    "capture_date": "2026-04-21",
+    "notes": "PayPal USD (PYUSD) on Solana. Token-2022 program. ACTIVE freeze authority: 2apBGMsS6ti9RyF5TwQTDswXBWskiJP2LD4cUEDqYJjk. Active mint authority: 8Jornc27vtAYPkwDzsZVgLQchAYyC8nD7aCNPCDV8Qk2. Score=1 (RugCheck whitelist). Demonstrates the freeze_authority_active signal fires on a real Token-2022 token. Expected: static signal fires at LOW confidence (~0.25) because freeze_authority is active. Simulation result expected: PASS (sells work for PYUSD). Note: confidence should be LOW not HIGH because (a) rugged=false, (b) jup_verified=true, (c) PYUSD is a legitimate stablecoin. Context mitigates the raw signal. Developer must implement context-aware confidence attenuation for known-verified tokens OR accept that static signal always fires and let scoring crate filter. Architect decision needed: see design gap note in 0004-detector-01-honeypot.md §Design Gaps.",
+    "signals_expected": {
+      "freeze_authority_active": true,
+      "transfer_fee_bps": 0,
+      "permanent_delegate_active": false,
+      "transfer_hook_present": false,
+      "buy_sell_ratio_above_sentinel": false,
+      "simulation_fail": false
+    }
+  },
+  "mint": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+  "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+  "creator": "5gUuDFHswKi2QMA1qJHf6FEVhNCrHnyAdfWniMaUUPE4",
+  "creatorBalance": 363619971508239,
+  "token": {
+    "mintAuthority": "8Jornc27vtAYPkwDzsZVgLQchAYyC8nD7aCNPCDV8Qk2",
+    "supply": 688556604401136,
+    "decimals": 6,
+    "isInitialized": true,
+    "freezeAuthority": "2apBGMsS6ti9RyF5TwQTDswXBWskiJP2LD4cUEDqYJjk"
+  },
+  "transferFee": {
+    "pct": 0,
+    "maxAmount": 0,
+    "authority": "11111111111111111111111111111111"
+  },
+  "permanentDelegate": null,
+  "transferHook": null,
+  "rugged": false,
+  "score": 1,
+  "score_normalised": 1,
+  "risks": [],
+  "markets": null,
+  "freezeAuthority": "2apBGMsS6ti9RyF5TwQTDswXBWskiJP2LD4cUEDqYJjk",
+  "mintAuthority": "8Jornc27vtAYPkwDzsZVgLQchAYyC8nD7aCNPCDV8Qk2",
+  "verification": {
+    "jup_verified": true,
+    "jup_strict": true
+  }
+}

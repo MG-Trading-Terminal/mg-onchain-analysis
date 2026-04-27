@@ -1,0 +1,63 @@
+# /etc/systemd/system/agave-validator.service
+#
+# systemd unit for the Solana Agave non-voting RPC validator with
+# Yellowstone gRPC Geyser plugin.
+#
+# Install:
+#   cp infra/solana-validator/systemd/solana-validator.service \
+#      /etc/systemd/system/agave-validator.service
+#   systemctl daemon-reload
+#   systemctl enable agave-validator
+#   systemctl start agave-validator
+#
+# Replace <USER> with the dedicated system user — default: sol
+# Replace /home/<USER> with the actual home directory if different.
+
+[Unit]
+Description=Solana Agave non-voting RPC validator with Yellowstone gRPC plugin
+Documentation=https://docs.anza.xyz/operations/setup-an-rpc-node
+# Start after networking and disk mounts are ready.
+After=network-online.target local-fs.target disable-thp.service
+Wants=network-online.target
+# Ensure THP is disabled before validator loads (accounts-db is sensitive to it).
+Requires=disable-thp.service
+
+[Service]
+# Run as dedicated unprivileged user. Do NOT run as root.
+User=sol
+Group=sol
+
+Type=simple
+Restart=on-failure
+RestartSec=10s
+# Maximum restart attempts — 0 means unlimited.
+# The validator is expected to run indefinitely; alert on repeated restarts via Prometheus.
+StartLimitBurst=5
+StartLimitIntervalSec=120s
+
+# The launch script exports env vars, validates config, then exec's agave-validator.
+ExecStart=/home/sol/config/validator-startup.sh
+
+# Soft stop: send SIGTERM and wait up to 5 minutes for clean shutdown.
+# Agave flushes accounts-db and ledger on clean exit — critical for ledger integrity.
+TimeoutStopSec=300s
+KillMode=mixed
+KillSignal=SIGTERM
+
+# Resource limits — these mirror /etc/security/limits.d/90-solana-nofiles.conf
+# so the service picks up the right limits regardless of PAM session state.
+LimitNOFILE=1000000
+LimitMEMLOCK=2000000000
+
+# Environment — inherit from user profile via ExecStart script.
+# Do NOT hard-code secrets here; use /home/sol/config/validator-startup.sh or
+# a EnvironmentFile with restricted permissions.
+EnvironmentFile=-/home/sol/config/validator.env
+
+# Standard I/O
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=agave-validator
+
+[Install]
+WantedBy=multi-user.target

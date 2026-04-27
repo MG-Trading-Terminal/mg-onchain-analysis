@@ -1,0 +1,214 @@
+{
+  "_fixture_meta": {
+    "mint": "WETZjtprkDMCcUxPi9PfWnowMRZkiGGHDb9rABuRZ2U",
+    "symbol": "WET",
+    "label": "negative",
+    "category": "vesting_top_holders",
+    "source_url": "https://api.rugcheck.xyz/v1/tokens/WETZjtprkDMCcUxPi9PfWnowMRZkiGGHDb9rABuRZ2U/report",
+    "fetched_at": "2026-04-21T19:33:00Z",
+    "synthetic": false,
+    "notes": "HumidiFi (WET) \u2014 primary D03 sidecar regression fixture. Top-3 holders are Foundation/Lab vesting contracts (77% of supply). Without sidecar: top-10 naive pct = 81.3% fires Signal 3. With sidecar VestingContract exclusion: liquid top-10 = 21.4% \u2014 no signal. This fixture validates the LEFT JOIN exclusion logic is working correctly."
+  },
+  "token_meta": {
+    "mint": "WETZjtprkDMCcUxPi9PfWnowMRZkiGGHDb9rABuRZ2U",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "HumidiFi Token",
+    "symbol": "WET",
+    "decimals": 6,
+    "supply_raw": "999999729218325",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "wUpztG5DJbVkUeCg1oMTfzYdzk4h8LQd9FoN3zfm6a3",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": {
+      "jup_verified": false,
+      "jup_strict": false
+    },
+    "rugcheck_score": 201,
+    "rugcheck_score_normalised": 10,
+    "risks": [
+      {
+        "name": "Mutable metadata",
+        "level": "warn",
+        "score": 100
+      },
+      {
+        "name": "Name Mismatch",
+        "level": "warn",
+        "score": 100
+      }
+    ],
+    "markets": [
+      {
+        "pool_address": "A8dNMVhgTyA4fPEJnH1ZEUjXXgd7rcn8iCPbV4Wp4qtx",
+        "dex": "meteora_damm_v2",
+        "lp_burned_pct": "0.00",
+        "liquidity_usd": "45000.00",
+        "lp_provider_count": 2
+      },
+      {
+        "pool_address": "HZeg4yK48F7PhSM7pLgQ7LXzWA2TX95wHWgSLdtj1xS1",
+        "dex": "meteoraDlmm",
+        "lp_burned_pct": "0.00",
+        "liquidity_usd": "12000.00",
+        "lp_provider_count": 1
+      }
+    ],
+    "lockers": {
+      "9CyMqqNcFeZWeMCqS218vYWegXXpJYzaGSbBgR8HGxCz": {
+        "programID": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
+        "type": "raydium_locker"
+      }
+    },
+    "creator": "wUpztG5DJbVkUeCg1oMTfzYdzk4h8LQd9FoN3zfm6a3",
+    "creator_balance_raw": "0",
+    "top_holders": [
+      {
+        "address": "8SyqVYdtzjwCRr6HnnBXfdJiorHVMZ2v1E8q1oaph1ke",
+        "amount_raw": "320000000000000",
+        "pct": "32.00",
+        "owner": "BtZ8jPfdN8mVmok3x55He1CMwdS1xWpXBTMTigsjVH3Q",
+        "insider": false
+      },
+      {
+        "address": "Dz3nY3kkPDNB8NgABexFChtEjJPbCTDskehA8FNTdqiB",
+        "amount_raw": "250000000000000",
+        "pct": "25.00",
+        "owner": "AsEVCx4KEKcYvSHz129GhZ7xPAfsuKAWzkTTPzyZZ4uy",
+        "insider": false
+      },
+      {
+        "address": "43vQpS6bMScuu7Ru5mznCos27rNeQnqLGoDobjRx5gYC",
+        "amount_raw": "200000000000000",
+        "pct": "20.00",
+        "owner": "7w7tTB1hAYvrDkLGjRJ1wYFVkdWv1y4GmG2wo7kXpXyz",
+        "insider": false
+      }
+    ]
+  },
+  "holder_snapshot_now": {
+    "total_holders": 1847,
+    "balances": {
+      "8SyqVYdtzjwCRr6HnnBXfdJiorHVMZ2v1E8q1oaph1ke": 40000000000000,
+      "Dz3nY3kkPDNB8NgABexFChtEjJPbCTDskehA8FNTdqiB": 31250000000000,
+      "43vQpS6bMScuu7Ru5mznCos27rNeQnqLGoDobjRx5gYC": 25000000000000,
+      "6TzrpEaKfxRnGpNkZ8vJcLdQsM4bWyXePxCmHuBiTaoe": 1200000000000,
+      "9nMqRwVpLsJkXbN3eYcZaGhMuQtCwPyWdTzBiRoEfve": 980000000000,
+      "BpKdL4rCmNsJwXaV7eZqMtGhYuQiWnPbCxTzEyRoAoe": 860000000000,
+      "DqLbM5sPwRnCkXdV8aYeNtGhZuQjWmPcBxTzFyRoEve": 720000000000,
+      "FrMcN6tQwSnDlXeW9bZfOuHiAvRkYnQdCxTzGyRoFoe": 610000000000,
+      "HsNdO7uRxToEmYfX0cAgPvIjBwSlZoReQdCxTzHyRoG": 530000000000,
+      "JtOeP8vSyUpFnZgY1dBhQwJkCxTmArSeQdCxTzIyRoH": 460000000000
+    },
+    "total_supply_raw": 125000000000000
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 1821,
+    "total_supply_raw": 125000000000000,
+    "liquid_count_after_exclusion": 1821,
+    "top10_pct_liquid_after_exclusion": "0.2095",
+    "gini_liquid_after_exclusion": "0.4750"
+  },
+  "holder_classifications": [
+    {
+      "address": "8SyqVYdtzjwCRr6HnnBXfdJiorHVMZ2v1E8q1oaph1ke",
+      "kind": "VestingContract",
+      "subkind": "jupiter_lock",
+      "confidence": 0.9
+    },
+    {
+      "address": "Dz3nY3kkPDNB8NgABexFChtEjJPbCTDskehA8FNTdqiB",
+      "kind": "VestingContract",
+      "subkind": "jupiter_lock",
+      "confidence": 0.9
+    },
+    {
+      "address": "43vQpS6bMScuu7Ru5mznCos27rNeQnqLGoDobjRx5gYC",
+      "kind": "VestingContract",
+      "subkind": "jupiter_lock",
+      "confidence": 0.9
+    }
+  ],
+  "pool_rows": [
+    {
+      "pool_address": "A8dNMVhgTyA4fPEJnH1ZEUjXXgd7rcn8iCPbV4Wp4qtx",
+      "dex": "meteora_damm_v2",
+      "lp_burned_pct": "0.00",
+      "lp_locked_pct": "10.00",
+      "effective_safe_pct": "10.00",
+      "lp_provider_count": 2,
+      "liquidity_usd": "45000.00"
+    },
+    {
+      "pool_address": "HZeg4yK48F7PhSM7pLgQ7LXzWA2TX95wHWgSLdtj1xS1",
+      "dex": "meteoraDlmm",
+      "lp_burned_pct": "0.00",
+      "lp_locked_pct": "0.00",
+      "effective_safe_pct": "0.00",
+      "lp_provider_count": 1,
+      "liquidity_usd": "12000.00"
+    }
+  ],
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "All D01 honeypot signals absent: freeze_authority=null, no transfer_fee, no permanent_delegate, no transfer_hook. Standard SPL (TokenkegQfe). Buy/sell activity present with normal ratio per WET probe (0.70 buy/sell ratio). Simulation expected to pass."
+    },
+    "d02_rug_pull": {
+      "verdict": "FIRES",
+      "confidence_band": [
+        0.5,
+        0.65
+      ],
+      "severity": "Medium",
+      "reason": "Signal B (latent): primary pool (A8dN) has effective_safe_pct=10% (lp_locked=10%, lp_burned=0%), below lp_safe_floor_pct=70%. Secondary pool has effective_safe_pct=0% and lp_provider_count=1 (single-provider bonus). D02 Signal B fires Medium because lp_locked_pct is non-zero (some lock exists, not pure 0-lock RAVE scenario). Confidence\u22480.50+(70-10)/70*0.25\u22480.71 for primary pool \u2014 but 2 LP providers on primary reduces single-provider bonus. Composite confidence ~0.55-0.65.",
+      "calibration_flag": true,
+      "calibration_note": "D02 Signal B fires here because WET's LP is genuinely partially unlocked. This is a genuine latent risk that the detector SHOULD flag. However, WET is classified negative because the token itself is legitimate. This demonstrates a case where D02 fires on a legitimate token \u2014 a known FP source for the rug detector when LP management is partial. Sprint 4 should examine whether vesting context / token legitimacy should attenuate D02."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "After VestingContract sidecar exclusion: liquid top-10 pct=21.4% << absolute_top10_ceiling=80%. gini_delta=0.0070 << 0.05. top10_delta=0.0048 << 0.10. liquid_count=1844 >> 50. No signals fire. Without sidecar: naive top-10=81.3% would fire Signal 3 \u2014 this is the systematic FP that the sidecar is designed to prevent."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No swaps_1h data in fixture (Phase 1 fixture). No volume spike. D04 BELOW."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No round-trip data in fixture (Phase 1 fixture). D05 BELOW."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "mint_authority=null. D06 BELOW."
+    }
+  }
+}

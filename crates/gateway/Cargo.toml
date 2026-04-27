@@ -1,0 +1,67 @@
+[package]
+name        = "mg-onchain-gateway"
+version.workspace     = true
+edition.workspace     = true
+rust-version.workspace = true
+license.workspace     = true
+repository.workspace  = true
+description = "axum REST and WebSocket API gateway, OpenAPI spec"
+
+[dependencies]
+# HTTP server
+axum            = { version = "0.8", features = ["macros", "ws"] }
+tokio           = { workspace = true }
+tower           = "0.5"
+tower-http      = { version = "0.6", features = ["trace", "cors", "request-id", "compression-full"] }
+hyper           = "1"
+
+# Auth
+jsonwebtoken    = "9"
+argon2          = "0.5"
+password-hash   = "0.5"
+rand_core       = { version = "0.6", features = ["std"] }
+ed25519-dalek   = { version = "2", features = ["pkcs8", "pem"] }
+secrecy         = "0.8"
+
+# Rate limiting
+governor        = { version = "0.6", features = ["std", "jitter"] }
+
+# Cache
+moka            = { version = "0.12", features = ["future"] }
+
+# Metrics
+prometheus      = "0.13"
+
+# Serialization (workspace)
+serde           = { workspace = true }
+serde_json      = { workspace = true }
+
+# Tracing
+tracing              = { workspace = true }
+tracing-subscriber   = { version = "0.3", features = ["json", "env-filter"] }
+
+# Utilities
+anyhow          = { workspace = true }
+thiserror       = { workspace = true }
+chrono          = { workspace = true }
+uuid            = { workspace = true }
+base64          = { workspace = true }
+futures         = { workspace = true }
+tokio-stream    = "0.1"
+toml            = { workspace = true }
+sqlx            = { workspace = true }
+hex             = { workspace = true }
+url             = { workspace = true }
+async-trait     = { workspace = true }
+
+# Internal crates
+mg-onchain-common         = { path = "../common" }
+mg-onchain-storage        = { path = "../storage" }
+mg-onchain-detectors      = { path = "../detectors" }
+mg-onchain-dex-adapter    = { path = "../dex-adapter" }
+mg-onchain-scoring        = { path = "../scoring" }
+mg-onchain-token-registry = { path = "../token-registry" }
+mg-onchain-graph          = { path = "../graph" }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }

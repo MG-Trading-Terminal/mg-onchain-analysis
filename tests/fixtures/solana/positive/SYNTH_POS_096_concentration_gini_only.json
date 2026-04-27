@@ -1,0 +1,76 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthConc096TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+    "symbol": "CONC096",
+    "label": "positive",
+    "category": "concentration_high",
+    "source_url": "synthetic/concentration/gini_signal1_only_borderline_top10",
+    "fetched_at": "2026-04-21T20:45:00Z",
+    "synthetic": true,
+    "notes": "D03 Signal 1 only: gini_delta=0.07 (above 0.05 threshold), top10 delta=0.06 (below 0.10 threshold for Signal 2), top10_abs=0.72 (below 0.80 for Signal 3). Tests that Signal 1 (Gini change) fires in isolation. The stealth-accumulation pattern: many small wallets being bought out by a few actors, visible in Gini before top10 threshold breached."
+  },
+  "token_meta": {
+    "mint": "SynthConc096TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "GiniOnly096",
+    "symbol": "CONC096",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevGiniOnly096111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 1900,
+    "rugcheck_score_normalised": 42,
+    "risks": [],
+    "markets": [ { "pool_address": "GiniPool096111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "100.00", "liquidity_usd": "44000.00", "lp_provider_count": 2 } ],
+    "lockers": {},
+    "creator": "DevGiniOnly096111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "44000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 680,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "GiniOnly096_001111111111111111111111111": 148000000000000,
+      "GiniOnly096_011111111111111111111111111": 118000000000000,
+      "GiniOnly096_021111111111111111111111111": 96000000000000,
+      "GiniOnly096_031111111111111111111111111": 78000000000000,
+      "GiniOnly096_041111111111111111111111111": 62000000000000,
+      "GiniOnly096_051111111111111111111111111": 48000000000000,
+      "GiniOnly096_061111111111111111111111111": 37000000000000,
+      "GiniOnly096_071111111111111111111111111": 28000000000000,
+      "GiniOnly096_081111111111111111111111111": 18000000000000,
+      "GiniOnly096_091111111111111111111111111": 12000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 720,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.66",
+    "gini_liquid_after_exclusion": "0.65"
+  },
+  "holder_classifications": [],
+  "pool_rows": [ { "pool_address": "GiniPool096111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "100.00", "lp_locked_pct": "0.00", "effective_safe_pct": "100.00", "lp_provider_count": 2, "liquidity_usd": "44000.00" } ],
+  "expected": {
+    "d01_honeypot": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No static honeypot signals." },
+    "d02_rug_pull": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "LP 100% burned. D02 does not fire." },
+    "d03_concentration": {
+      "verdict": "FIRES",
+      "confidence_band": [0.55, 0.75],
+      "severity": "Medium",
+      "reason": "top10_now=(148+118+96+78+62+48+37+28+18+12)e12/1e15=0.645+0.075=0.720. Wait: 148+118=266, +96=362, +78=440, +62=502, +48=550, +37=587, +28=615, +18=633, +12=645 -> 645e12/1e15=0.645. Signal 2: delta=0.645-0.66=-0.015 (slight decrease) -> Signal 2 does NOT fire. Signal 3: 0.645<0.80 -> does NOT fire. Signal 1: gini_now estimated ~0.72 (moderately concentrated), prior=0.65, delta=0.07>=0.05 -> Signal 1 fires. conf_signal1=min(0.75, 0.50+(0.07-0.05)/0.05*0.25)=min(0.75,0.50+0.10)=0.60 Medium.",
+      "calibration_flag": true,
+      "calibration_note": "Signal 1 fires at conf=0.60. However top10_now=0.645 which is lower than prior=0.66 (delta negative). This means overall distribution is dispersing while gini rises — possible stealth concentration by non-top-10 wallets. This is an interesting edge case. The gini_now=0.72 estimate is rough; real implementation would compute gini from full balance distribution. Sprint 5: ensure gini is computed from actual balances in holder_snapshot_now."
+    },
+    "d04_pump_dump": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No swap data in fixture." },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No round-trip events." },
+    "d06_mint_burn_anomaly": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "mint_authority=null." }
+  }
+}

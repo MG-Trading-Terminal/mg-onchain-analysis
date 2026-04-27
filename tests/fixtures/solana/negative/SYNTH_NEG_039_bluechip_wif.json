@@ -1,0 +1,83 @@
+{
+  "_fixture_meta": {
+    "mint": "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm",
+    "symbol": "WIF",
+    "label": "negative",
+    "category": "bluechip",
+    "source_url": "synthetic/bluechip/wif_dogwifhat_established_meme",
+    "fetched_at": "2026-04-21T20:53:00Z",
+    "synthetic": true,
+    "notes": "dogwifhat (WIF) — top Solana meme token. jup_strict=true. mint_authority=null. Fixed supply 998.9M tokens. Very large holder base, broad distribution. LP is community-provided across many pools. Tests the canonical established-meme negative case — should produce no alerts across all 6 detectors."
+  },
+  "token_meta": {
+    "mint": "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "dogwifhat",
+    "symbol": "WIF",
+    "decimals": 6,
+    "supply_raw": "998888888000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": false,
+    "update_authority": null,
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": true, "jup_strict": true },
+    "rugcheck_score": 95,
+    "rugcheck_score_normalised": 4,
+    "risks": [],
+    "markets": [
+      { "pool_address": "WIFPool01111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "liquidity_usd": "18000000.00", "lp_provider_count": 580 },
+      { "pool_address": "WIFPool02111111111111111111111111111111111", "dex": "orca", "lp_burned_pct": "0.00", "liquidity_usd": "9200000.00", "lp_provider_count": 340 }
+    ],
+    "lockers": {},
+    "creator": "wifFounder1111111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "27200000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 245000,
+    "total_supply_raw": 998888888000000,
+    "balances": {
+      "WIFPool01111111111111111111111111111111111": 120000000000000,
+      "WIFPool02111111111111111111111111111111111": 80000000000000,
+      "WIFCEXHot01111111111111111111111111111111": 65000000000000,
+      "WIFHolder011111111111111111111111111111111": 18000000000000,
+      "WIFHolder021111111111111111111111111111111": 14000000000000,
+      "WIFHolder031111111111111111111111111111111": 11000000000000,
+      "WIFHolder041111111111111111111111111111111": 9000000000000,
+      "WIFHolder051111111111111111111111111111111": 7200000000000,
+      "WIFHolder061111111111111111111111111111111": 5800000000000,
+      "WIFHolder071111111111111111111111111111111": 4600000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 244200,
+    "total_supply_raw": 998888888000000,
+    "top10_pct_liquid_after_exclusion": "0.14",
+    "gini_liquid_after_exclusion": "0.65"
+  },
+  "holder_classifications": [
+    { "address": "WIFPool01111111111111111111111111111111111", "type": "lp_pool", "label": "Raydium WIF/SOL pool" },
+    { "address": "WIFPool02111111111111111111111111111111111", "type": "lp_pool", "label": "Orca WIF/USDC pool" },
+    { "address": "WIFCEXHot01111111111111111111111111111111", "type": "cex_hot_wallet", "label": "Binance WIF wallet" }
+  ],
+  "pool_rows": [
+    { "pool_address": "WIFPool01111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "lp_locked_pct": "0.00", "effective_safe_pct": "0.00", "lp_provider_count": 580, "liquidity_usd": "18000000.00" },
+    { "pool_address": "WIFPool02111111111111111111111111111111111", "dex": "orca", "lp_burned_pct": "0.00", "lp_locked_pct": "0.00", "effective_safe_pct": "0.00", "lp_provider_count": 340, "liquidity_usd": "9200000.00" }
+  ],
+  "swaps_1h": { "volume_usd": "38000000.00", "trade_count": 52000, "unique_buyers": 26000, "price_start": "1.820", "price_end": "1.825", "price_change_pct": "0.003" },
+  "swaps_7d_daily_baseline": { "day_count_nonzero": 7, "mean_daily_volume_usd": "36000000.00", "std_daily_volume_usd": "6500000.00", "volume_multiplier_observed": "1.06", "volume_z_score": "0.3" },
+  "signal_a_round_trips": [],
+  "pool_total_volume_1h_usd": "38000000.00",
+  "expected": {
+    "d01_honeypot": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "No static honeypot signals. jup_strict=true." },
+    "d02_rug_pull": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "is_established_protocol=true (jup_strict). D02 suppressed. 580+ LP providers each pool." },
+    "d03_concentration": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "After LP/CEX exclusion: top10_pct_liquid=0.14. gini_delta~0. No signal." },
+    "d04_pump_dump": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "vol_multiplier=1.06 << 5.0. price_change=+0.3% << 30%. Normal." },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "No round-trip events in 52k trades. 26k unique buyers." },
+    "d06_mint_burn_anomaly": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "mint_authority=null. Fixed supply. No events." }
+  }
+}

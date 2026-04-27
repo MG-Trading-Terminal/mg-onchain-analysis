@@ -1,0 +1,46 @@
+{
+  "_label": "NEG_D12_01",
+  "_description": "Legitimate Uniswap v3 swap via Permit2. Spender = Uniswap UniversalRouter (0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD) which is in the known_legitimate_permit2_spenders allowlist. Must NOT fire. Suppression reason: spender_in_legitimate_allowlist.",
+  "_chain": "ethereum",
+  "_token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "_source": "Synthetic — mimics any mainnet Uniswap USDC swap via UniversalRouter post-July 2022. This exact flow occurs millions of times per day on Ethereum mainnet.",
+  "_adr_note": "Synthetic fixture. No RPC call required.",
+  "transfers": [
+    {
+      "chain": "ethereum",
+      "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "from_address": "0xuser0000000000000000000000000000000001aa",
+      "to_address": "0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad",
+      "amount_raw": "100000000",
+      "tx_hash": "0xd12neg01cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "log_index": 3,
+      "block_height": 19500000,
+      "block_time": "2024-03-10T09:00:00Z",
+      "decimals": 6
+    }
+  ],
+  "permit2_events": [
+    {
+      "chain": "ethereum",
+      "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "owner": "0xuser0000000000000000000000000000000001aa",
+      "spender": "0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad",
+      "amount_raw": "100000000",
+      "expiration_unix": 1741600000,
+      "nonce": 12,
+      "tx_hash": "0xd12neg01cccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "log_index": 2,
+      "block_height": 19500000,
+      "block_time": "2024-03-10T09:00:00Z",
+      "event_kind": "permit"
+    }
+  ],
+  "_known_drainer_addresses_for_test": [
+    "0x3c116dedca98c1813eadb17b71e869c0faba0f5e"
+  ],
+  "_expected": {
+    "detector_id": "permit2_drainer_v1",
+    "fires": false,
+    "suppression_reason": "spender_in_legitimate_allowlist"
+  }
+}

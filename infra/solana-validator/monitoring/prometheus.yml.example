@@ -1,0 +1,91 @@
+# prometheus.yml — scrape config for Solana validator + Yellowstone gRPC plugin
+#
+# This is a PARTIAL config showing only the relevant scrape jobs.
+# Merge into your existing prometheus.yml or use standalone with:
+#   ./prometheus --config.file=prometheus.yml
+#
+# Metrics ports:
+#   agave-validator built-in : localhost:1234/metrics
+#   yellowstone-grpc plugin  : localhost:8999/metrics
+#   node_exporter            : localhost:9100/metrics
+#
+# Replace <VALIDATOR_HOST> with the validator machine's hostname or IP.
+# If Prometheus runs ON the validator machine, use localhost.
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    chain: "solana"
+    node: "mg-rpc-01"
+
+# ---------------------------------------------------------------------------
+# Rule files (alerts)
+# ---------------------------------------------------------------------------
+rule_files:
+  - "alerts.yml"
+
+# ---------------------------------------------------------------------------
+# Scrape jobs
+# ---------------------------------------------------------------------------
+scrape_configs:
+
+  # --------------------------------------------------------------------------
+  # Agave validator built-in Prometheus endpoint
+  # Metrics prefix: solana_validator_*, solana_rpc_*, solana_poh_*, etc.
+  # Port 1234 is the default; set with --prometheus-port flag if different.
+  # --------------------------------------------------------------------------
+  - job_name: "agave-validator"
+    static_configs:
+      - targets: ["<VALIDATOR_HOST>:1234"]
+        labels:
+          instance: "mg-rpc-01"
+          role: "solana-rpc"
+    # Solana's metrics endpoint can be slow under load; allow 30s
+    scrape_timeout: 30s
+    # Some validator metric labels are very high cardinality.
+    # Drop metrics that are not needed to reduce Prometheus storage.
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: "solana_validator_gossip_.*_count"
+        action: drop
+
+  # --------------------------------------------------------------------------
+  # Yellowstone gRPC plugin Prometheus endpoint
+  # Metrics prefix: yellowstone_grpc_*
+  # Key metrics:
+  #   yellowstone_grpc_channel_overflow_total  — backpressure / drop events
+  #   yellowstone_grpc_subscribers_total       — active stream subscribers
+  #   yellowstone_grpc_sent_total              — messages sent to subscribers
+  #   yellowstone_grpc_slot_status             — slot pipeline latency
+  # --------------------------------------------------------------------------
+  - job_name: "yellowstone-grpc"
+    static_configs:
+      - targets: ["<VALIDATOR_HOST>:8999"]
+        labels:
+          instance: "mg-rpc-01"
+          role: "yellowstone-grpc"
+    scrape_timeout: 10s
+
+  # --------------------------------------------------------------------------
+  # Node exporter — OS-level: CPU, RAM, disk I/O, network, OOM events
+  # Install: https://github.com/prometheus/node_exporter
+  # Run as: ./node_exporter --web.listen-address=":9100"
+  # --------------------------------------------------------------------------
+  - job_name: "node-exporter"
+    static_configs:
+      - targets: ["<VALIDATOR_HOST>:9100"]
+        labels:
+          instance: "mg-rpc-01"
+          role: "os"
+    scrape_timeout: 10s
+    # Collect disk stats only for validator mounts — skip tmpfs, loop devices
+    params:
+      collect[]:
+        - "diskstats"
+        - "filesystem"
+        - "meminfo"
+        - "netdev"
+        - "cpu"
+        - "vmstat"
+        - "interrupts"

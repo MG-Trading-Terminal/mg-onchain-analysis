@@ -1,0 +1,108 @@
+{
+  "_fixture_meta": {
+    "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    "symbol": "USDC",
+    "label": "negative",
+    "category": "token2022_legit",
+    "source_url": "https://api.rugcheck.xyz/v1/tokens/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/report",
+    "fetched_at": "2026-04-21T19:31:00Z",
+    "synthetic": false,
+    "notes": "USDC \u2014 regulated stablecoin with freeze authority (OFAC compliance). Fires D01 S1 (freeze_authority active) at low confidence but jup_strict=true attenuates. Critical edge case: legitimate freeze authority use. Negative for rug/concentration purposes."
+  },
+  "token_meta": {
+    "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "USD Coin",
+    "symbol": "USDC",
+    "decimals": 6,
+    "supply_raw": "9121252924546467",
+    "mint_authority": "BJE5MMbqXjVwjAF7oxwPYXnTXDyspzZyt4vwenNw5ruG",
+    "freeze_authority": "7dGbd2QZcCKcTndnHcTL8q7SMVXAkp688NTQYwrRCrar",
+    "mutable": true,
+    "update_authority": "2wmVCSfPxGPjrnMMn7rchp4uaeoTqN39mXFC2zhPdri9",
+    "transfer_fee": {
+      "fee_bps": 0,
+      "max_amount": 0,
+      "authority": null
+    },
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": {
+      "jup_verified": true,
+      "jup_strict": true
+    },
+    "rugcheck_score": 1,
+    "rugcheck_score_normalised": 1,
+    "risks": [],
+    "markets": [],
+    "lockers": {},
+    "creator": "2wmVCSfPxGPjrnMMn7rchp4uaeoTqN39mXFC2zhPdri9",
+    "creator_balance_raw": "10000000",
+    "top_holders": []
+  },
+  "holder_snapshot_now": {
+    "total_holders": 2800000,
+    "balances": {}
+  },
+  "holder_snapshot_prior_24h": null,
+  "holder_classifications": [],
+  "pool_rows": [],
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.2,
+        0.35
+      ],
+      "severity": "Low",
+      "reason": "Freeze authority active \u2192 S1 fires (raw+=0.25). No transfer_fee, no permanent_delegate, no transfer_hook. raw=0.25 \u2192 sigmoid(-0.55)\u22480.37. jup_strict=true context attenuates; simulation expected to PASS (Circle compliance freeze \u2260 sell block). Confidence band 0.20\u20130.35 represents static-only Low severity. This is the 'static-positive, simulation-negative' calibration fixture per D01 design \u00a710.",
+      "calibration_flag": false
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "No DEX pools. D02 emits no-pool Info event. mint_authority active is NOT a D02 signal (D02 is LP-drain focused). Signal B cannot fire without a pool row."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.05
+      ],
+      "severity": "Info",
+      "reason": "2.8M holders. Top-10 liquid share is << 80% ceiling. No concentration signals fire."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No swaps_1h data in fixture (Phase 1 fixture). No volume spike. D04 BELOW."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [
+        0.02,
+        0.1
+      ],
+      "severity": "Info",
+      "reason": "No round-trip data in fixture (Phase 1 fixture). D05 BELOW."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "SUPPRESSED_INFO",
+      "confidence_band": [
+        0.08,
+        0.12
+      ],
+      "severity": "Info",
+      "reason": "Signal A: mint_authority active. is_established_protocol=true. conf dampened to 0.10 Info."
+    }
+  }
+}

@@ -1,0 +1,163 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthMint061kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+    "symbol": "MINT061",
+    "label": "positive",
+    "category": "mint_anomaly",
+    "source_url": "synthetic/mint_burn/signal_c_hidden_mint_pattern",
+    "fetched_at": "2026-04-21T20:10:00Z",
+    "synthetic": true,
+    "notes": "D06 Signal C (hidden mint pattern): mint_authority active, 35% cumulative non-LP mint over 25 days (age=20d >= 14d). Sun et al. 2024 archetype. Signal A omitted (C subsumes). Confidence=min(0.95, 0.75+(0.35-0.20)*1.0)=0.90."
+  },
+  "token_meta": {
+    "mint": "SynthMint061kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "HiddenMint061",
+    "symbol": "MINT061",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": "DeployerMint061111111111111111111111111111",
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DeployerMint061111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 5200,
+    "rugcheck_score_normalised": 80,
+    "risks": [
+      { "name": "Mint Authority still enabled", "level": "danger", "description": "Additional tokens may be minted" }
+    ],
+    "markets": [
+      {
+        "pool_address": "MintPool061111111111111111111111111111111111",
+        "dex": "raydium",
+        "lp_burned_pct": "75.00",
+        "liquidity_usd": "24000.00",
+        "lp_provider_count": 1
+      }
+    ],
+    "lockers": {},
+    "creator": "DeployerMint061111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "24000.00",
+    "detected_at": "2026-04-01T10:00:00Z"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 380,
+    "total_supply_raw": 1350000000000000,
+    "balances": {
+      "DeployerMint061111111111111111111111111111": 180000000000000,
+      "InsiderMint061_011111111111111111111111111": 165000000000000,
+      "InsiderMint061_021111111111111111111111111": 142000000000000,
+      "MintHolder061_031111111111111111111111111": 48000000000000,
+      "MintHolder061_041111111111111111111111111": 31000000000000,
+      "MintHolder061_051111111111111111111111111": 19000000000000,
+      "MintHolder061_061111111111111111111111111": 12000000000000,
+      "MintHolder061_071111111111111111111111111": 7500000000000,
+      "MintHolder061_081111111111111111111111111": 4800000000000,
+      "MintHolder061_091111111111111111111111111": 3100000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 375,
+    "total_supply_raw": 1350000000000000,
+    "top10_pct_liquid_after_exclusion": "0.44",
+    "gini_liquid_after_exclusion": "0.72"
+  },
+  "holder_classifications": [
+    { "address": "DeployerMint061111111111111111111111111111", "kind": "deployer" },
+    { "address": "InsiderMint061_011111111111111111111111111", "kind": "insider" },
+    { "address": "InsiderMint061_021111111111111111111111111", "kind": "insider" }
+  ],
+  "pool_rows": [
+    {
+      "pool_address": "MintPool061111111111111111111111111111111111",
+      "dex": "raydium",
+      "lp_burned_pct": "75.00",
+      "lp_locked_pct": "0.00",
+      "effective_safe_pct": "75.00",
+      "lp_provider_count": 1,
+      "liquidity_usd": "24000.00"
+    }
+  ],
+  "mint_events_30d": [
+    {
+      "day_offset": -25,
+      "tx_hash": "MintTx061A111111111111111111111111111111111111",
+      "from_address": "11111111111111111111111111111111",
+      "to_address": "DeployerMint061111111111111111111111111111",
+      "amount_raw": "50000000000000",
+      "supply_change_pct": "0.050",
+      "recipient_is_known_lp": false,
+      "recipient_holder_kind": "deployer"
+    },
+    {
+      "day_offset": -15,
+      "tx_hash": "MintTx061B111111111111111111111111111111111111",
+      "from_address": "11111111111111111111111111111111",
+      "to_address": "InsiderMint061_011111111111111111111111111",
+      "amount_raw": "150000000000000",
+      "supply_change_pct": "0.150",
+      "recipient_is_known_lp": false,
+      "recipient_holder_kind": "insider"
+    },
+    {
+      "day_offset": -5,
+      "tx_hash": "MintTx061C111111111111111111111111111111111111",
+      "from_address": "11111111111111111111111111111111",
+      "to_address": "InsiderMint061_021111111111111111111111111",
+      "amount_raw": "150000000000000",
+      "supply_change_pct": "0.150",
+      "recipient_is_known_lp": false,
+      "recipient_holder_kind": "insider"
+    }
+  ],
+  "signal_c_data": {
+    "cumulative_supply_change_30d_pct": "0.350",
+    "mint_event_count_30d": 3,
+    "token_age_days": 20,
+    "mint_authority": "DeployerMint061111111111111111111111111111",
+    "supply_base": "circulating"
+  },
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.15],
+      "severity": "Info",
+      "reason": "No freeze, no transfer_fee, no permanent_delegate, no transfer_hook."
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.10],
+      "severity": "Info",
+      "reason": "LP 75% burned; effective_safe=75%. D02 Signal B does not fire."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.15],
+      "severity": "Info",
+      "reason": "top10 ~0.44; minimal delta from prior. No D03 threshold breach."
+    },
+    "d04_pump_dump": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.15],
+      "severity": "Info",
+      "reason": "Hidden mint does not produce a short-term volume/price spike visible to D04. Supply inflation occurs over 25 days."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.10],
+      "severity": "Info",
+      "reason": "No self-dealing round-trips in pool. Mint events are transfers from zero address not pool swaps."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "FIRES",
+      "confidence_band": [0.85, 0.95],
+      "severity": "Critical",
+      "reason": "Signal C fires: mint_authority active, cumulative_supply_change_30d=35% >= 20% threshold, token_age=20d >= 14d, all mints to non-LP recipients. conf=min(0.95, 0.75+(0.35-0.20)*1.0)=0.90. Signal A omitted (C subsumes). Signal B independently fires for each mint event >= 5% to non-LP but is not the primary event when C fires."
+    }
+  }
+}

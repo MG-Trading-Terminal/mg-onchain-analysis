@@ -1,0 +1,74 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthConc085IIIIIIIIIIIIIIIIIIIIIIIIIIIIII",
+    "symbol": "CONC085",
+    "label": "positive",
+    "category": "concentration_high",
+    "source_url": "synthetic/concentration/signal3_absolute_88pct",
+    "fetched_at": "2026-04-21T20:34:00Z",
+    "synthetic": true,
+    "notes": "D03 Signal 3 only: top10_pct_liquid=88% >= 80% threshold. conf=min(0.85, 0.65+(0.88-0.80)/0.20*0.20)=0.73."
+  },
+  "token_meta": {
+    "mint": "SynthConc085IIIIIIIIIIIIIIIIIIIIIIIIIIIIII",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "AbsConc085",
+    "symbol": "CONC085",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevConc085111111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 3100,
+    "rugcheck_score_normalised": 61,
+    "risks": [ { "name": "High holder concentration", "level": "danger" } ],
+    "markets": [ { "pool_address": "ConcPool085111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "100.00", "liquidity_usd": "29000.00", "lp_provider_count": 1 } ],
+    "lockers": {},
+    "creator": "DevConc085111111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "29000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 85,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "AbsHolder085_001111111111111111111111111": 220000000000000,
+      "AbsHolder085_011111111111111111111111111": 175000000000000,
+      "AbsHolder085_021111111111111111111111111": 140000000000000,
+      "AbsHolder085_031111111111111111111111111": 110000000000000,
+      "AbsHolder085_041111111111111111111111111": 80000000000000,
+      "AbsHolder085_051111111111111111111111111": 55000000000000,
+      "AbsHolder085_061111111111111111111111111": 35000000000000,
+      "AbsHolder085_071111111111111111111111111": 20000000000000,
+      "AbsHolder085_081111111111111111111111111": 12000000000000,
+      "AbsHolder085_091111111111111111111111111": 8000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 82,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.86",
+    "gini_liquid_after_exclusion": "0.79"
+  },
+  "holder_classifications": [],
+  "pool_rows": [ { "pool_address": "ConcPool085111111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "100.00", "lp_locked_pct": "0.00", "effective_safe_pct": "100.00", "lp_provider_count": 1, "liquidity_usd": "29000.00" } ],
+  "expected": {
+    "d01_honeypot": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.15], "severity": "Info", "reason": "No honeypot signals." },
+    "d02_rug_pull": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "LP 100% burned. D02 does not fire." },
+    "d03_concentration": {
+      "verdict": "FIRES",
+      "confidence_band": [0.70, 0.80],
+      "severity": "High",
+      "reason": "Signal 3: top10 now=(220+175+140+110+80+55+35+20+12+8)e12/1e15=0.855. Signal 3 fires: 0.855 >= 0.80. conf=min(0.85, 0.65+(0.855-0.80)/0.20*0.20)=min(0.85,0.65+0.055)=0.705. High severity."
+    },
+    "d04_pump_dump": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No spike." },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No self-dealing." },
+    "d06_mint_burn_anomaly": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "mint_authority=null." }
+  }
+}

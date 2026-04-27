@@ -1,0 +1,96 @@
+# Indexer configuration example.
+# Copy to config/indexer.toml and fill in real values.
+# All fields that are commented out have defaults shown in square brackets.
+
+# ----------------------------
+# Adapter configuration
+# ----------------------------
+# Phase 2 supports Solana only (ADR 0001 §D1). EVM adapters are Phase 4.
+# The adapter variant is selected by the top-level key.
+
+[adapter.Solana]
+# gRPC endpoint URL.
+# Helius:      https://mainnet.helius-rpc.com
+# Triton:      https://ams1.rpc.triton.one:443
+# Self-hosted: http://localhost:10000
+endpoint = "https://mainnet.helius-rpc.com"
+
+# Authentication token (never commit real tokens).
+# Helius: your Helius API key.
+# Triton: your Triton access token.
+# Self-hosted: omit this field.
+# auth_token = "your-api-key-here"
+
+# Solana commitment level for the live subscription stream.
+# Options: "processed" | "confirmed" (default) | "finalized"
+# Per ADR 0001 §D2: use "confirmed" for hot path, "finalized" for immutable records.
+commitment = "confirmed"
+
+# File-backed checkpoint path (created if not exists).
+# [default: "./checkpoints/solana.json"]
+# checkpoint_path = "./checkpoints/solana.json"
+
+# Solana JSON-RPC endpoint for backfill (getBlock calls).
+# If omitted, derived from the gRPC endpoint.
+# rpc_endpoint = "https://mainnet.helius-rpc.com"
+
+[adapter.Solana.reconnect]
+# Base delay for the first reconnect attempt (milliseconds).
+# [default: 500]
+base_delay_ms = 500
+# Maximum reconnect delay cap (milliseconds).
+# [default: 30000]
+max_delay_ms = 30000
+# Maximum consecutive reconnect attempts before giving up.
+# [default: 10] (set 0 for unlimited)
+max_attempts = 10
+# Extended base delay on rate-limit responses.
+# [default: 5000]
+rate_limit_base_ms = 5000
+
+# ----------------------------
+# Storage configuration
+# ----------------------------
+
+[storage]
+# PostgreSQL connection URL.
+# Example: postgres://user:password@localhost:5432/mg_onchain
+postgres_url = "postgres://postgres:postgres@localhost:5432/mg_onchain"
+
+# Apply pending Postgres migrations at startup.
+# Set to false if migrations are applied out-of-band (e.g. CI/CD).
+# [default: true]
+migrations_auto_apply = true
+
+# ----------------------------
+# Batch configuration
+# ----------------------------
+# Controls when in-flight events are flushed to Postgres.
+# A flush fires when EITHER size OR timeout_ms is reached — whichever comes first.
+
+[batch]
+# Maximum events per table per flush.
+# [default: 500]
+# At MVP rates (~100s events/min), size=500 means the timeout trigger fires first.
+# Raise for higher throughput to improve write efficiency.
+size = 500
+
+# Maximum milliseconds between the first event entering a buffer and a flush.
+# [default: 2000]
+# 2s lag is acceptable for MVP detectors operating over multi-minute windows.
+# Lower to 200–500ms for near-real-time alerting requirements.
+timeout_ms = 2000
+
+# Maximum number of un-committed batches allowed to queue.
+# Provides bounded backpressure: if Postgres falls behind, the subscribe loop
+# blocks instead of buffering unboundedly.
+# [default: 4]
+max_in_flight = 4
+
+# ----------------------------
+# Adapter identifier
+# ----------------------------
+# Unique key used for checkpoint storage.
+# Change if running multiple indexer instances with different filter subsets.
+# [default: "solana"]
+# adapter_id = "solana"

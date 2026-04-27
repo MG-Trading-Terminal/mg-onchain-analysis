@@ -1,0 +1,65 @@
+{
+  "_fixture_meta": {
+    "label": "positive_static_transfer_hook",
+    "detector": "honeypot_sim",
+    "expected_confidence_range": [0.10, 0.30],
+    "expected_severity": "Low",
+    "capture_date": "2026-04-21",
+    "synthetic": true,
+    "notes": "SYNTHETIC fixture — no publicly-flagged Solana token with a confirmed-malicious transfer hook was available in the analyst corpus-sourcing run (2026-04-21). The RugCheck API and Offside Security corpus (research/02-detection-methodology.md §Honeypot gap) contain transfer-hook tokens but none with a confirmed-rugged label that could be captured as a fixture at Sprint 2 exit. This synthetic fixture is constructed to exercise the S4 code path and calibrate the lower confidence boundary for a hook-only signal. REPLACEMENT INSTRUCTIONS: When a live confirmed-rugged token with transferHook set to a deployer-controlled program is documented in the wild (e.g., via RugCheck rugged=true + transferHook != null), replace this file with the captured on-chain state and remove the synthetic=true flag. Cite research/02-detection-methodology.md §Honeypot gap as the gap reference.",
+    "signals_expected": {
+      "freeze_authority_active": false,
+      "transfer_fee_bps": 0,
+      "transfer_fee_authority_active": false,
+      "permanent_delegate_active": false,
+      "transfer_hook_present": true,
+      "transfer_hook_program_id": "SYNTHETIC_HOOK_PROGRAM_PLACEHOLDER",
+      "buy_sell_ratio_above_sentinel": false,
+      "simulation_fail": true
+    },
+    "expected_confidence_walk": {
+      "S1_freeze": 0.0,
+      "S2_tax": 0.0,
+      "S2_fee_auth": 0.0,
+      "S3_delegate": 0.0,
+      "S4_hook": 0.20,
+      "S5_ratio": 0.0,
+      "raw": 0.20,
+      "static_conf_formula": "sigmoid(0.20/0.55 - 1.0) = sigmoid(-0.636) ≈ 0.346",
+      "after_sim_skipped_attenuation": "0.346 × 0.80 ≈ 0.277",
+      "note": "S4 alone produces low-end confidence. Only simulation (S6, Phase 3) can confirm whether the hook is malicious. This is the documented worst-case FN scenario from review §5."
+    }
+  },
+  "mint": "SYNTHETIC_PLACEHOLDER_ADDR",
+  "tokenProgram": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+  "creator": "DEPLOYER_WALLET_PLACEHOLDER",
+  "token": {
+    "mintAuthority": null,
+    "supply": 1000000000000000,
+    "decimals": 6,
+    "isInitialized": true,
+    "freezeAuthority": null
+  },
+  "transferFee": {
+    "pct": 0,
+    "maxAmount": 0,
+    "authority": "11111111111111111111111111111111"
+  },
+  "permanentDelegate": null,
+  "transferHook": "7dGbd2QZcCKcTndnHcTL8q7SMVXAkp688NTQYwrRCrar",
+  "rugged": true,
+  "score": 60000,
+  "risks": [
+    {
+      "name": "Transfer Hook Present",
+      "description": "Token has a Token-2022 transfer hook program set. The hook executes arbitrary logic on every transfer and can silently revert sell transactions for non-whitelisted addresses.",
+      "level": "danger"
+    }
+  ],
+  "markets": [],
+  "verification": null,
+  "observed_sells_24h": 0,
+  "observed_buys_24h": 0,
+  "buy_sell_ratio_24h": 0.0,
+  "source_reference": "SYNTHETIC — see _fixture_meta.notes. Research gap documented in research/02-detection-methodology.md §Honeypot gap."
+}

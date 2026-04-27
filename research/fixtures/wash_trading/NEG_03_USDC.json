@@ -1,0 +1,46 @@
+{
+  "meta": {
+    "fixture_id": "NEG_03_USDC",
+    "synthetic": false,
+    "calibration_flag": false,
+    "expected_correct": true,
+    "description": "USDC on Solana — canonical clean stable reference. Pool below min_pool_usd_for_h1 on Solana native chain (most USDC volume routes through Jupiter aggregator, not direct pool swaps). Signal A and B should not fire; detector returns Info/insufficient_liquidity.",
+    "expected_signal": "none",
+    "expected_confidence_max": 0.05,
+    "source": "live_reference",
+    "token_mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    "created": "2026-04-21",
+    "spec_ref": "docs/designs/0008-detector-05-wash-trading.md §10 NEG_03"
+  },
+  "token": {
+    "chain": "solana",
+    "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    "symbol": "USDC",
+    "decimals": 6,
+    "rugcheck_score": 5,
+    "verification": {
+      "jup_verified": true,
+      "jup_strict": true
+    },
+    "total_market_liquidity_usd": "0.00",
+    "note": "For D05 purposes, USDC's primary Solana pool liquidity is tracked by Jupiter routing, not a single Raydium pool. The token-registry liquidity_usd for a single pool context may be near zero for canonical stablecoin pairs. is_established_protocol=true (jup_strict=true)."
+  },
+  "pool": {
+    "address": "canonical_usdc_sol_pool_not_applicable",
+    "dex": "raydium_v4",
+    "liquidity_usd": "0.00",
+    "note": "USDC on Solana does not have a typical AMM pool with token wash-trading risk; used as canonical clean negative reference"
+  },
+  "expected_result": {
+    "early_exit_reason": "insufficient_liquidity",
+    "pool_usd": "0.00",
+    "min_pool_usd_for_h1": "10000.00",
+    "event_type": "info",
+    "evidence_key": "wash_trading_h1/insufficient_liquidity",
+    "confidence": 0.02,
+    "signal_a_fires": false,
+    "signal_b_fires": false,
+    "signal_c_fires": false
+  },
+  "test_assertion": "assert(events.len() == 1 AND events[0].severity == Info AND evidence contains 'insufficient_liquidity')"
+}

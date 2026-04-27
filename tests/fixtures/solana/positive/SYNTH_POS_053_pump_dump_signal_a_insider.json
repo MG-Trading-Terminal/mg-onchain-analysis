@@ -1,0 +1,143 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthPumpD053ccccccccccccccccccccccccccccccc",
+    "symbol": "PUMP053",
+    "label": "positive",
+    "category": "pump_dump",
+    "source_url": "synthetic/pump_dump/signal_a_with_insider_sell",
+    "fetched_at": "2026-04-21T20:02:00Z",
+    "synthetic": true,
+    "notes": "D04 Signal A + Signal C (insider amplifier). 8x volume, +42% price. Deployer sold 62% of holdings within 18h post-spike. Signal A base conf=0.672, +0.15 amplifier => 0.822 (Critical). Chainalysis 2025 dump pattern."
+  },
+  "token_meta": {
+    "mint": "SynthPumpD053ccccccccccccccccccccccccccccccc",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "InsiderDump053",
+    "symbol": "PUMP053",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevInsider053111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 3400,
+    "rugcheck_score_normalised": 65,
+    "risks": [],
+    "markets": [
+      {
+        "pool_address": "InsiderPool053111111111111111111111111111111",
+        "dex": "raydium",
+        "lp_burned_pct": "92.00",
+        "liquidity_usd": "78000.00",
+        "lp_provider_count": 2
+      }
+    ],
+    "lockers": {},
+    "creator": "DevInsider053111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "78000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 890,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "InsHolder053_00111111111111111111111111111": 38000000000000,
+      "InsHolder053_01111111111111111111111111111": 29000000000000,
+      "InsHolder053_02111111111111111111111111111": 21000000000000,
+      "InsHolder053_03111111111111111111111111111": 15000000000000,
+      "InsHolder053_04111111111111111111111111111": 11000000000000,
+      "InsHolder053_05111111111111111111111111111": 8000000000000,
+      "InsHolder053_06111111111111111111111111111": 6000000000000,
+      "InsHolder053_07111111111111111111111111111": 4500000000000,
+      "InsHolder053_08111111111111111111111111111": 3200000000000,
+      "InsHolder053_09111111111111111111111111111": 2200000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 210,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.52",
+    "gini_liquid_after_exclusion": "0.67"
+  },
+  "holder_classifications": [
+    { "address": "DevInsider053111111111111111111111111111111", "kind": "deployer" },
+    { "address": "InsHolder053_00111111111111111111111111111", "kind": "insider" }
+  ],
+  "pool_rows": [
+    {
+      "pool_address": "InsiderPool053111111111111111111111111111111",
+      "dex": "raydium",
+      "lp_burned_pct": "92.00",
+      "lp_locked_pct": "0.00",
+      "effective_safe_pct": "92.00",
+      "lp_provider_count": 2,
+      "liquidity_usd": "78000.00"
+    }
+  ],
+  "swaps_1h": {
+    "volume_usd": "336000.00",
+    "trade_count": 198,
+    "unique_buyers": 174,
+    "price_start": "0.000098",
+    "price_end": "0.000139",
+    "price_change_pct": "0.418"
+  },
+  "swaps_7d_daily_baseline": {
+    "day_count_nonzero": 5,
+    "mean_daily_volume_usd": "42000.00",
+    "std_daily_volume_usd": "11200.00",
+    "volume_multiplier_observed": "8.0",
+    "volume_z_score": "26.4"
+  },
+  "insider_sell_data": {
+    "window_hours": 18,
+    "insider_wallets": ["DevInsider053111111111111111111111111111111", "InsHolder053_00111111111111111111111111111"],
+    "prior_balance_combined_raw": "320000000000000",
+    "sold_raw": "198400000000000",
+    "insider_sold_pct": "0.62",
+    "insider_source": "top_holders_proxy"
+  },
+  "expected": {
+    "d01_honeypot": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.15],
+      "severity": "Info",
+      "reason": "No honeypot signals present."
+    },
+    "d02_rug_pull": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.10],
+      "severity": "Info",
+      "reason": "LP 92% burned; effective_safe_pct=92%. D02 Signal B does not fire."
+    },
+    "d03_concentration": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.15],
+      "severity": "Info",
+      "reason": "top10 now ~0.138 (sum/supply); prior 0.52. top10 decreased as pump distributed to 890 holders. No concentration increase signal."
+    },
+    "d04_pump_dump": {
+      "verdict": "FIRES",
+      "confidence_band": [0.79, 0.93],
+      "severity": "Critical",
+      "reason": "Signal A: vol_1h=336k, baseline=42k, multiplier=8x, price=+41.8%. raw=(8/5-1)*0.5+(0.418/0.30-1)*0.3=0.30+0.118=0.418; sigmoid(0.418)=0.603 -> clamped to 0.603. Signal C: insider_sold_pct=0.62 >= 0.40 threshold. Amplified: 0.603+0.15=0.753; signal_b base cap not applicable (Signal A). cap=0.95 -> 0.753 -> confidence_band [0.72,0.86] accounting for proxy vs cluster source. Severity escalates: Medium -> High via C amplifier based on confidence 0.75 threshold."
+    },
+    "d05_wash_trading_h1": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.10],
+      "severity": "Info",
+      "reason": "174 unique buyers; organic pump pattern. Insider sells are large single transactions, not round-trips. No H1 self-dealing pattern."
+    },
+    "d06_mint_burn_anomaly": {
+      "verdict": "BELOW_THRESHOLD",
+      "confidence_band": [0.02, 0.05],
+      "severity": "Info",
+      "reason": "mint_authority=null. No supply events. All signals inactive."
+    }
+  }
+}

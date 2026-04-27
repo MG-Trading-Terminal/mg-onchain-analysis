@@ -1,0 +1,112 @@
+# config/adapters.toml.example
+#
+# Yellowstone gRPC Solana adapter configuration.
+# Copy this file to config/adapters.toml and fill in real values.
+# NEVER commit config/adapters.toml (it contains auth tokens if used).
+# config/adapters.toml is in .gitignore.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# POLICY: Self-Sovereign Infrastructure
+# ─────────────────────────────────────────────────────────────────────────────
+# Per ADR 0003 (2026-04-21): production deployments MUST use a self-hosted
+# Solana validator running the yellowstone-grpc plugin. Managed providers
+# (Helius, Triton, etc.) are BANNED from production hot path. Rationale:
+#   - Data is open and on-chain — no 3rd party has a monopoly on it.
+#   - Rate limits, query logging, subpoena exposure, acquisition shutdowns,
+#     and cascading outages across all four consumers are real risk vectors.
+#   - Four production consumers (bot, custody, market maker, exchange) cannot
+#     share a single point of failure outside our operational control.
+#
+# See docs/adr/0003-self-sovereign-infrastructure.md for the binding rationale
+# and the Solana validator hardware / ops spec.
+#
+# The chain-adapter code is endpoint-agnostic — same gRPC wire format works
+# against self-hosted + any provider. Only this config file decides where.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DEFAULT — Self-hosted validator running yellowstone-grpc plugin
+# ─────────────────────────────────────────────────────────────────────────────
+# Setup: docs/operations/solana-validator-setup.md (TODO — Sprint 3 infra track)
+# Source: https://github.com/rpcpool/yellowstone-grpc
+# Auth: none by default; set auth_token if you configure the plugin with a token list
+# Endpoint: plaintext gRPC on port 10000 (default plugin port); JSON-RPC on 8899
+
+[solana]
+endpoint         = "http://localhost:10000"
+auth_token       = ""                             # omit or leave empty for localhost
+rpc_endpoint     = "http://localhost:8899"        # Solana JSON-RPC on same host
+checkpoint_path  = "./checkpoints/solana.json"
+commitment       = "confirmed"
+
+[solana.reconnect]
+base_delay_ms      = 200         # fast local loopback
+max_delay_ms       = 10_000
+max_attempts       = 0           # 0 = unlimited (appropriate for self-hosted)
+rate_limit_base_ms = 1_000
+
+[solana.filters]
+# Default filter subscribes to SPL Token + Token-2022 + major DEX programs.
+# Narrow this for specific workloads to reduce processing cost.
+program_ids = [
+  "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",   # SPL Token
+  "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",   # Token-2022
+  "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",  # Raydium AMM v4
+  "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",  # Raydium CLMM
+  "CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C",  # Raydium CPMM
+  "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc",   # Orca Whirlpool
+  "LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo",   # Meteora DLMM
+  "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",   # PumpFun
+]
+account_owners = [
+  "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+]
+include_slot_updates = true      # Required for reorg detection. Do not disable.
+
+# ═════════════════════════════════════════════════════════════════════════════
+# DEV BOOTSTRAP ALTERNATIVES — commented out, provider-backed
+# ═════════════════════════════════════════════════════════════════════════════
+# WARNING: 3rd-party — dev bootstrap only. MUST be removed before production.
+# See ADR 0003. These blocks exist solely for one-time fixture capture or
+# temporary experimentation before the user's validator is online. Never
+# point production traffic at them.
+
+# ──────────────────── Helius LaserStream (dev-bootstrap only) ───────────────
+# Docs: https://docs.helius.dev/laserstream/overview
+#
+# [solana]
+# endpoint     = "https://mainnet.helius-rpc.com"
+# auth_token   = "YOUR_HELIUS_API_KEY"        # never commit
+# rpc_endpoint = "https://mainnet.helius-rpc.com"
+# checkpoint_path = "./checkpoints/solana.json"
+# commitment      = "confirmed"
+#
+# [solana.reconnect]
+# base_delay_ms      = 500
+# max_delay_ms       = 30_000
+# max_attempts       = 10
+# rate_limit_base_ms = 5_000
+
+# ──────────────────── Triton One Dragon's Mouth (dev-bootstrap only) ────────
+# Docs: https://docs.triton.one/rpc-pool/dragon-s-mouth-grpc-subscriptions
+#
+# [solana]
+# endpoint     = "https://ams1.rpc.triton.one:443"    # replace with your region
+# auth_token   = "YOUR_TRITON_ACCESS_TOKEN"            # never commit
+# rpc_endpoint = "https://ams1-mainnet.rpcpool.com"
+# checkpoint_path = "./checkpoints/solana.json"
+# commitment      = "confirmed"
+#
+# [solana.reconnect]
+# base_delay_ms      = 500
+# max_delay_ms       = 30_000
+# max_attempts       = 10
+# rate_limit_base_ms = 5_000
+
+# ──────────────────── Anza public RPC (read-only, bootstrap discovery) ──────
+# Docs: https://docs.anza.xyz/clients/jsonrpc-api
+# Rate-limit: ~100 req/10sec per IP. No gRPC streaming.
+# Use ONLY for one-off discovery calls while standing up your own validator.
+#
+# rpc_endpoint = "https://api.mainnet-beta.solana.com"
+# (No Yellowstone gRPC subscribe path — not available on Anza public RPC.)

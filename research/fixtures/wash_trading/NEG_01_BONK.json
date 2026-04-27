@@ -1,0 +1,52 @@
+{
+  "meta": {
+    "fixture_id": "NEG_01_BONK",
+    "synthetic": false,
+    "calibration_flag": false,
+    "expected_correct": true,
+    "description": "BONK — high-volume legitimate distributed trading. Many unique senders, no single wallet with >=3 round-trips within 25 slots. Signal A and B should not fire.",
+    "expected_signal": "none",
+    "expected_confidence_max": 0.30,
+    "source": "live_reference",
+    "token_mint": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+    "created": "2026-04-21",
+    "spec_ref": "docs/designs/0008-detector-05-wash-trading.md §10 NEG_01"
+  },
+  "token": {
+    "chain": "solana",
+    "mint": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+    "symbol": "BONK",
+    "decimals": 5,
+    "rugcheck_score": 10,
+    "verification": {
+      "jup_verified": true,
+      "jup_strict": true
+    },
+    "total_market_liquidity_usd": "45000000.00",
+    "note": "is_established_protocol=true (jup_strict=true) — Signal A suppressed regardless"
+  },
+  "pool": {
+    "address": "8QaXeHBrShJTdtN1rWCcBgRJ9kkxoEFRkDEHUBL6UCKP",
+    "dex": "raydium_v4",
+    "liquidity_usd": "45000000.00",
+    "note": "Representative Raydium BONK/SOL pool; exact pool address may differ from live state"
+  },
+  "trading_pattern_summary": {
+    "unique_senders_24h": 12400,
+    "total_swaps_24h": 89000,
+    "max_round_trips_any_single_wallet": 1,
+    "note": "BONK's distributed retail trading produces many unique wallets each transacting once or twice; no systematic round-trip pattern from any individual address",
+    "typical_block_gap_between_same_wallet_swaps": "thousands of slots — far exceeds 25-slot window",
+    "cluster_net_flow_check": "With 12,400 distinct senders and top-50 by volume all being DEX arbitrage bots and Jupiter router addresses (filtered as known-aggregator), Signal B cluster detection finds no group with net flows summing to zero"
+  },
+  "expected_result": {
+    "signal_a_fires": false,
+    "signal_a_suppressed_by_established_protocol": true,
+    "signal_b_fires": false,
+    "signal_c_fires": false,
+    "event_type": "info",
+    "confidence": 0.02,
+    "reason": "is_established_protocol=true (jup_strict=true); Signal A suppressed. Signal B: no cluster with min 3 wallets and net zero flows in top-50. No anomaly detected."
+  },
+  "test_assertion": "assert(events.is_empty() OR events[0].severity == Info)"
+}

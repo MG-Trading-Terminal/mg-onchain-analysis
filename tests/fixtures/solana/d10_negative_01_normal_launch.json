@@ -1,0 +1,45 @@
+{
+  "_label": "NEG_D10_01",
+  "_description": "Synthetic fixture: pool initialized with $1500 USD liquidity (≈10 SOL @ $150/SOL) and 100% LP locked in a known locker. Neither Signal A nor Signal B fires. Expected: no event.",
+  "_chain": "solana",
+  "_token": "LegitToken01111111111111111111111111111111111",
+  "_pool": "LegitPool011111111111111111111111111111111111",
+  "_deployer": "LegitDeployer1111111111111111111111111111111",
+  "_source": "Synthetic — research/03-feature-gap-2026-04-24.md §T1-1.",
+  "_note": "$1500 USD > $750 threshold (Signal A does not fire). 100% locked (Signal B does not fire). Expected: empty events.",
+
+  "pool_initialize": {
+    "initial_liquidity_usd": "1500.000000",
+    "_sol_equivalent_at_150": "10.000000",
+    "initial_liquidity_usd_threshold": "750.000000"
+  },
+
+  "lp_state": {
+    "lockers": [
+      {
+        "locker_address": "Unicrypt111111111111111111111111111111111111",
+        "locker_name": "Unicrypt",
+        "locked_amount_raw": "1000000000",
+        "lp_total_supply_raw": "1000000000",
+        "unlock_at": null
+      }
+    ],
+    "lp_locked_pct": "100.000000",
+    "lp_burned_pct": "0.000000",
+    "lp_safe_floor_pct": "0.700000"
+  },
+
+  "token_meta": {
+    "jup_verified": false,
+    "jup_strict": false,
+    "rugcheck_score": 40
+  },
+
+  "_expected": {
+    "detector_id": "launch_audit",
+    "signal_a_fired": false,
+    "signal_b_fired": false,
+    "fires": false,
+    "events": []
+  }
+}

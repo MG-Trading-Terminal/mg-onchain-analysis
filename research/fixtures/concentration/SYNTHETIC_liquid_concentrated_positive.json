@@ -1,0 +1,52 @@
+{
+  "_comment": "Positive Fixture #2 — cold-start path: 6 Liquid wallets hold 90% of circulating supply.",
+  "_fixture_type": "positive",
+  "_signals_expected": [3],
+  "_source": "Synthetic fixture. Developer MUST replace with a real confirmed token before Phase 3 ships. See docs/designs/0006-detector-03-concentration.md §8.",
+  "_cold_start": true,
+  "_collector_note": "snapshot_prior is null — first evaluation of this token. Signal 3 fires at absolute ceiling. Info cold_start event also emitted.",
+
+  "snapshot_now": {
+    "chain": "solana",
+    "token": "SYNTHETIC_liquid_concentrated_positive",
+    "snapshot_id": 5001,
+    "slot": 310500000,
+    "block_time": "2026-04-21T09:00:00Z",
+    "total_holders": 42,
+    "top_holders_raw": [
+      { "address": "AAA111BBB222CCC333DDD444EEE555FFF666GGG777HH", "balance_raw": 2000000000000, "balance_pct": "0.2000" },
+      { "address": "BBB222CCC333DDD444EEE555FFF666GGG777HHH888II", "balance_raw": 1800000000000, "balance_pct": "0.1800" },
+      { "address": "CCC333DDD444EEE555FFF666GGG777HHH888III999JJ", "balance_raw": 1600000000000, "balance_pct": "0.1600" },
+      { "address": "DDD444EEE555FFF666GGG777HHH888III999JJJ000KK", "balance_raw": 1400000000000, "balance_pct": "0.1400" },
+      { "address": "EEE555FFF666GGG777HHH888III999JJJ000KKK111LL", "balance_raw": 1200000000000, "balance_pct": "0.1200" },
+      { "address": "FFF666GGG777HHH888III999JJJ000KKK111LLL222MM", "balance_raw": 1000000000000, "balance_pct": "0.1000" }
+    ],
+    "total_supply_raw": 10000000000000,
+    "liquid_supply_raw": 10000000000000,
+    "liquid_count": 42,
+    "excluded_count": 0,
+    "needs_classification_count": 0,
+    "_computed": {
+      "top10_liquid_raw": 9000000000000,
+      "top10_pct_liquid": "0.9000",
+      "gini_liquid": "0.3095",
+      "_gini_note": "With 42 wallets where top-6 hold 90% and remaining 36 share 10% equally (~0.28% each), Gini is moderate-high"
+    }
+  },
+
+  "snapshot_prior": null,
+
+  "sidecar_rows": [],
+
+  "expected": {
+    "_note": "Cold start: no prior snapshot → Info(cold_start) emitted. top10_pct_now=0.90 >= absolute_top10_ceiling=0.80 → Signal 3 fires.",
+    "signals_fired": [3],
+    "info_events": ["cold_start"],
+    "signal_3": {
+      "_recalc": "raw_excess=0.90-0.80=0.10, conf=min(0.85, 0.65+0.10/0.20*0.20)=min(0.85,0.65+0.10)=0.75",
+      "confidence": "0.75",
+      "severity": "High"
+    },
+    "max_confidence": "0.75"
+  }
+}

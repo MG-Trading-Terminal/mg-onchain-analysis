@@ -1,0 +1,45 @@
+{
+  "_fixture": "d05_b_positive_01_3wallet_ring",
+  "_detector": "wash_trading_h1 / Signal B (graph cycles)",
+  "_signal": "3-wallet elementary ring A→B→C→A in 30-minute window. Volume ≥ $1,000 threshold. Expected: Signal B fires, confidence ≈ 0.50.",
+  "_design": "docs/designs/0017-d05-signal-b-graph-cycles.md §6.3",
+  "chain": "solana",
+  "token": "WASHTokenAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+  "transfers": [
+    {
+      "from_address": "WALLET_A_1111111111111111111111111111111111111",
+      "to_address":   "WALLET_B_2222222222222222222222222222222222222",
+      "amount_raw": "12500000000",
+      "block_time": "2024-01-15T10:00:00Z",
+      "block_height": 250000
+    },
+    {
+      "from_address": "WALLET_B_2222222222222222222222222222222222222",
+      "to_address":   "WALLET_C_3333333333333333333333333333333333333",
+      "amount_raw": "12400000000",
+      "block_time": "2024-01-15T10:15:00Z",
+      "block_height": 250100
+    },
+    {
+      "from_address": "WALLET_C_3333333333333333333333333333333333333",
+      "to_address":   "WALLET_A_1111111111111111111111111111111111111",
+      "amount_raw": "12350000000",
+      "block_time": "2024-01-15T10:28:00Z",
+      "block_height": 250200
+    }
+  ],
+  "expected": {
+    "signal_b_fires": true,
+    "cycle_count_min": 1,
+    "cycle_length": 3,
+    "confidence_min": 0.40,
+    "confidence_max": 0.85,
+    "rationale": "3-hop ring A→B→C→A with ~$50K volume (assuming $4/token, 9 decimals). Ramp = min(1, 50000/10000)=1 → conf=0.80."
+  },
+  "token_meta": {
+    "decimals": 9,
+    "price_usd_proxy": 4.0,
+    "total_market_liquidity_usd": "2500000",
+    "circulating_supply_raw": "625000000000000000"
+  }
+}

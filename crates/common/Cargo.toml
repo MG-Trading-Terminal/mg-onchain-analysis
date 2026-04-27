@@ -1,0 +1,20 @@
+[package]
+name        = "mg-onchain-common"
+version.workspace     = true
+edition.workspace     = true
+rust-version.workspace = true
+license.workspace     = true
+repository.workspace  = true
+description = "Shared domain types: AnomalyEvent, Transfer, Swap, PoolEvent, TokenMeta, HolderSnapshot, Severity, Chain, Address"
+
+[dependencies]
+anyhow.workspace      = true
+serde.workspace       = true
+serde_json.workspace  = true
+rust_decimal.workspace = true
+thiserror.workspace   = true
+chrono.workspace      = true
+hex.workspace         = true
+# bs58 is used only in this crate (Solana address validation).
+# Not promoted to workspace deps until another crate needs it.
+bs58 = "0.5"

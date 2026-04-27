@@ -1,0 +1,102 @@
+{
+  "fixture_id": "NEG_03_USDC_flat_baseline",
+  "synthetic": false,
+  "detector": "pump_dump",
+  "category": "stablecoin_flat",
+  "label": "negative",
+  "source": "Public data: USDC on Solana; parameters approximated from CoinGecko / Solana Explorer 2026-04-22",
+  "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  "chain": "solana",
+  "token_name": "USD Coin",
+  "token_symbol": "USDC",
+
+  "token_meta": {
+    "decimals": 6,
+    "total_supply_raw": "26000000000000000",
+    "mint_authority": "2wmVCSfPxGPjrnMMn7rchp4uaeoTqN39mXFC2zhPdri9",
+    "freeze_authority": "2wmVCSfPxGPjrnMMn7rchp4uaeoTqN39mXFC2zhPdri9",
+    "transfer_fee_bps": 0,
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "jup_verified": true,
+    "jup_strict": true,
+    "rugcheck_score": 2,
+    "total_holders": 3200000,
+    "total_market_liquidity_usd": "2100000000",
+    "note": "Freeze authority active (OFAC compliance, Circle-controlled). D01 attenuated by jup_strict. Not relevant for D04."
+  },
+
+  "observation_window": {
+    "start": "2026-04-22T08:00:00Z",
+    "end": "2026-04-22T09:00:00Z",
+    "window_hours": 1
+  },
+
+  "market_cap": {
+    "fdv_usd": "26000000000",
+    "circulating_supply_pct": "100",
+    "market_cap_proxy": "fdv",
+    "market_cap_usd": "26000000000",
+    "above_filter": true,
+    "filter_threshold_usd": "60000000",
+    "note": "USDC market cap $26B >> $60M filter. Detector exits with Info event immediately."
+  },
+
+  "swaps_1h": {
+    "volume_usd": "800000000",
+    "note": "Approximate: USDC has $10B–$20B daily Solana DEX volume. ~$800M in 1h is normal."
+  },
+
+  "baseline_7d": {
+    "days_with_nonzero_volume": 7,
+    "approximate_mean_volume_usd": "15000000000",
+    "note": "Robust multi-billion dollar daily baseline. volume_ratio ≈ 1.28× (0.8B/day_fraction vs 15B daily). Well below 5× threshold if hypothetically evaluated."
+  },
+
+  "price_data": {
+    "price_at_window_start_usd": "1.0001",
+    "price_at_window_end_usd": "0.9999",
+    "price_change_pct_1h": "-0.0002",
+    "note": "Stablecoin peg: price change is noise (~0.02% variation). Well below 30% threshold."
+  },
+
+  "signal_evaluation": {
+    "market_cap_filter_triggers": true,
+    "market_cap_filter_reason": "market_cap_usd = 26000000000 >> filter = 60000000",
+    "signal_a_evaluated": false,
+    "signal_b_evaluated": false,
+    "signal_c_evaluated": false,
+    "is_established_protocol": true,
+    "is_established_protocol_reason": "jup_strict=true"
+  },
+
+  "expected_output": {
+    "fires_anomaly_event": false,
+    "fires_info_event": true,
+    "info_signal": "market_cap_above_filter",
+    "confidence": "0.05",
+    "severity": "Info",
+    "evidence_keys": {
+      "pump_dump/market_cap_usd": "26000000000",
+      "pump_dump/signal": "market_cap_above_filter"
+    }
+  },
+
+  "additional_validation": {
+    "if_market_cap_filter_bypassed_in_unit_test": {
+      "signal_a_would_fire": false,
+      "reason_a": "price_change_pct_1h = -0.0002 << 0.30 threshold",
+      "signal_b_would_fire": false,
+      "reason_b": "burst_ratio = 0.8B / (15B / 24h) * 1h ≈ 0.053 << 0.90 threshold; also baseline_days_available = 7 >= 3",
+      "signal_c_would_apply": false,
+      "reason_c": "Neither A nor B fires"
+    }
+  },
+
+  "notes": [
+    "Validates the market_cap_filter path as the primary termination condition for high-cap tokens.",
+    "Stablecoin price characteristic (near-zero 1h change) provides an additional safety net: even without the market cap filter, price_change_pct_1h ≈ 0 << 0.30 ensures Signal A cannot fire.",
+    "USDC mint authority is active (Circle OFAC compliance). This is the known legitimate freeze-authority use case from D01 design. Not relevant to D04.",
+    "is_established_protocol = true (jup_strict=true). If somehow evaluated, Signal C would be suppressed.",
+    "USDC mint on Solana: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v — confirmed via Solana Explorer and Circle documentation."
+  ]
+}

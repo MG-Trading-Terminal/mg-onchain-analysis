@@ -1,0 +1,190 @@
+{
+  "_fixture_meta": {
+    "label": "positive",
+    "detector": "withdraw_withheld_drain",
+    "signal": "A_extraction_event_plus_B_rotation_composite",
+    "synthetic": true,
+    "expected_signals": ["extraction_event", "authority_rotation"],
+    "expected_composite_confidence_gte": "0.95",
+    "expected_composite_severity": "Critical",
+    "live_search_attempted": true,
+    "live_search_result": "No confirmed live Token-2022 withdraw_withheld rug found in RugCheck API as of 2026-04-21. RugCheck exposes transferFee.feeBps in the JSON response but has no withdraw_withheld_events endpoint. Corpus scan documented in research/fixtures/solana-corpus-phase2.md. This fixture remains synthetic until a real incident is confirmed.",
+    "replacement_instruction": "Search RugCheck API for rugged=true tokens with token_program=TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb AND transferFee.feeBps > 3000. Cross-reference on-chain against solscan.io instruction history for WithdrawWithheldTokensFromAccounts. Capture token2022_instructions rows from the Postgres pipeline. Replace this file.",
+    "rationale": "Sustained extraction over 7 days: 8 WithdrawWithheld* instructions across two authority wallets (one rotation mid-window). Cumulative $12,000 USD. fee_bps=8000 (80%). Signal A saturates at 0.90 (Critical). Signal B fires at 0.75 (High). Composite: 0.95 (Critical).",
+    "signal_a_confidence_calculation": "conf = min(0.90, 0.60 + min(0.15, (8-3)*0.03) + ln(12000/1000)*0.10) = min(0.90, 0.60 + 0.15 + 0.249) = min(0.90, 0.999) = 0.90",
+    "composite_confidence_calculation": "conf = min(0.95, 0.90 + 0.10) = 0.95",
+    "captured_at": "2026-04-21T00:00:00Z"
+  },
+  "mint": "SYNTH_D07_POS_003_REPLACE_WITH_REAL_RUGGED_TOKEN",
+  "chain": "solana",
+  "symbol": "DRAIN",
+  "name": "SyntheticSustainedDrainToken",
+  "decimals": 9,
+  "token_program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+  "total_supply_raw": "5000000000000000",
+  "circulating_supply_raw": "4500000000000000",
+  "mint_authority": null,
+  "freeze_authority": null,
+  "creator": "DeployerWalletCCCC3333333333333333333333333",
+  "creator_balance_raw": "0",
+  "transfer_fee": {
+    "feeBps": 8000,
+    "maxFeeRaw": "9999999999999",
+    "authority": "DeployerWalletCCCC3333333333333333333333333"
+  },
+  "permanent_delegate": null,
+  "transfer_hook_program": null,
+  "top_holders": [],
+  "total_holders": 1250,
+  "markets": [
+    {
+      "pool_address": "RaydiumPoolCCCC11111111111111111111111111111",
+      "dex": "raydium_v4",
+      "lp_burned_pct": "0.00",
+      "liquidity_usd": "120000.00",
+      "lp_provider_count": 1
+    }
+  ],
+  "total_market_liquidity_usd": "120000.00",
+  "lockers": [],
+  "graph_insiders_detected": true,
+  "insider_networks": [],
+  "launchpad": null,
+  "deploy_platform": null,
+  "detected_at": "2026-04-07T00:00:00Z",
+  "rugged": true,
+  "verification": { "jup_verified": false, "jup_strict": false },
+  "rugcheck_score": 96,
+  "_d07_token2022_instructions": {
+    "note": "8 extraction events over 7 days with a mid-window authority rotation. Events 1-4 by OldAuthority; rotation on day 4; events 5-8 by NewAuthority. Cumulative USD $12,000.",
+    "rotation_events": [
+      {
+        "id": 3000,
+        "tx_hash": "ROTATION_TX_031_PLACEHOLDER_JJJJJJJJJJJJJJJJJJJJJJJJJJJJJ",
+        "block_height": 310200000,
+        "block_time": "2026-04-18T00:00:00Z",
+        "instruction_kind": "set_authority_withdraw_withheld",
+        "authority": "OldAuthorityCCCC111111111111111111111111111",
+        "prev_authority": "OldAuthorityCCCC111111111111111111111111111",
+        "new_authority": "NewAuthorityDDDD111111111111111111111111111",
+        "amount_raw": null,
+        "amount_usd": "6000.00",
+        "_note_prev_authority_tenure_days": 4,
+        "_note_new_authority_first_sol_time": "2026-04-17T22:00:00Z",
+        "_note_rotation_delta_hours": 2
+      }
+    ],
+    "withdraw_events": [
+      {
+        "id": 3001,
+        "tx_hash": "EXTRACT_TX_031A_PLACEHOLDER",
+        "block_height": 310086400,
+        "block_time": "2026-04-15T00:00:00Z",
+        "instruction_kind": "withdraw_withheld_from_accounts",
+        "authority": "OldAuthorityCCCC111111111111111111111111111",
+        "destination": "OldAuthorityAcctCCCC11111111111111111111",
+        "amount_raw": "375000000000",
+        "amount_usd": "1500.00"
+      },
+      {
+        "id": 3002,
+        "tx_hash": "EXTRACT_TX_032A_PLACEHOLDER",
+        "block_height": 310129600,
+        "block_time": "2026-04-16T00:00:00Z",
+        "instruction_kind": "withdraw_withheld_from_accounts",
+        "authority": "OldAuthorityCCCC111111111111111111111111111",
+        "destination": "OldAuthorityAcctCCCC11111111111111111111",
+        "amount_raw": "375000000000",
+        "amount_usd": "1500.00"
+      },
+      {
+        "id": 3003,
+        "tx_hash": "EXTRACT_TX_033A_PLACEHOLDER",
+        "block_height": 310172800,
+        "block_time": "2026-04-17T00:00:00Z",
+        "instruction_kind": "withdraw_withheld_from_accounts",
+        "authority": "OldAuthorityCCCC111111111111111111111111111",
+        "destination": "OldAuthorityAcctCCCC11111111111111111111",
+        "amount_raw": "375000000000",
+        "amount_usd": "1500.00"
+      },
+      {
+        "id": 3004,
+        "tx_hash": "EXTRACT_TX_034A_PLACEHOLDER",
+        "block_height": 310192800,
+        "block_time": "2026-04-17T12:00:00Z",
+        "instruction_kind": "withdraw_withheld_from_accounts",
+        "authority": "OldAuthorityCCCC111111111111111111111111111",
+        "destination": "OldAuthorityAcctCCCC11111111111111111111",
+        "amount_raw": "375000000000",
+        "amount_usd": "1500.00"
+      },
+      {
+        "id": 3005,
+        "tx_hash": "EXTRACT_TX_035B_PLACEHOLDER",
+        "block_height": 310243200,
+        "block_time": "2026-04-19T00:00:00Z",
+        "instruction_kind": "withdraw_withheld_from_accounts",
+        "authority": "NewAuthorityDDDD111111111111111111111111111",
+        "destination": "NewAuthorityAcctDDDD11111111111111111111",
+        "amount_raw": "375000000000",
+        "amount_usd": "1500.00"
+      },
+      {
+        "id": 3006,
+        "tx_hash": "EXTRACT_TX_036B_PLACEHOLDER",
+        "block_height": 310286400,
+        "block_time": "2026-04-20T00:00:00Z",
+        "instruction_kind": "withdraw_withheld_from_accounts",
+        "authority": "NewAuthorityDDDD111111111111111111111111111",
+        "destination": "NewAuthorityAcctDDDD11111111111111111111",
+        "amount_raw": "375000000000",
+        "amount_usd": "1500.00"
+      },
+      {
+        "id": 3007,
+        "tx_hash": "EXTRACT_TX_037B_PLACEHOLDER",
+        "block_height": 310315200,
+        "block_time": "2026-04-20T08:00:00Z",
+        "instruction_kind": "withdraw_withheld_from_accounts",
+        "authority": "NewAuthorityDDDD111111111111111111111111111",
+        "destination": "NewAuthorityAcctDDDD11111111111111111111",
+        "amount_raw": "375000000000",
+        "amount_usd": "1500.00"
+      },
+      {
+        "id": 3008,
+        "tx_hash": "EXTRACT_TX_038B_PLACEHOLDER",
+        "block_height": 310329600,
+        "block_time": "2026-04-20T16:00:00Z",
+        "instruction_kind": "withdraw_withheld_from_accounts",
+        "authority": "NewAuthorityDDDD111111111111111111111111111",
+        "destination": "NewAuthorityAcctDDDD11111111111111111111",
+        "amount_raw": "375000000000",
+        "amount_usd": "1500.00"
+      }
+    ],
+    "w3_aggregate": {
+      "event_count": 8,
+      "cumulative_raw": "3000000000000",
+      "cumulative_usd": "12000.00"
+    }
+  },
+  "_d07_expected_output": {
+    "signal_b": {
+      "fires": true,
+      "confidence": "0.75",
+      "severity": "High",
+      "authority_is_fresh_wallet": "1",
+      "prev_authority_tenure_days": 4
+    },
+    "signal_a": {
+      "fires": true,
+      "base_confidence": "0.90",
+      "composite_confidence": "0.95",
+      "severity": "Critical",
+      "rotation_detected": "1",
+      "combined_with_d01_s2": "1"
+    }
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "_fixture_meta": {
+    "mint": "SynthRug094RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR",
+    "symbol": "RUG094",
+    "label": "positive",
+    "category": "rug_latent",
+    "source_url": "synthetic/rug_latent/multi_pool_all_zero_lock",
+    "fetched_at": "2026-04-21T20:43:00Z",
+    "synthetic": true,
+    "notes": "D02: two pools, both 0% locked/burned. Pool A (Raydium, $85k) and Pool B (Orca, $55k). Weighted effective_safe = (0*85k + 0*55k)/(85k+55k) = 0.0%. Full combined liquidity at rug risk. Multi-pool zero-lock case. lp_provider_count=1 on both pools (same deployer). Confirms multi-pool aggregation in D02."
+  },
+  "token_meta": {
+    "mint": "SynthRug094RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR",
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "name": "MultiPoolRug094",
+    "symbol": "RUG094",
+    "decimals": 6,
+    "supply_raw": "1000000000000000",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "mutable": true,
+    "update_authority": "DevMultiRug094111111111111111111111111111111",
+    "transfer_fee": null,
+    "permanent_delegate": null,
+    "transfer_hook": null,
+    "rugged": false,
+    "verification": { "jup_verified": false, "jup_strict": false },
+    "rugcheck_score": 3100,
+    "rugcheck_score_normalised": 62,
+    "risks": [ { "name": "LP not burned or locked", "level": "danger" } ],
+    "markets": [
+      { "pool_address": "MultiPoolA094111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "liquidity_usd": "85000.00", "lp_provider_count": 1 },
+      { "pool_address": "MultiPoolB094111111111111111111111111111111", "dex": "orca", "lp_burned_pct": "0.00", "liquidity_usd": "55000.00", "lp_provider_count": 1 }
+    ],
+    "lockers": {},
+    "creator": "DevMultiRug094111111111111111111111111111111",
+    "creator_balance_raw": "0",
+    "total_market_liquidity_usd": "140000.00"
+  },
+  "holder_snapshot_now": {
+    "total_holders": 620,
+    "total_supply_raw": 1000000000000000,
+    "balances": {
+      "MultiRug094_011111111111111111111111111": 72000000000000,
+      "MultiRug094_021111111111111111111111111": 48000000000000,
+      "MultiRug094_031111111111111111111111111": 33000000000000,
+      "MultiRug094_041111111111111111111111111": 21000000000000,
+      "MultiRug094_051111111111111111111111111": 14000000000000
+    }
+  },
+  "holder_snapshot_prior_24h": {
+    "total_holders": 598,
+    "total_supply_raw": 1000000000000000,
+    "top10_pct_liquid_after_exclusion": "0.21",
+    "gini_liquid_after_exclusion": "0.47"
+  },
+  "holder_classifications": [],
+  "pool_rows": [
+    { "pool_address": "MultiPoolA094111111111111111111111111111111", "dex": "raydium", "lp_burned_pct": "0.00", "lp_locked_pct": "0.00", "effective_safe_pct": "0.00", "lp_provider_count": 1, "liquidity_usd": "85000.00" },
+    { "pool_address": "MultiPoolB094111111111111111111111111111111", "dex": "orca", "lp_burned_pct": "0.00", "lp_locked_pct": "0.00", "effective_safe_pct": "0.00", "lp_provider_count": 1, "liquidity_usd": "55000.00" }
+  ],
+  "swaps_1h": { "volume_usd": "42000.00", "trade_count": 98, "unique_buyers": 82, "price_start": "0.000140", "price_end": "0.000143", "price_change_pct": "0.021" },
+  "swaps_7d_daily_baseline": { "day_count_nonzero": 7, "mean_daily_volume_usd": "48000.00", "std_daily_volume_usd": "9000.00", "volume_multiplier_observed": "0.88", "volume_z_score": "-0.7" },
+  "signal_a_round_trips": [],
+  "pool_total_volume_1h_usd": "42000.00",
+  "expected": {
+    "d01_honeypot": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No static honeypot signals." },
+    "d02_rug_pull": {
+      "verdict": "FIRES",
+      "confidence_band": [0.75, 0.85],
+      "severity": "High",
+      "reason": "Signal B: weighted_effective_safe=(0*85000+0*55000)/140000=0.0%. conf=min(0.75, 0.50+(1-0.0)*0.50)=0.75. Single LP provider on each pool (same deployer): +0.05 bonus -> 0.80. Both pools zero-lock amplifies: second pool at risk adds no further signal but confirms deployer controls all liquidity. Final: 0.80 High. $140k at rug risk."
+    },
+    "d03_concentration": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.12], "severity": "Info", "reason": "top10_now=(72+48+33+21+14)e12/1e15=0.188. prior=0.21. Delta=-0.022. All signals below threshold." },
+    "d04_pump_dump": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "vol_multiplier=0.88 < 5.0. price_change=+2.1% < 30%. D04 does not fire." },
+    "d05_wash_trading_h1": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.10], "severity": "Info", "reason": "No round-trip events detected." },
+    "d06_mint_burn_anomaly": { "verdict": "BELOW_THRESHOLD", "confidence_band": [0.02, 0.05], "severity": "Info", "reason": "mint_authority=null." }
+  }
+}
