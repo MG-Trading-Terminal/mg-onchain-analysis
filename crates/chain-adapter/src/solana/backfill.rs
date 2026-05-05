@@ -2,10 +2,10 @@
 //!
 //! # Design
 //!
-//! Backfill is distinct from the live Yellowstone stream because:
-//! 1. It reads from an archive/historical RPC — not all gRPC providers retain full block history.
-//! 2. It must guarantee complete coverage of the requested slot range (no gaps).
-//! 3. It runs in a separate tokio task so it doesn't block live event processing.
+//! Backfill reads historical blocks from the Solana JSON-RPC HTTP endpoint:
+//! 1. Complete coverage of the requested slot range (no gaps).
+//! 2. Runs in a separate tokio task so it doesn't block live subscription processing.
+//! 3. Skipped slots (no block produced) are silently ignored.
 //!
 //! # API used
 //!
@@ -222,12 +222,8 @@ pub fn build_backfill_stream(
             "starting backfill"
         );
 
-        // Resolve RPC endpoint.
-        let rpc_url = config
-            .rpc_endpoint
-            .as_ref()
-            .map(|u| u.as_str().to_owned())
-            .unwrap_or_else(|| config.endpoint.as_str().to_owned());
+        // Resolve RPC endpoint: use the configured HTTP URL.
+        let rpc_url = config.http_url.as_str().trim_end_matches('/').to_owned();
 
         let client = BackfillRpcClient::new(&rpc_url);
         let mut last_checkpoint_slot = start;
@@ -308,7 +304,7 @@ pub fn build_backfill_stream(
 /// Decode all transactions in a block into `Event` values.
 fn decode_block_transactions(block: &GetBlockResponse, slot: u64, block_time: Option<i64>) -> Vec<Event> {
     use crate::solana::decode::{decode_transaction, SplInstruction, TxDecodeInput};
-    use solana_sdk::pubkey::Pubkey;
+    use mg_solana_types::Pubkey;
     use std::collections::HashMap;
     use tracing::warn;
 

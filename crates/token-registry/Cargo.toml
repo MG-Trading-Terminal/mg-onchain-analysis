@@ -36,8 +36,8 @@ sqlx.workspace = true
 # bs58 — encode Solana public keys from raw bytes in rpc.rs.
 bs58.workspace = true
 
-# solana-sdk — needed for RawAccount.owner field (Pubkey type) in B1.1.
-solana-sdk.workspace = true
+# mg-solana-types — Pubkey for RawAccount.owner field (Sprint 25, ADR 0006 — replaces solana-sdk).
+mg-solana-types = { path = "../solana-types" }
 
 [features]
 # Enable test mock types for use in integration tests and sibling crates.

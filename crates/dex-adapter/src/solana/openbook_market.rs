@@ -79,7 +79,7 @@
 //! the vault_signer_nonce in the market account data produces the vault signer
 //! address shown on Solscan as the market's vault authority.
 
-use solana_sdk::pubkey::Pubkey;
+use mg_solana_types::Pubkey;
 use thiserror::Error;
 
 // ---------------------------------------------------------------------------

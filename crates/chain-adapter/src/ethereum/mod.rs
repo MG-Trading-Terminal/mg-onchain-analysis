@@ -28,12 +28,12 @@
 //! - `alloy = { version = "0.x", features = [...] }` to workspace Cargo.toml
 //! - Wire `WsRpcClient` to use `alloy::providers::WsConnect`
 //!
-//! # Reth ExEx (Sprint 16+)
+//! # Reth ExEx (out-of-process bridge — Sprint 25)
 //!
-//! Currently uses WebSocket JSON-RPC + `ReorgBuffer` hash-tracking for reorg detection.
-//! Sprint 16+ will add an ExEx in-process variant (`exex.rs`) behind a feature flag
-//! that receives `ChainCommitted`/`ChainReverted` directly from the Reth node process,
-//! eliminating the hash-tracking state machine for the ExEx path.
+//! Per ADR 0006 (code-level self-sovereignty), the ExEx integration runs as a separate
+//! `bridge/exex-bridge/` process that links `reth-exex` only there and exposes
+//! `ChainCommitted`/`ChainReverted` notifications over our own gRPC proto. The
+//! `chain-adapter` crate does NOT link any `reth-*` dependency.
 //!
 //! # Known gaps (Sprint 15)
 //!
@@ -46,18 +46,17 @@
 
 pub mod adapter;
 pub mod decoder;
+pub mod http;
 pub mod reorg;
 pub mod rpc;
 pub mod types;
 
-// ExEx-mode client — compiled only with --features exex.
-// Sprint 24: EthereumRpcExEx trait + ExExRpcClient skeleton.
-// Sprint 25: onchain-reth binary entry wires ExExRpcClient into EthereumAdapter.
-#[cfg(feature = "exex")]
-pub mod exex;
-
 pub use adapter::EthereumAdapter;
+pub use http::{
+    AddressClass, ContractAge, DiscoveredToken, EvmTokenMeta, OwnershipEventProbe,
+    RecentHolderFlows, SimulateSellOutcome, SwapVolumeProbe, TransferEdge, classify_address,
+    discover_recent_pairs, discover_recent_v3_pools, eth_get_transaction_count,
+    evm_token_metadata, fetch_recent_holder_flows, find_contract_age, probe_ownership_events,
+    probe_swap_volume, simulate_sell_evm,
+};
 pub use rpc::{EthereumRpc, MockEthereumRpc, WsRpcClient};
-
-#[cfg(feature = "exex")]
-pub use exex::{EthereumRpcExEx, ExExRpcClient, ExExNotification};

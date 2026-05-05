@@ -9,6 +9,7 @@ pub mod events;
 pub mod health;
 pub mod metrics_handler;
 pub mod risk;
+pub mod score;
 
 use std::sync::Arc;
 
@@ -35,11 +36,15 @@ pub fn build_router(state: Arc<AppState>) -> Router {
         .route("/v1/tokens/{chain}/{mint}/risk", get(risk::get_token_risk_handler))
         .route("/v1/anomaly_events", get(events::list_anomaly_events_handler))
         .route("/v1/detectors", get(detectors_handler::list_detectors_handler))
+        // Sprint 26 T26-6: Pull-based query engine REST + WS (ADR 0007 / design 0028 §4.5).
+        // NOTE: /v1/anomaly_events is preserved unchanged per design 0028 §11.10 (backwards compat).
+        .route("/v1/score", get(score::score_handler))
         // Admin endpoints
         .route("/v1/admin/cache/{chain}/{mint}", delete(admin::invalidate_cache_handler))
         .route("/v1/admin/users", post(admin::create_user_handler))
-        // WebSocket
+        // WebSocket: existing stream + new watchlist (T26-6)
         .route("/v1/ws/stream", get(ws::ws_stream_handler))
+        .route("/v1/watchlist", get(ws::watchlist::watchlist_ws_handler))
         // Tower middleware stack
         .layer(
             tower::ServiceBuilder::new()

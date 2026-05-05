@@ -57,6 +57,12 @@ pub struct ServiceConfig {
     /// Gateway bind address and endpoint paths.
     #[serde(default)]
     pub gateway: ServiceGatewayConfig,
+
+    /// Periodic scan worker configuration (T26-6, ADR 0007 §6.4).
+    ///
+    /// Nested under `[periodic_scan]` in TOML. Absent = use `PeriodicScanConfig::default()`.
+    #[serde(default)]
+    pub periodic_scan: Option<crate::init::periodic_scan::PeriodicScanConfig>,
 }
 
 impl ServiceConfig {
@@ -345,6 +351,10 @@ impl ChainsConfig {
 /// Solana chain configuration.
 ///
 /// Decision D-E: `enabled = true` (Solana is the primary chain for shitcoin detection).
+///
+/// Sprint 26 (T26-2): replaced the single Yellowstone gRPC `rpc_url` field with two
+/// standard JSON-RPC endpoints: `http_url` (port 8899) and `ws_url` (port 8900).
+/// This mirrors `EvmChainConfig` and aligns with ADR 0007.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct SolanaChainConfig {
     /// Whether to start the Solana indexer.
@@ -353,11 +363,19 @@ pub struct SolanaChainConfig {
     #[serde(default = "SolanaChainConfig::default_enabled")]
     pub enabled: bool,
 
-    /// Yellowstone gRPC endpoint URL for the Solana adapter.
+    /// Solana JSON-RPC HTTP endpoint.
     ///
-    /// Default: `http://localhost:10000` (self-hosted per ADR 0003).
-    #[serde(default = "SolanaChainConfig::default_rpc_url")]
-    pub rpc_url: String,
+    /// Used for one-shot requests: `getBlock`, `getTransaction`, `getSlot`, etc.
+    /// Default: `http://127.0.0.1:8899` (standard Agave RPC-only HTTP port).
+    #[serde(default = "SolanaChainConfig::default_http_url")]
+    pub http_url: String,
+
+    /// Solana JSON-RPC WebSocket endpoint.
+    ///
+    /// Used for push subscriptions: `programSubscribe`, `logsSubscribe`, etc.
+    /// Default: `ws://127.0.0.1:8900` (standard Agave RPC-only WebSocket port).
+    #[serde(default = "SolanaChainConfig::default_ws_url")]
+    pub ws_url: String,
 
     /// Checkpoint file path for the Solana adapter.
     #[serde(default = "SolanaChainConfig::default_checkpoint_path")]
@@ -369,8 +387,12 @@ impl SolanaChainConfig {
         true // D-E: Solana on by default
     }
 
-    fn default_rpc_url() -> String {
-        "http://localhost:10000".to_string()
+    fn default_http_url() -> String {
+        "http://127.0.0.1:8899".to_string()
+    }
+
+    fn default_ws_url() -> String {
+        "ws://127.0.0.1:8900".to_string()
     }
 
     fn default_checkpoint_path() -> String {
@@ -382,7 +404,8 @@ impl Default for SolanaChainConfig {
     fn default() -> Self {
         Self {
             enabled: Self::default_enabled(),
-            rpc_url: Self::default_rpc_url(),
+            http_url: Self::default_http_url(),
+            ws_url: Self::default_ws_url(),
             checkpoint_path: Self::default_checkpoint_path(),
         }
     }

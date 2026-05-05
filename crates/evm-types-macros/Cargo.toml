@@ -1,0 +1,23 @@
+[package]
+name    = "mg-evm-types-macros"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+# This crate is a proc-macro crate.
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1"
+quote       = "1"
+syn         = { version = "2", features = ["full", "extra-traits"] }
+
+# tiny-keccak is used at macro-expansion time (inside the proc-macro) to compute
+# the SIGNATURE_HASH literal.  It is NOT a dependency of the generated code.
+tiny-keccak = { version = "2", features = ["keccak"] }
+
+[dev-dependencies]
+mg-evm-types = { path = "../evm-types" }
+hex = "0.4"

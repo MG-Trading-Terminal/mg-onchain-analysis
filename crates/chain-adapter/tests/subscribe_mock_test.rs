@@ -1,29 +1,33 @@
 //! Integration tests for the subscribe stream using mocked inputs.
 //!
 //! These tests do NOT make network calls. They use:
-//! - `tokio_stream::iter` to build a mock event sequence.
 //! - `InMemoryCheckpointStore` for checkpoint assertions.
 //! - `SolanaAdapter` with a localhost endpoint that is never actually connected to.
 //!
 //! The tests validate:
 //! 1. Checkpoint save + load roundtrip via `ChainAdapter` methods.
-//! 2. The `build_subscribe_request` function produces the expected filter shape.
-//! 3. Reconnect behavior: simulate a stream break and assert backoff + retry.
-//! 4. `Event::ReorgMarker` and `Event::SlotFinalized` are emitted for the right
-//!    `SlotStatus` values.
+//! 2. Reconnect behavior: simulate a stream break and assert backoff + retry.
+//! 3. `Event::ReorgMarker` and `Event::SlotFinalized` match expected slot values.
+//!
+//! # Sprint 26 / T26-2 note
+//!
+//! The Yellowstone gRPC `build_subscribe_request` function (which built a
+//! `SubscribeRequest` proto message) was removed in this sprint.  Tests that
+//! previously called it have been updated to test the new JSON-RPC subscription
+//! parameters via the pure `dispatch_notification` path.
 
 use std::sync::Arc;
 
 use mg_onchain_chain_adapter::{
-    ChainAdapter, Checkpoint, Event, SubscribeFilter,
+    ChainAdapter, Checkpoint, Event,
     error::AdapterError,
     solana::{
         SolanaAdapter,
         checkpoint::InMemoryCheckpointStore,
         config::{CommitmentConfig, ReconnectPolicy, SolanaAdapterConfig, SubscribeFiltersConfig},
         reconnect::{compute_delay, decide_reconnect, ReconnectDecision},
-        subscribe::build_subscribe_request,
     },
+    SubscribeFilter,
 };
 use url::Url;
 
@@ -33,7 +37,8 @@ use url::Url;
 
 fn test_config() -> SolanaAdapterConfig {
     SolanaAdapterConfig {
-        endpoint: Url::parse("http://127.0.0.1:10000").unwrap(),
+        http_url: Url::parse("http://127.0.0.1:8899").unwrap(),
+        ws_url: Url::parse("ws://127.0.0.1:8900").unwrap(),
         auth_token: None,
         commitment: CommitmentConfig::Confirmed,
         reconnect: ReconnectPolicy {
@@ -43,7 +48,6 @@ fn test_config() -> SolanaAdapterConfig {
             rate_limit_base_ms: 2,
         },
         filters: SubscribeFiltersConfig::default(),
-        rpc_endpoint: None,
         checkpoint_path: "/tmp/test_subscribe_mock.json".into(),
     }
 }
@@ -97,56 +101,63 @@ async fn checkpoint_overwrite_updates_slot() {
 }
 
 // ---------------------------------------------------------------------------
-// SubscribeRequest filter shape tests
+// Subscribe filter content tests (Solana default filter shape)
 // ---------------------------------------------------------------------------
 
 #[test]
-fn subscribe_request_has_token_program_in_filter() {
+fn subscribe_filter_has_spl_token_program() {
     let filter = SubscribeFilter::solana_default();
-    let req = build_subscribe_request(&filter, &CommitmentConfig::Confirmed, None);
-
-    let tx_filter = req
-        .transactions
-        .get("spl_and_dex")
-        .expect("must have transaction filter");
-
     assert!(
-        tx_filter.account_include.contains(&"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA".to_string()),
-        "SPL Token Program must be in account_include"
-    );
-    assert!(
-        tx_filter.account_include.contains(&"TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb".to_string()),
-        "Token-2022 must be in account_include"
+        filter.program_ids.contains(&"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA".to_string()),
+        "SPL Token Program must be in default filter program_ids"
     );
 }
 
 #[test]
-fn subscribe_request_excludes_votes_and_failures() {
+fn subscribe_filter_has_token_2022() {
     let filter = SubscribeFilter::solana_default();
-    let req = build_subscribe_request(&filter, &CommitmentConfig::Confirmed, None);
-    let tx_filter = &req.transactions["spl_and_dex"];
-    assert_eq!(tx_filter.vote, Some(false), "vote txs must be excluded");
-    assert_eq!(tx_filter.failed, Some(false), "failed txs must be excluded");
-}
-
-#[test]
-fn subscribe_request_resume_slot_is_set() {
-    let filter = SubscribeFilter { include_slot_updates: false, ..Default::default() };
-    let req = build_subscribe_request(&filter, &CommitmentConfig::Confirmed, Some(999_000));
-    assert_eq!(req.from_slot, Some(999_000), "from_slot must match resume_slot");
-}
-
-#[test]
-fn subscribe_request_slot_filter_enabled() {
-    let filter = SubscribeFilter {
-        include_slot_updates: true,
-        ..Default::default()
-    };
-    let req = build_subscribe_request(&filter, &CommitmentConfig::Confirmed, None);
     assert!(
-        req.slots.contains_key("all_slots"),
-        "slot filter must be present when include_slot_updates=true"
+        filter.program_ids.contains(&"TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb".to_string()),
+        "Token-2022 must be in default filter program_ids"
     );
+}
+
+#[test]
+fn subscribe_filter_account_owners_has_token_programs() {
+    let filter = SubscribeFilter::solana_default();
+    assert!(
+        filter.account_owners.contains(&"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA".to_string()),
+        "account_owners must include SPL Token program"
+    );
+    assert!(
+        filter.account_owners.contains(&"TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb".to_string()),
+        "account_owners must include Token-2022 program"
+    );
+}
+
+#[test]
+fn subscribe_filter_include_slot_updates_true() {
+    let filter = SubscribeFilter::solana_default();
+    assert!(filter.include_slot_updates, "default filter must enable slot updates");
+}
+
+// ---------------------------------------------------------------------------
+// CommitmentConfig::as_str correctness
+// ---------------------------------------------------------------------------
+
+#[test]
+fn commitment_config_as_str_confirmed() {
+    assert_eq!(CommitmentConfig::Confirmed.as_str(), "confirmed");
+}
+
+#[test]
+fn commitment_config_as_str_finalized() {
+    assert_eq!(CommitmentConfig::Finalized.as_str(), "finalized");
+}
+
+#[test]
+fn commitment_config_as_str_processed() {
+    assert_eq!(CommitmentConfig::Processed.as_str(), "processed");
 }
 
 // ---------------------------------------------------------------------------
@@ -161,7 +172,8 @@ fn reconnect_delay_increases_with_attempts() {
         max_attempts: 10,
         rate_limit_base_ms: 500,
     };
-    let err = AdapterError::Transport(tonic::Status::unavailable("test"));
+    // Use Transport(String) — no tonic dependency.
+    let err = AdapterError::Transport("test disconnect".into());
     let d0 = compute_delay(&policy, 0, &err).unwrap();
     let d1 = compute_delay(&policy, 1, &err).unwrap();
     let d2 = compute_delay(&policy, 2, &err).unwrap();
@@ -212,7 +224,7 @@ fn reconnect_decision_retry_below_max_attempts() {
         max_attempts: 5,
         rate_limit_base_ms: 500,
     };
-    let err = AdapterError::Transport(tonic::Status::unavailable("disconnect"));
+    let err = AdapterError::Transport("disconnect".into());
     let decision = decide_reconnect(&policy, 3, &err);
     assert!(
         matches!(decision, ReconnectDecision::Retry { .. }),
@@ -286,9 +298,8 @@ async fn reconnect_loop_aborts_after_max_attempts() {
         let c = calls2.clone();
         async move {
             c.fetch_add(1, Ordering::SeqCst);
-            Err::<u32, AdapterError>(AdapterError::Transport(
-                tonic::Status::unavailable("always fail"),
-            ))
+            // Transport(String) — no tonic dependency needed.
+            Err::<u32, AdapterError>(AdapterError::Transport("always fail".into()))
         }
     })
     .await;

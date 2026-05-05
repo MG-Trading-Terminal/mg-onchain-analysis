@@ -1,0 +1,22 @@
+[package]
+name    = "mg-evm-types"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+serde      = { workspace = true }
+serde_json = { workspace = true }
+thiserror  = { workspace = true }
+hex        = { workspace = true }
+
+# Keccak-256 spec implementation (NIST / public spec).  No chain-specific semantics.
+tiny-keccak = { version = "2", features = ["keccak"] }
+
+# 256-bit integer arithmetic.  Admitted under ADR 0006 Rule A as a mathematical
+# primitive.  See ADR 0006 "Note on primitive-types::U256".
+primitive-types = { version = "0.14", features = ["serde"] }
+
+[dev-dependencies]
+serde_json = { workspace = true }

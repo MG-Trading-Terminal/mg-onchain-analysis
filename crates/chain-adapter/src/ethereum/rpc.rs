@@ -1,28 +1,15 @@
 //! `EthereumRpc` trait — abstraction over the Ethereum JSON-RPC transport.
 //!
-//! # Sprint 16 (2026-04-24) — alloy 1.0.22 WsRpcClient
+//! # Sprint 24 (2026-04-27) — tokio-tungstenite WsRpcClient (ADR 0006 Task #5b)
 //!
-//! ## alloy version
+//! Replaced `alloy::rpc::client::RpcClient` + `alloy::transports::ws::WsConnect`
+//! with an in-tree `JsonRpcClient` backed by `tokio-tungstenite`.  All alloy
+//! imports removed from this file; `mg_evm_types::B256` used for subscription ids.
 //!
-//! `alloy = "1.0"` (resolved: 1.0.22). Features: `rpc-client-ws`, `pubsub`,
-//! `sol-types`, `json-rpc`. See workspace Cargo.toml for the full feature rationale.
-//!
-//! `providers`, `rpc-types-eth`, and `consensus` are intentionally excluded: they
-//! transitively pull in `alloy-consensus` which has a proc-macro incompatibility with
-//! `serde 1.0.228` (serde_core split — `serde::__private` path changed). Instead,
-//! `WsRpcClient` uses `alloy_rpc_client::RpcClient::connect_pubsub` directly with
-//! raw JSON-RPC requests and `serde_json::Value` deserialization.
-//!
-//! ## Transport choice (ADR 0004)
+//! ## Transport choice (ADR 0004 / ADR 0006)
 //!
 //! Production path: WebSocket JSON-RPC (`ws://127.0.0.1:8546`) against a self-hosted
 //! Reth node per ADR 0003 + ADR 0004. No Alchemy/Infura/QuickNode.
-//!
-//! ## ExEx in-process variant (Sprint 17+)
-//!
-//! TODO(sprint-17): Add `exex.rs` behind `cfg(feature = "exex")`. The ExEx path
-//! receives `ChainCommitted`/`ChainReverted` notifications in-process, eliminating
-//! the hash-tracking `ReorgBuffer`.
 //!
 //! ## Reconnect (Sprint 17+)
 //!
@@ -45,6 +32,7 @@ use tracing::{debug, error, warn};
 
 use crate::error::AdapterError;
 use crate::ethereum::types::{BlockData, BlockHeader, LogFilter, RawLog};
+use crate::jsonrpc::JsonRpcClient;
 
 // ---------------------------------------------------------------------------
 // EthereumRpc trait
@@ -53,7 +41,7 @@ use crate::ethereum::types::{BlockData, BlockHeader, LogFilter, RawLog};
 /// Abstraction over the Ethereum JSON-RPC transport.
 ///
 /// Implemented by:
-/// - `WsRpcClient` — real WebSocket client (Sprint 16)
+/// - `WsRpcClient` — real WebSocket client (Sprint 16; migrated to tokio-tungstenite Sprint 24)
 /// - `MockEthereumRpc` — in-memory fake for unit tests
 ///
 /// All methods are `async` and return `Result<_, AdapterError>`.
@@ -129,10 +117,10 @@ pub trait EthereumRpc: Send + Sync {
 
 /// WebSocket JSON-RPC client connecting to a self-hosted Reth node.
 ///
-/// Uses `alloy_rpc_client::RpcClient::connect_pubsub` with
-/// `alloy_transport_ws::WsConnect`. Sends raw JSON-RPC requests and
-/// deserializes responses via `serde_json::Value` to avoid pulling in
-/// `alloy-consensus` (which has a serde 1.0.228 incompatibility — see module doc).
+/// Backed by the in-tree `JsonRpcClient` (tokio-tungstenite over RFC 6455 WebSocket).
+/// Sends raw JSON-RPC requests and deserialises responses via `serde_json::Value`.
+///
+/// Migrated from `alloy::rpc::client::RpcClient` in Sprint 24 per ADR 0006.
 ///
 /// # Endpoint
 ///
@@ -149,8 +137,8 @@ pub trait EthereumRpc: Send + Sync {
 ///   -p mg-onchain-chain-adapter ethereum_ws_live
 /// ```
 pub struct WsRpcClient {
-    /// The alloy RPC client over a WebSocket pubsub transport.
-    client: alloy::rpc::client::RpcClient,
+    /// In-tree JSON-RPC 2.0 over WebSocket client.
+    client: JsonRpcClient,
     /// The URL used to connect (kept for logging).
     pub ws_url: String,
 }
@@ -165,7 +153,7 @@ impl WsRpcClient {
         let mut last_err = String::new();
 
         for (attempt, &delay_ms) in delays_ms.iter().enumerate() {
-            match Self::try_connect(ws_url).await {
+            match JsonRpcClient::connect(ws_url).await {
                 Ok(client) => {
                     debug!(%ws_url, attempt, "WsRpcClient connected");
                     return Ok(Self { client, ws_url: ws_url.to_string() });
@@ -184,13 +172,6 @@ impl WsRpcClient {
         })
     }
 
-    async fn try_connect(ws_url: &str) -> Result<alloy::rpc::client::RpcClient, String> {
-        use alloy::transports::ws::WsConnect;
-        alloy::rpc::client::RpcClient::connect_pubsub(WsConnect::new(ws_url))
-            .await
-            .map_err(|e| e.to_string())
-    }
-
     /// Convenience constructor reading the URL from `ETHEREUM_RPC_WS_URL` env var,
     /// defaulting to `ws://127.0.0.1:8546`.
     pub async fn from_env() -> Result<Self, AdapterError> {
@@ -203,18 +184,24 @@ impl WsRpcClient {
 #[async_trait::async_trait]
 impl EthereumRpc for WsRpcClient {
     async fn get_latest_block_number(&self) -> Result<u64, AdapterError> {
-        let hex: String = self.client
-            .request("eth_blockNumber", ())
+        let result = self.client
+            .request_raw("eth_blockNumber", &Value::Array(vec![]))
             .await
-            .map_err(|e| AdapterError::RpcError { slot: 0, reason: e.to_string() })?;
-        parse_hex_u64(&hex, "eth_blockNumber")
+            .map_err(|e| AdapterError::RpcError { slot: 0, reason: e })?;
+
+        let hex = result.as_str().ok_or_else(|| AdapterError::RpcError {
+            slot: 0,
+            reason: format!("eth_blockNumber: expected string, got {result}"),
+        })?;
+        parse_hex_u64(hex, "eth_blockNumber")
     }
 
     async fn get_finalized_block_number(&self) -> Result<u64, AdapterError> {
-        let result: Value = self.client
-            .request("eth_getBlockByNumber", ("finalized", false))
+        let params = serde_json::json!(["finalized", false]);
+        let result = self.client
+            .request_raw("eth_getBlockByNumber", &params)
             .await
-            .map_err(|e| AdapterError::RpcError { slot: 0, reason: e.to_string() })?;
+            .map_err(|e| AdapterError::RpcError { slot: 0, reason: e })?;
 
         let num_hex = result.get("number")
             .and_then(|v| v.as_str())
@@ -227,10 +214,11 @@ impl EthereumRpc for WsRpcClient {
 
     async fn get_block_by_number(&self, number: u64) -> Result<BlockData, AdapterError> {
         let hex_num = format!("0x{number:x}");
-        let block: Value = self.client
-            .request("eth_getBlockByNumber", (hex_num.as_str(), false))
+        let params = serde_json::json!([hex_num, false]);
+        let block = self.client
+            .request_raw("eth_getBlockByNumber", &params)
             .await
-            .map_err(|e| AdapterError::RpcError { slot: number, reason: e.to_string() })?;
+            .map_err(|e| AdapterError::RpcError { slot: number, reason: e })?;
 
         parse_block_data(&block, number)
     }
@@ -238,14 +226,7 @@ impl EthereumRpc for WsRpcClient {
     fn subscribe_new_heads(
         &self,
     ) -> Pin<Box<dyn Stream<Item = Result<BlockHeader, AdapterError>> + Send + 'static>> {
-        // Step 1: call eth_subscribe("newHeads") to get a subscription ID.
-        // Step 2: retrieve the typed Subscription<Value> from the client.
-        // Step 3: map each Value → BlockHeader.
-        //
-        // The background task (subscribe_new_heads_inner) implements reconnect-on-disconnect
-        // with bounded exponential backoff (Sprint 17 item 6 / ADR 0005).
-        //
-        // We clone the client (Arc internally) and ws_url to move into the async block.
+        // Clone the client (cheap Arc clone) and ws_url to move into the async block.
         let client = self.client.clone();
         let ws_url = self.ws_url.clone();
 
@@ -254,11 +235,17 @@ impl EthereumRpc for WsRpcClient {
 
     async fn get_logs(&self, filter: LogFilter) -> Result<Vec<RawLog>, AdapterError> {
         let filter_obj = build_log_filter_json(&filter);
+        let params = Value::Array(vec![filter_obj]);
 
-        let raw_logs: Vec<Value> = self.client
-            .request("eth_getLogs", (filter_obj,))
+        let result = self.client
+            .request_raw("eth_getLogs", &params)
             .await
-            .map_err(|e| AdapterError::RpcError { slot: 0, reason: e.to_string() })?;
+            .map_err(|e| AdapterError::RpcError { slot: 0, reason: e })?;
+
+        let raw_logs = result.as_array().ok_or_else(|| AdapterError::RpcError {
+            slot: 0,
+            reason: format!("eth_getLogs: expected array, got {result}"),
+        })?;
 
         raw_logs.iter().map(parse_raw_log).collect()
     }
@@ -271,26 +258,26 @@ impl EthereumRpc for WsRpcClient {
             "to": to,
             "data": format!("0x{}", hex::encode(&calldata)),
         });
+        let params = serde_json::json!([call_obj, "latest"]);
 
         // eth_call returns a hex-encoded result string on success, or a JSON-RPC
-        // error (which alloy's RpcClient surfaces as an Err) on revert.
-        let result: Result<String, _> = self.client
-            .request("eth_call", (call_obj, "latest"))
-            .await;
-
-        match result {
-            Ok(hex_str) => {
-                // Successful call — decode the hex return data.
-                let stripped = hex_str.strip_prefix("0x").unwrap_or(&hex_str);
+        // error (which our JsonRpcClient surfaces as an Err) on revert.
+        match self.client.request_raw("eth_call", &params).await {
+            Ok(value) => {
+                let hex_str = value.as_str().ok_or_else(|| AdapterError::RpcError {
+                    slot: 0,
+                    reason: format!("eth_call: expected string result, got {value}"),
+                })?;
+                let stripped = hex_str.strip_prefix("0x").unwrap_or(hex_str);
                 hex::decode(stripped).map_err(|e| AdapterError::DecodeError {
                     context: "eth_call",
                     reason: format!("hex decode of return data: {e}"),
                 })
             }
-            Err(e) => {
+            Err(reason) => {
                 // The RPC client surfaces call reverts as JSON-RPC errors.
                 // We surface them as `CallReverted` for pattern-matching in detectors.
-                Err(AdapterError::CallReverted { reason: e.to_string() })
+                Err(AdapterError::CallReverted { reason })
             }
         }
     }
@@ -334,7 +321,7 @@ const RECONNECT_DELAYS_MS: [u64; 10] = [500, 1_000, 2_000, 4_000, 8_000, 16_000,
 ///
 /// # Reconnect strategy (ADR 0005 / Sprint 17 item 6)
 ///
-/// On transport-level disconnect (`sub.recv()` returns `Err`), the driver:
+/// On transport-level disconnect (subscription channel closed), the driver:
 /// 1. Emits a `tracing::warn!` with the disconnect reason.
 /// 2. Waits for the next backoff delay from `RECONNECT_DELAYS_MS`.
 /// 3. Re-establishes the subscription by calling `eth_subscribe("newHeads")` again.
@@ -344,34 +331,27 @@ const RECONNECT_DELAYS_MS: [u64; 10] = [500, 1_000, 2_000, 4_000, 8_000, 16_000,
 /// the caller.
 ///
 /// Successful event delivery resets the attempt counter.
-///
-/// The `ws_url` is used for reconnect logging only — the `client` itself handles
-/// the underlying WebSocket transport reconnect when the alloy client is shared.
 async fn subscribe_new_heads_inner(
-    client: alloy::rpc::client::RpcClient,
+    client: JsonRpcClient,
     ws_url: String,
     tx: tokio::sync::mpsc::Sender<Result<BlockHeader, AdapterError>>,
 ) {
-    use alloy::primitives::B256;
-
     let mut attempt: usize = 0;
 
     loop {
         // ----------------------------------------------------------------
         // Subscribe phase
         // ----------------------------------------------------------------
-        let sub_id_res: Result<B256, _> = client
-            .request("eth_subscribe", ["newHeads"])
-            .await;
+        let params = serde_json::json!(["newHeads"]);
+        let sub_result = client.subscribe("eth_subscribe", &params).await;
 
-        let sub_id = match sub_id_res {
-            Ok(id) => {
+        let (_sub_id, mut sub_rx) = match sub_result {
+            Ok(pair) => {
                 debug!(%ws_url, attempt, "WS newHeads subscription established");
                 attempt = 0; // reset counter on successful subscribe
-                id
+                pair
             }
-            Err(e) => {
-                let reason = e.to_string();
+            Err(reason) => {
                 warn!(
                     %ws_url,
                     attempt,
@@ -398,28 +378,22 @@ async fn subscribe_new_heads_inner(
         };
 
         // ----------------------------------------------------------------
-        // Consume phase — forward headers until disconnect or receiver drop
+        // Consume phase — forward headers until channel closes or receiver drops
         // ----------------------------------------------------------------
-        let mut sub = client.get_raw_subscription(sub_id).await;
-        let reason;
+        let disconnect_reason;
 
         loop {
-            match sub.recv().await {
-                Ok(raw) => {
-                    let item = serde_json::from_str::<Value>(raw.get())
-                        .map_err(|e| AdapterError::DecodeError {
-                            context: "subscribe_new_heads",
-                            reason: e.to_string(),
-                        })
-                        .and_then(|v| parse_block_header_from_value(&v));
+            match sub_rx.recv().await {
+                Some(raw) => {
+                    let item = parse_block_header_from_value(&raw);
                     if tx.send(item).await.is_err() {
                         // Receiver dropped — caller is done.
                         return;
                     }
                 }
-                Err(e) => {
-                    // Transport disconnect — break to reconnect loop.
-                    reason = e.to_string();
+                None => {
+                    // Channel closed — transport disconnect.
+                    disconnect_reason = "subscription channel closed (WS disconnect)".to_string();
                     break;
                 }
             }
@@ -431,7 +405,7 @@ async fn subscribe_new_heads_inner(
         warn!(
             %ws_url,
             attempt,
-            disconnect_reason = %reason,
+            disconnect_reason = %disconnect_reason,
             delay_ms = RECONNECT_DELAYS_MS[attempt.min(RECONNECT_DELAYS_MS.len() - 1)],
             "WS disconnect; reconnecting"
         );
@@ -440,7 +414,7 @@ async fn subscribe_new_heads_inner(
             let final_err = AdapterError::RpcError {
                 slot: 0,
                 reason: format!(
-                    "WsRpcClient: WS stream disconnected after {} reconnect attempts: {reason}",
+                    "WsRpcClient: WS stream disconnected after {} reconnect attempts: {disconnect_reason}",
                     RECONNECT_DELAYS_MS.len()
                 ),
             };
@@ -460,7 +434,7 @@ async fn subscribe_new_heads_inner(
 /// The background task runs `subscribe_new_heads_inner` which implements
 /// reconnect-on-disconnect with bounded exponential backoff (Sprint 17 item 6).
 fn async_stream_impl(
-    client: alloy::rpc::client::RpcClient,
+    client: JsonRpcClient,
     ws_url: String,
 ) -> impl Stream<Item = Result<BlockHeader, AdapterError>> + Send + 'static {
     let (tx, rx) = tokio::sync::mpsc::channel(64);
@@ -880,28 +854,16 @@ mod tests {
     }
 
     // -----------------------------------------------------------------------
-    // Live WS integration tests — require ETHEREUM_RPC_WS_URL and a running Reth node
-    // -----------------------------------------------------------------------
-
-    // -----------------------------------------------------------------------
     // WsRpcClient reconnect unit tests
     // -----------------------------------------------------------------------
 
     /// Verify that `subscribe_new_heads_inner` exhausts reconnect attempts when
     /// the subscription always fails, and propagates an error to the receiver.
     ///
-    /// This test uses a mock that always rejects subscribe calls. We override the
-    /// inner function by driving it with a pre-prepared channel and verifying that
-    /// after exhaustion the sender closes (signalling stream end).
-    ///
     /// Note: this is a unit test of the reconnect logic path only. Live WS
     /// reconnect testing requires a real Reth node and is `#[ignore]`-gated.
     #[tokio::test]
     async fn reconnect_exhaustion_closes_stream() {
-        // MockEthereumRpc::subscribe_new_heads returns an empty (immediately-ending) stream.
-        // We verify that after the stream ends and all reconnect attempts exhaust,
-        // the channel is closed.
-        //
         // We test the DELAYS constant directly — assert correct length.
         assert_eq!(RECONNECT_DELAYS_MS.len(), 10, "reconnect delay table must have 10 entries");
 
@@ -935,8 +897,6 @@ mod tests {
     }
 
     /// Live: reconnect test requires a real WS server that disconnects after N messages.
-    /// This is structurally impossible to test without a mock WS server, so the live
-    /// path is #[ignore]-gated per gotcha #13.
     #[tokio::test]
     #[ignore]
     async fn ethereum_ws_live_reconnect_on_disconnect() {

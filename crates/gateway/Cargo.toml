@@ -62,6 +62,8 @@ mg-onchain-dex-adapter    = { path = "../dex-adapter" }
 mg-onchain-scoring        = { path = "../scoring" }
 mg-onchain-token-registry = { path = "../token-registry" }
 mg-onchain-graph          = { path = "../graph" }
+mg-onchain-indexer        = { path = "../indexer" }
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+rust_decimal = { workspace = true }

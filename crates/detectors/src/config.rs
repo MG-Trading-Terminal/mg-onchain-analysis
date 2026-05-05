@@ -1233,6 +1233,30 @@ pub struct BridgeDrainConfig {
     pub bridge_registry_path: Threshold<String>,
 }
 
+// ---------------------------------------------------------------------------
+// VerdictCacheTtlConfig — Sprint 26 (ADR 0007 §9.5)
+// ---------------------------------------------------------------------------
+
+/// Per-detector TTL minutes for `verdict_cache`.
+///
+/// Deserialized from `config/detectors.toml` `[verdict_cache.ttl_minutes]`.
+/// Keys are config-side detector ids (e.g. `d01_honeypot_v1`); values are
+/// TTL in minutes. The indexer maps these to runtime `Detector::id()` values
+/// at lookup time via `VerdictCacheConfig::from_toml_map`.
+///
+/// Three TTL classes per ADR 0007 §9.5:
+/// - Fast-moving signals (5 min): D04 pump_dump, D05 wash_trading, D11, D13.
+/// - Honeypot (15 min): D01.
+/// - Slow-moving signals (60 min): everything else.
+#[derive(Debug, Clone, Deserialize, Serialize, Default)]
+pub struct VerdictCacheTtlConfig {
+    /// TTL in minutes, keyed by config-side detector id.
+    ///
+    /// Example: `{ "d01_honeypot_v1" = 15, "d04_pump_dump_v1" = 5, ... }`
+    #[serde(default)]
+    pub ttl_minutes: std::collections::HashMap<String, u64>,
+}
+
 /// All detector threshold configs, loaded from one TOML file.
 ///
 /// Subsection names MUST match detector ID constants (the `id()` method on each
@@ -1257,6 +1281,12 @@ pub struct AllDetectorConfigs {
     pub smart_money_v1: SmartMoneyConfig,
     /// D14 Bridge Drain detector config (Sprint 26).
     pub bridge_drain_v1: BridgeDrainConfig,
+    /// Verdict cache TTL config (Sprint 26 T26-4, ADR 0007 §9.5).
+    ///
+    /// Per-detector TTL minutes for `verdict_cache`. Read by the indexer's
+    /// `VerdictCacheConfig::from_toml_map` to compute `expires_at` on upsert.
+    #[serde(default)]
+    pub verdict_cache: VerdictCacheTtlConfig,
 }
 
 /// Thin alias used in [`DetectorContext`][crate::context::DetectorContext].

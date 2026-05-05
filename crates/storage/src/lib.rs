@@ -51,6 +51,7 @@ pub mod migrations;
 pub mod pg;
 pub mod price_provider;
 pub mod token_metadata;
+pub mod verdict_cache;
 pub mod wallet_pnl_corpus;
 
 pub use checkpoint::{AsyncCheckpointStore, Checkpoint, InMemoryAsyncCheckpointStore, PgCheckpointStore};
@@ -63,6 +64,9 @@ pub use token_metadata::{MetadataError, TokenMetadata, TokenMetadataFetcher};
 pub use price_provider::MockTokenPriceProvider;
 #[cfg(any(test, feature = "test-utils"))]
 pub use token_metadata::MockTokenMetadataFetcher;
+pub use verdict_cache::{CachedVerdict, PgVerdictCacheStore, VerdictCacheStore};
+#[cfg(any(test, feature = "test-utils"))]
+pub use verdict_cache::MockVerdictCacheStore;
 pub use wallet_pnl_corpus::{PgWalletPnlCorpusStore, WalletPnlCorpusRow, WalletPnlCorpusStore};
 #[cfg(any(test, feature = "test-utils"))]
 pub use wallet_pnl_corpus::MockWalletPnlCorpusStore;

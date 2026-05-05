@@ -665,7 +665,7 @@ async fn sprint8_exit_end_to_end() {
 
     // Pool address: use wSOL mint (known-valid 32-byte Solana base58).
     let pool_addr_str = "So11111111111111111111111111111111111111112";
-    let k = solana_sdk::pubkey::Pubkey::new_from_array([0x01; 32]);
+    let k = mg_solana_types::Pubkey::new_from_array([0x01; 32]);
     let cpmm_accounts = RaydiumCpmmSwapAccounts {
         payer: k,
         authority: k,

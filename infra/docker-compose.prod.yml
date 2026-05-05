@@ -1,0 +1,274 @@
+# infra/docker-compose.prod.yml — mg-onchain-analysis production stack
+#
+# ADR 0003 (self-sovereign infrastructure): all services build or run from
+# source in this repository or pinned upstream images. No SaaS endpoints in
+# the production hot path.
+# ADR 0007 (pull-based query engine): the Solana node runs in standard
+# RPC-only mode — no Yellowstone Geyser plugin required.
+# Design 0028 §3 (lightweight topology): three topology profiles correspond
+# to the three operator scenarios documented in infra/PRODUCTION.md.
+#
+# Profiles:
+#   ethereum  -- Topology A: Ethereum-only operator
+#   solana    -- Topology B: Solana-only operator
+#   multi     -- Topology C: Multi-chain operator (Ethereum + Solana)
+#
+# postgres + onchain-service run under ALL profiles. Chain nodes are gated by
+# profile so operators pay only for what they use.
+#
+# Prerequisites: Docker Engine 24+, docker-compose v2+
+#   cp infra/.env.example infra/.env && edit infra/.env
+#   docker compose -f infra/docker-compose.prod.yml --profile <profile> up -d
+
+networks:
+  mg-internal:
+    driver: bridge
+
+volumes:
+  reth-data:
+  lighthouse-data:
+  agave-ledger:
+  pg-data:
+  onchain-checkpoints:
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # ethereum-node: Reth (EL) + Lighthouse (CL)
+  # Profile: ethereum, multi
+  # Cross-reference: infra/ethereum-node/ runbook
+  # ADR 0004: Reth chosen over Geth — parallel sync + Rust ecosystem alignment.
+  # NOTE: image tags are mutable — pin to digest before production.
+  # ---------------------------------------------------------------------------
+  ethereum-node:
+    profiles: ["ethereum", "multi"]
+    image: ghcr.io/paradigmxyz/reth:${RETH_TAG:-v1.3.0}
+    container_name: mg-reth
+    restart: unless-stopped
+    networks:
+      - mg-internal
+    volumes:
+      - ${RETH_DATA_DIR:-reth-data}:/data/reth
+      # JWT secret shared with Lighthouse (Engine API auth).
+      # Generate: openssl rand -hex 32 > infra/jwt.hex
+      - ./jwt.hex:/jwt.hex:ro
+    ports:
+      - "127.0.0.1:8545:8545"   # HTTP JSON-RPC (loopback only)
+      - "127.0.0.1:8546:8546"   # WebSocket JSON-RPC (loopback only)
+      - "127.0.0.1:8551:8551"   # Engine API (loopback only)
+      - "0.0.0.0:30303:30303/tcp"  # P2P TCP (must be reachable from internet)
+      - "0.0.0.0:30303:30303/udp"  # P2P UDP
+      - "127.0.0.1:9001:9001"   # Prometheus metrics (loopback only)
+    command:
+      - node
+      - --chain=mainnet
+      - --datadir=/data/reth
+      - --http
+      - --http.addr=0.0.0.0
+      - --http.port=8545
+      - --http.api=eth,net,web3,debug
+      - --ws
+      - --ws.addr=0.0.0.0
+      - --ws.port=8546
+      - --ws.api=eth,net,web3
+      - --authrpc.addr=0.0.0.0
+      - --authrpc.port=8551
+      - --authrpc.jwtsecret=/jwt.hex
+      - --metrics=0.0.0.0:9001
+      - --log.level=${RETH_LOG_LEVEL:-info}
+      - --discovery.port=30303
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - >
+          curl -sf -X POST http://localhost:8545
+          -H 'Content-Type: application/json'
+          -d '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}'
+          | grep -q '"result"'
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  lighthouse:
+    profiles: ["ethereum", "multi"]
+    image: sigp/lighthouse:v6.0.1
+    container_name: mg-lighthouse
+    restart: unless-stopped
+    networks:
+      - mg-internal
+    depends_on:
+      ethereum-node:
+        condition: service_healthy
+    volumes:
+      - ${LIGHTHOUSE_DATA_DIR:-lighthouse-data}:/data/lighthouse
+      - ./jwt.hex:/jwt.hex:ro
+    ports:
+      - "127.0.0.1:5052:5052"
+      - "0.0.0.0:9000:9000/tcp"
+      - "0.0.0.0:9000:9000/udp"
+    command:
+      - lighthouse
+      - beacon_node
+      - --network=mainnet
+      - --datadir=/data/lighthouse
+      - --execution-endpoint=http://ethereum-node:8551
+      - --execution-jwt=/jwt.hex
+      - --http
+      - --http-address=0.0.0.0
+      - --http-port=5052
+      - --checkpoint-sync-url=https://beaconstate.ethstaker.cc
+      - --slasher=false
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  # ---------------------------------------------------------------------------
+  # solana-node: Agave RPC-only node (standard JSON-RPC + WebSocket)
+  # Profile: solana, multi
+  # ADR 0007: RPC-only mode — no Yellowstone Geyser plugin needed.
+  # The chain-adapter uses standard Solana JSON-RPC + WebSocket.
+  #
+  # RAM CAVEAT: 64-128 GB estimate for RPC-only mode (design 0028 §11 open
+  # question b). Verify with your specific Agave commit before provisioning.
+  # ---------------------------------------------------------------------------
+  solana-node:
+    profiles: ["solana", "multi"]
+    build:
+      context: ./solana-validator
+      dockerfile: Dockerfile.rpc
+      args:
+        AGAVE_TAG: ${AGAVE_TAG:-v3.1.13}
+    image: mg-solana-rpc:${AGAVE_TAG:-v3.1.13}
+    container_name: mg-solana-rpc
+    restart: unless-stopped
+    networks:
+      - mg-internal
+    volumes:
+      - ${AGAVE_LEDGER_DIR:-agave-ledger}:/mnt/ledger
+    ports:
+      - "127.0.0.1:8899:8899"   # Solana JSON-RPC (loopback only)
+      - "127.0.0.1:8900:8900"   # Solana WebSocket PubSub (loopback only)
+      - "0.0.0.0:8001:8001/udp" # Gossip P2P
+      - "0.0.0.0:8001:8001/tcp"
+      - "127.0.0.1:1234:1234"   # Agave internal metrics
+    environment:
+      AGAVE_RPC_PORT: "8899"
+      AGAVE_PUBSUB_PORT: "8900"
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - >
+          curl -sf http://localhost:8899
+          -H 'Content-Type: application/json'
+          -d '{"jsonrpc":"2.0","id":1,"method":"getHealth"}'
+          | grep -q '"result":"ok"'
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 300s
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  # ---------------------------------------------------------------------------
+  # postgres: PostgreSQL 16 — metadata, verdict_cache, anomaly_events.
+  # Runs under ALL profiles (required by onchain-service).
+  # Storage under pull-based model: ~50 GB initial, ~10 GB/month growth.
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:16
+    container_name: mg-postgres
+    restart: unless-stopped
+    networks:
+      - mg-internal
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-mg_onchain}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in infra/.env}
+      POSTGRES_DB: ${POSTGRES_DB:-mg_onchain}
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
+    volumes:
+      - ${PG_DATA_DIR:-pg-data}:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mg_onchain}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+  # ---------------------------------------------------------------------------
+  # onchain-service: the mg-onchain-analysis binary
+  # Runs under ALL profiles. Builds from source via infra/Dockerfile.service.
+  # Exposes REST + WebSocket API on :8080 for consumers.
+  # ---------------------------------------------------------------------------
+  onchain-service:
+    build:
+      context: ../
+      dockerfile: infra/Dockerfile.service
+    image: mg-onchain-service:${SERVICE_TAG:-latest}
+    container_name: mg-onchain-service
+    restart: unless-stopped
+    networks:
+      - mg-internal
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: >-
+        postgres://${POSTGRES_USER:-mg_onchain}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-mg_onchain}
+      ETHEREUM_RPC_URL: http://ethereum-node:8545
+      ETHEREUM_WS_URL: ws://ethereum-node:8546
+      SOLANA_HTTP_URL: http://solana-node:8899
+      SOLANA_WS_URL: ws://solana-node:8900
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_ENDPOINT:-}
+      RUST_LOG: ${RUST_LOG:-info}
+    volumes:
+      - onchain-checkpoints:/app/checkpoints
+    ports:
+      - "0.0.0.0:8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "10"
+
+  # ---------------------------------------------------------------------------
+  # otel-collector: OpenTelemetry Collector sidecar (OPTIONAL)
+  # Uncomment to enable trace export. Provide infra/otel-collector-config.yaml.
+  # Design 0028 §11.9.
+  # ---------------------------------------------------------------------------
+  # otel-collector:
+  #   image: otel/opentelemetry-collector-contrib:0.102.0
+  #   container_name: mg-otel-collector
+  #   restart: unless-stopped
+  #   networks:
+  #     - mg-internal
+  #   volumes:
+  #     - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+  #   command: ["--config=/etc/otel-collector-config.yaml"]
+  #   ports:
+  #     - "127.0.0.1:4317:4317"  # OTLP gRPC (loopback)
+  #     - "127.0.0.1:4318:4318"  # OTLP HTTP (loopback)
+  #     - "127.0.0.1:8888:8888"  # Collector self-metrics

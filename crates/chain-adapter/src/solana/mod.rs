@@ -1,39 +1,40 @@
-//! Solana chain adapter — Yellowstone gRPC implementation.
+//! Solana chain adapter — standard JSON-RPC 2.0 + WebSocket implementation.
 //!
 //! # Overview
 //!
-//! [`SolanaAdapter`] implements the [`ChainAdapter`] trait for Solana using the
-//! Yellowstone gRPC Geyser plugin protocol. It is provider-agnostic per ADR 0001 §D2:
-//! the same struct connects to Helius LaserStream, Triton Dragon's Mouth, or a
-//! self-hosted validator running the plugin — provider selection is config-only.
+//! [`SolanaAdapter`] implements the [`ChainAdapter`] trait for Solana using standard
+//! Solana JSON-RPC 2.0 over HTTP and WebSocket, per ADR 0007 / design 0028.
 //!
-//! # Version pinning
+//! Sprint 26 (T26-2) replaced the Yellowstone gRPC Geyser plugin path with this
+//! standard JSON-RPC adapter.  The operational model change is:
 //!
-//! This adapter was written against:
-//! - `yellowstone-grpc-client = "13.1"`
-//! - `yellowstone-grpc-proto = "12.2"`
-//! - `tonic = "0.14"`
-//! - `solana-sdk = "4"`
+//! - **Before (Sprint 25)**: continuous Yellowstone gRPC firehose via `GeyserClient`,
+//!   requiring a 256–512 GB RAM validator-class Solana node.
+//! - **After (Sprint 26)**: pull-based JSON-RPC queries against a standard Agave
+//!   RPC-only node (~64–128 GB RAM) using:
+//!   - `logsSubscribe` / `programSubscribe` WebSocket subscriptions for live events.
+//!   - `getSignaturesForAddress` + `getTransaction` + `getBlock` HTTP calls for backfill.
+//!   - `getHealth` / `getSlot` for liveness and tip queries.
 //!
-//! If you bump these, verify that `GeyserGrpcClient::build_from_shared`,
-//! `subscribe_once`, and the proto message field names haven't changed.
-//! Check `CHANGELOG.md` entry for this task.
+//! # Configuration
 //!
-//! # Known gaps (Phase 1)
+//! Two URL fields replace the single gRPC `endpoint`:
+//! - `http_url` — JSON-RPC HTTP endpoint (port 8899 by default on Agave).
+//! - `ws_url`   — JSON-RPC WebSocket endpoint (port 8900 by default on Agave).
 //!
-//! - Token-2022 transfer hook analysis: Phase 1 emits `Transfer` with
-//!   `token_program = Token-2022` flag but does not decode hook output.
-//!   See `decode.rs` `FLAG: TOKEN_2022_HOOK_ANALYSIS`.
+//! # Known gaps (Phase 1 / Sprint 26)
 //!
-//! - DEX-specific pool state: `Swap` events carry DEX identity (`DexKind`) but
-//!   pool reserve state is not decoded. That belongs in `crates/dex-adapter`.
+//! - `logsSubscribe` provides the transaction signature but not raw instruction bytes.
+//!   Full `Event::Transfer` / `Event::Swap` emission from the live stream is deferred
+//!   to the detector evaluation path via `getTransaction` (T26-4).
+//!   The subscribe stream currently emits `Event::SlotFinalized` as a signal that
+//!   a relevant slot has activity.
 //!
-//! - Full `TokenMeta` enrichment: `symbol`, `name`, `top_holders`, `markets`
-//!   require RPC calls. `token-registry` crate enriches these in Phase 2.
+//! - DEX-specific pool state reconstruction (Raydium reserves, Orca tick state) belongs
+//!   in `crates/dex-adapter` (Phase 2).
 //!
-//! - The `rpc_endpoint` backfill path uses a minimal `reqwest`-based JSON-RPC
-//!   client. In Phase 2 this may be replaced by `solana-client` if more RPC
-//!   methods are needed.
+//! - Full `TokenMeta` enrichment requires `getAccountInfo` calls; that belongs in
+//!   `crates/token-registry` (Phase 2).
 
 pub mod backfill;
 pub mod checkpoint;
@@ -67,7 +68,7 @@ use crate::{
 // SolanaAdapter
 // ---------------------------------------------------------------------------
 
-/// Solana chain adapter backed by Yellowstone gRPC.
+/// Solana chain adapter backed by standard JSON-RPC 2.0 + WebSocket.
 ///
 /// Create via [`SolanaAdapter::new`], then call [`ChainAdapter::subscribe`] or
 /// [`ChainAdapter::backfill`].
@@ -96,12 +97,12 @@ impl SolanaAdapter {
     /// use url::Url;
     ///
     /// let config = SolanaAdapterConfig {
-    ///     endpoint: Url::parse("http://localhost:10000").unwrap(),
+    ///     http_url: Url::parse("http://127.0.0.1:8899").unwrap(),
+    ///     ws_url:   Url::parse("ws://127.0.0.1:8900").unwrap(),
     ///     auth_token: None,
     ///     commitment: CommitmentConfig::Confirmed,
     ///     reconnect: ReconnectPolicy::default(),
     ///     filters: SubscribeFiltersConfig::default(),
-    ///     rpc_endpoint: None,
     ///     checkpoint_path: "./checkpoints/solana.json".into(),
     /// };
     ///
@@ -169,53 +170,12 @@ impl ChainAdapter for SolanaAdapter {
     }
 
     async fn health_check(&self) -> Result<(), AdapterError> {
-        use yellowstone_grpc_client::GeyserGrpcClient;
-
-        let endpoint_str = self.config.endpoint.as_str().trim_end_matches('/');
-
-        let mut builder = GeyserGrpcClient::build_from_shared(endpoint_str.to_owned())
-            .map_err(|e| AdapterError::Config(format!("invalid endpoint: {e}")))?;
-
-        builder = builder
-            .x_token(self.config.auth_token.clone())
-            .map_err(|e| AdapterError::Config(format!("failed to set auth token: {e}")))?;
-
-        let mut client = builder
-            .connect()
-            .await
-            .map_err(|e| AdapterError::GrpcClient(e.to_string()))?;
-
-        client
-            .health_check()
-            .await
-            .map_err(|e| AdapterError::GrpcClient(e.to_string()))?;
-
-        Ok(())
+        subscribe::health_check_connection(&self.config).await
     }
 
     async fn tip(&self) -> Result<BlockRef, AdapterError> {
-        use yellowstone_grpc_client::GeyserGrpcClient;
-
-        let endpoint_str = self.config.endpoint.as_str().trim_end_matches('/');
-
-        let mut builder = GeyserGrpcClient::build_from_shared(endpoint_str.to_owned())
-            .map_err(|e| AdapterError::Config(format!("invalid endpoint: {e}")))?;
-
-        builder = builder
-            .x_token(self.config.auth_token.clone())
-            .map_err(|e| AdapterError::Config(format!("failed to set auth token: {e}")))?;
-
-        let mut client = builder
-            .connect()
-            .await
-            .map_err(|e| AdapterError::GrpcClient(e.to_string()))?;
-
-        let slot_response = client
-            .get_slot(Some(self.config.commitment.to_proto()))
-            .await
-            .map_err(|e| AdapterError::GrpcClient(e.to_string()))?;
-
-        Ok(BlockRef::new(Chain::Solana, slot_response.slot))
+        let slot = subscribe::get_tip_slot(&self.config).await?;
+        Ok(BlockRef::new(Chain::Solana, slot))
     }
 
     /// Override: return the Solana-specific SPL token + DEX program filter.
@@ -239,12 +199,12 @@ mod tests {
 
     fn test_config() -> SolanaAdapterConfig {
         SolanaAdapterConfig {
-            endpoint: Url::parse("http://localhost:10000").unwrap(),
+            http_url: Url::parse("http://127.0.0.1:8899").unwrap(),
+            ws_url: Url::parse("ws://127.0.0.1:8900").unwrap(),
             auth_token: None,
             commitment: CommitmentConfig::Confirmed,
             reconnect: ReconnectPolicy::default(),
             filters: SubscribeFiltersConfig::default(),
-            rpc_endpoint: None,
             checkpoint_path: "/tmp/test_checkpoint.json".into(),
         }
     }
@@ -280,7 +240,7 @@ mod tests {
     #[tokio::test]
     async fn subscribe_returns_a_stream() {
         // Verify the method compiles and returns a stream.
-        // We cannot test content without a real gRPC endpoint.
+        // We cannot test content without a real JSON-RPC WebSocket endpoint.
         let adapter = make_adapter();
         let _stream = adapter.subscribe(SubscribeFilter::solana_default());
         // If we got here without panic, the type is correct.

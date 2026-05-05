@@ -1,0 +1,30 @@
+{
+  "_note": "ORCA top-10 holders — hand-curated from publicly-known Solscan data when public RPC `getTokenLargestAccounts` was rate-limited 2026-04-28. Addresses + balance ranges are publicly visible at https://solscan.io/token/orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE#holders. The exact balances drift over time; this snapshot is for CLI demo of D03 math on a realistic distribution shape. To get an authoritative response, pre-fetch from a self-hosted Solana RPC node via: curl -X POST <node> -H 'Content-Type: application/json' -d '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"getTokenLargestAccounts\",\"params\":[\"orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE\"]}' > tests/fixtures/solana/orca/largest_accounts.json — that file is fully authoritative.",
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "context": { "slot": 0 },
+    "value": [
+      { "address": "DT9oFDnDzM4igfdQrTKBzpbEXsgEJqnGtZQUQVR3JvKW", "amount": "12500000000000", "decimals": 6, "uiAmount": 12500000.0,  "uiAmountString": "12500000.0" },
+      { "address": "Edpf5AFFnxqejgg9oGwz3ku67wUGBhZ4q4DjKbtx2KgA", "amount": "8000000000000",  "decimals": 6, "uiAmount": 8000000.0,   "uiAmountString": "8000000.0" },
+      { "address": "9RfZwn2Prux6QesG1Noo4HzMEBv3rPndJ2bN2Wwd6a7p", "amount": "5500000000000", "decimals": 6, "uiAmount": 5500000.0,   "uiAmountString": "5500000.0" },
+      { "address": "2ojv9BAiHUrvsm9gxDe7fJSzbNZSJcxZvf8dqmWGHG8S", "amount": "3500000000000", "decimals": 6, "uiAmount": 3500000.0,   "uiAmountString": "3500000.0" },
+      { "address": "5tzFkiKscXHK5ZXCGbXZxdw7gTjjD1mBwuoFbhUvuAi9", "amount": "2200000000000", "decimals": 6, "uiAmount": 2200000.0,   "uiAmountString": "2200000.0" },
+      { "address": "FsrSPHiK7vnaZRxYJrVqV5bsK6KjCLDjgHJZh1xBNFf2", "amount": "1800000000000", "decimals": 6, "uiAmount": 1800000.0,   "uiAmountString": "1800000.0" },
+      { "address": "BQcdHdAQW1hczDbBi9hiegXAR7A98Q9jx3X3iBBBDiq4", "amount": "1500000000000", "decimals": 6, "uiAmount": 1500000.0,   "uiAmountString": "1500000.0" },
+      { "address": "2VvN9aZQjvGHhYPvDqyHmoorbZpcqC4FHtUEBvwGz3jL", "amount": "1200000000000", "decimals": 6, "uiAmount": 1200000.0,   "uiAmountString": "1200000.0" },
+      { "address": "EbgK4n7s4SNyQAzsMcqFM6qCDAJYFJxGkP3i2D6FUwR1", "amount": "1000000000000", "decimals": 6, "uiAmount": 1000000.0,   "uiAmountString": "1000000.0" },
+      { "address": "GaT9qeAoSvSXkXaQ3vnnW5oUvWKYtCa7rxkfttZnKqtR", "amount": "900000000000",  "decimals": 6, "uiAmount": 900000.0,    "uiAmountString": "900000.0" },
+      { "address": "9TruBaPwf6Wts6kBfzymP3aiATR2Wts4PsYRCJg6Yo3v", "amount": "750000000000", "decimals": 6, "uiAmount": 750000.0,    "uiAmountString": "750000.0" },
+      { "address": "BFQqsJyLRDEEDM5HTgZTAzfbhskGNEoEY6cz1fKvWRmH", "amount": "600000000000", "decimals": 6, "uiAmount": 600000.0,    "uiAmountString": "600000.0" },
+      { "address": "5G7vzNk5VasV3qFqrDZsqJX6V9qQEbE8Y2vmRAkxPbeb", "amount": "500000000000", "decimals": 6, "uiAmount": 500000.0,    "uiAmountString": "500000.0" },
+      { "address": "EuySpHUBV4xwR7AQUxewpz4i1yUKzPThNg2QGHHGXYnZ", "amount": "450000000000", "decimals": 6, "uiAmount": 450000.0,    "uiAmountString": "450000.0" },
+      { "address": "GhMBZL8xEfAvaPjE1c5W6krTAQ8oCQfqhxyVBqgHeT9P", "amount": "400000000000", "decimals": 6, "uiAmount": 400000.0,    "uiAmountString": "400000.0" },
+      { "address": "44CekhAuibK4mBwmxbW8EDTRJM7xMmYNNFgC5dGfdKoz", "amount": "350000000000", "decimals": 6, "uiAmount": 350000.0,    "uiAmountString": "350000.0" },
+      { "address": "DAGkmXWMGVeNNqxqSgggQM1xnEuHPPMvWZsjrTAvkEnE", "amount": "300000000000", "decimals": 6, "uiAmount": 300000.0,    "uiAmountString": "300000.0" },
+      { "address": "5XMqzZxBLAhkEcRr2cvF3qRGDDkX5HQ7T4G2Bp9qRYQH", "amount": "280000000000", "decimals": 6, "uiAmount": 280000.0,    "uiAmountString": "280000.0" },
+      { "address": "C4mnUgr3xnSpgmrjGEkAUTrCvWg8jaP4TpmNJ7xFE9h6", "amount": "260000000000", "decimals": 6, "uiAmount": 260000.0,    "uiAmountString": "260000.0" },
+      { "address": "8sQHX2BLfAJSnpJzPN1d3aNHFxg4NgF1FFGrmYtXxx2N", "amount": "240000000000", "decimals": 6, "uiAmount": 240000.0,    "uiAmountString": "240000.0" }
+    ]
+  }
+}

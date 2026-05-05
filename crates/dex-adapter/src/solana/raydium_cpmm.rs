@@ -38,12 +38,7 @@
 //! FLAG: TOKEN_2022_FEE_RECONCILIATION — same gap as AMM v4. Post-Phase-2 work.
 
 use chrono::{DateTime, Utc};
-use solana_sdk::hash::Hash;
-use solana_sdk::instruction::{AccountMeta, Instruction};
-use solana_sdk::pubkey::Pubkey;
-use solana_sdk::signature::Keypair;
-use solana_sdk::signer::Signer;
-use solana_sdk::transaction::Transaction;
+use mg_solana_types::{AccountMeta, Hash, Instruction, Keypair, Pubkey, Transaction};
 
 use mg_onchain_common::chain::{BlockRef, Chain, TxHash};
 use mg_onchain_common::event::{DexKind, PoolEvent, PoolEventKind, Swap};
@@ -1295,10 +1290,7 @@ mod tests {
     // Builder tests (Sprint 7, P6-4 Phase B)
     // -----------------------------------------------------------------------
 
-    use solana_sdk::hash::Hash;
-    use solana_sdk::pubkey::Pubkey;
-    use solana_sdk::signature::Keypair;
-    use solana_sdk::signer::Signer;
+    use mg_solana_types::{Hash, Keypair, Pubkey};
 
     fn make_cpmm_swap_accounts() -> RaydiumCpmmSwapAccounts {
         RaydiumCpmmSwapAccounts {
@@ -1405,12 +1397,14 @@ mod tests {
         let tx =
             build_swap_base_input_transaction(&accs, 500_000, 250_000, &payer, blockhash);
 
-        let serialized =
-            bincode::serialize(&tx).expect("Transaction must be bincode-serializable");
+        // Use our wire-format serialisation (not bincode — Solana tx wire format
+        // uses compact-u16 short_vec, not standard bincode).
+        let serialized = tx.serialize();
         assert!(!serialized.is_empty());
 
-        let deserialized: solana_sdk::transaction::Transaction =
-            bincode::deserialize(&serialized).expect("round-trip deserialization");
+        // Round-trip via our own from_bytes deserialiser.
+        let deserialized = mg_solana_types::Transaction::from_bytes(&serialized)
+            .expect("round-trip wire deserialisation");
         assert_eq!(
             deserialized.message.instructions.len(),
             2,

@@ -2,7 +2,7 @@
 //!
 //! # D-E: Per-chain enable flags
 //!
-//! `build_solana_adapter` constructs the Solana Yellowstone gRPC adapter.
+//! `build_solana_adapter` constructs the Solana JSON-RPC 2.0 + WebSocket adapter.
 //! `build_evm_adapters` constructs one `EthereumAdapter` per enabled EVM chain
 //! (Ethereum, BSC, Base, Arbitrum, Polygon) using the per-chain WS endpoint.
 //! `build_ethereum_adapter` is the single-chain variant (kept for backwards compat).
@@ -49,22 +49,24 @@ use crate::config::{ChainsConfig, EvmChainConfig, SolanaChainConfig};
 /// Construct a `SolanaAdapter` from the given chain config.
 ///
 /// Uses a `FileCheckpointStore` backed by `config.checkpoint_path`.
-/// The gRPC endpoint defaults to `http://localhost:10000` (ADR 0003).
+/// HTTP and WS endpoints default to localhost:8899/8900 (ADR 0003).
 ///
 /// # D-E
 ///
 /// Only called when `config.chains.solana.enabled = true` (D-E).
 pub fn build_solana_adapter(config: &SolanaChainConfig) -> anyhow::Result<SolanaAdapter> {
-    let endpoint = Url::parse(&config.rpc_url)
-        .with_context(|| format!("invalid Solana rpc_url: {}", config.rpc_url))?;
+    let http_url = Url::parse(&config.http_url)
+        .with_context(|| format!("invalid Solana http_url: {}", config.http_url))?;
+    let ws_url = Url::parse(&config.ws_url)
+        .with_context(|| format!("invalid Solana ws_url: {}", config.ws_url))?;
 
     let adapter_config = SolanaAdapterConfig {
-        endpoint,
+        http_url,
+        ws_url,
         auth_token: None, // ADR 0003: self-hosted — no auth token required
         commitment: CommitmentConfig::Confirmed, // CLAUDE.md: Confirmed for hot path
         reconnect: ReconnectPolicy::default(),
         filters: SubscribeFiltersConfig::default(),
-        rpc_endpoint: None,
         checkpoint_path: config.checkpoint_path.clone(),
     };
 
@@ -72,7 +74,8 @@ pub fn build_solana_adapter(config: &SolanaChainConfig) -> anyhow::Result<Solana
         FileCheckpointStore::new(&config.checkpoint_path);
 
     info!(
-        endpoint = %config.rpc_url,
+        http_url = %config.http_url,
+        ws_url = %config.ws_url,
         checkpoint = %config.checkpoint_path,
         "building Solana adapter"
     );
@@ -98,11 +101,6 @@ pub fn build_solana_adapter(config: &SolanaChainConfig) -> anyhow::Result<Solana
 ///
 /// Returns the first connection error encountered. All chains must be
 /// reachable at startup — a failed connection for any enabled chain is fatal.
-///
-/// # TODO(sprint-20): ExEx feature flag
-///
-/// When `cfg(feature = "exex")` lands (gotcha #59), this constructor will
-/// optionally build an `ExExRpcClient` variant for the Ethereum slot.
 pub async fn build_evm_adapters(
     config: &ChainsConfig,
 ) -> anyhow::Result<Vec<(Chain, EthereumAdapter)>> {
@@ -171,13 +169,23 @@ mod tests {
     }
 
     #[test]
-    fn solana_adapter_rejects_invalid_url() {
+    fn solana_adapter_rejects_invalid_http_url() {
         let config = SolanaChainConfig {
-            rpc_url: "not_a_valid_url !!!".to_string(),
+            http_url: "not_a_valid_url !!!".to_string(),
             ..Default::default()
         };
         let result = build_solana_adapter(&config);
-        assert!(result.is_err(), "invalid rpc_url must fail");
+        assert!(result.is_err(), "invalid http_url must fail");
+    }
+
+    #[test]
+    fn solana_adapter_rejects_invalid_ws_url() {
+        let config = SolanaChainConfig {
+            ws_url: "not_a_valid_url !!!".to_string(),
+            ..Default::default()
+        };
+        let result = build_solana_adapter(&config);
+        assert!(result.is_err(), "invalid ws_url must fail");
     }
 
     #[test]

@@ -20,6 +20,7 @@ async-trait.workspace = true
 
 # Internal
 mg-onchain-common        = { path = "../common" }
+mg-solana-types          = { path = "../solana-types" }
 # token-registry: provides SolanaRpc trait and RawAccount for HttpPoolAccountProvider (B1.5).
 mg-onchain-token-registry = { path = "../token-registry" }
 
@@ -28,13 +29,7 @@ mg-onchain-token-registry = { path = "../token-registry" }
 # packed structs. bytemuck::from_bytes lets us cast &[u8] slices safely.
 bytemuck = { version = "1", features = ["derive"] }
 
-# solana-sdk: canonical Pubkey + Keypair + Instruction + Transaction types used by
-# simulation instruction builders (Phase A/B, Sprint 7, P6-4). Pinned to workspace
-# version to stay in lock-step with chain-adapter.
-solana-sdk.workspace  = true
-
 # sha2: SHA-256 for deterministic simulation keypair derivation (B3 §DG3).
-# Transitively provided by solana-sdk but listed explicitly for clarity.
 sha2 = "0.10"
 
 [features]

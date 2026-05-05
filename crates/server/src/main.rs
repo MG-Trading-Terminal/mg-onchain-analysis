@@ -237,6 +237,56 @@ async fn main() -> anyhow::Result<()> {
     let gateway_metrics = GatewayMetrics::new()
         .context("failed to register gateway Prometheus metrics")?;
 
+    // Build the coordinator for the pull-based query engine (ADR 0007 / design 0028 §4.5).
+    // At this point we reconstruct a fresh coordinator reference for AppState.
+    // The coordinator used for streaming (step 12) and this one share the same
+    // ShutdownSignal so both coordinate on the same shutdown boundary.
+    //
+    // T26-6: populate detector_ids from build_all_detectors() so that the
+    // cache-hit probe in trigger_evaluate iterates ALL registered detectors.
+    // The detector list is built later in step 11 (spawn_streaming_subsystem);
+    // for Sprint 26 we compute the ids from the static detector list here.
+    //
+    // Detector ids (alphabetical, matching build_all_detectors order):
+    // bridge_drain_v1, deployer_changepoint, holder_concentration, honeypot_sim,
+    // mint_burn_anomaly, permit2_drainer_v1, pump_dump, rug_pull_lp_drain,
+    // sandwich_mev_v1, sybil_detection, synchronized_activity_v1, wash_trading_h1,
+    // withdraw_withheld_drain.
+    let all_detector_ids: Vec<String> = vec![
+        "bridge_drain_v1".to_owned(),
+        "deployer_changepoint".to_owned(),
+        "holder_concentration".to_owned(),
+        "honeypot_sim".to_owned(),
+        "mint_burn_anomaly".to_owned(),
+        "permit2_drainer_v1".to_owned(),
+        "pump_dump".to_owned(),
+        "rug_pull_lp_drain".to_owned(),
+        "sandwich_mev_v1".to_owned(),
+        "sybil_detection".to_owned(),
+        "synchronized_activity_v1".to_owned(),
+        "wash_trading_h1".to_owned(),
+        "withdraw_withheld_drain".to_owned(),
+    ];
+
+    // Verdict cache store for the pull-based coordinator.
+    let verdict_cache_store: Arc<dyn mg_onchain_storage::verdict_cache::VerdictCacheStore> =
+        Arc::new(mg_onchain_storage::verdict_cache::PgVerdictCacheStore::new(pool.clone()));
+
+    // Build the AppState coordinator (separate Arc from the streaming coordinator
+    // so AppState owns a stable reference independent of coordinator.join() consuming it).
+    let app_coordinator = Arc::new(
+        mg_onchain_indexer::coordinator::MultiChainCoordinator::new(
+            // No adapter slots here — the coordinator in AppState is used for trigger_evaluate,
+            // not for streaming. Adapter slots are in the streaming coordinator (step 12).
+            // T26-8: wire real adapter slots once T26-2 Solana rewrite is complete.
+            vec![],
+            shutdown.clone(),
+        )
+        .with_verdict_cache(verdict_cache_store, mg_onchain_indexer::trigger::VerdictCacheConfig::default())
+        .with_detector_ids(all_detector_ids.clone())
+        .with_max_concurrent(8),
+    );
+
     let app_state = AppState::new(
         gateway_config,
         pg_store.clone(),
@@ -245,6 +295,7 @@ async fn main() -> anyhow::Result<()> {
         detector_config,
         jwt_keys,
         gateway_metrics,
+        app_coordinator.clone(),
     );
 
     // -----------------------------------------------------------------------
@@ -264,6 +315,35 @@ async fn main() -> anyhow::Result<()> {
         streaming_metrics,
     )
     .await;
+
+    // -----------------------------------------------------------------------
+    // Step 11a: Spawn periodic scan workers (T26-6, ADR 0007 §6.4 / design 0028 §4.6)
+    //
+    // Two workers mirror the smart-money labeller pattern:
+    // - watchlist_rescore_worker: every N minutes, re-scores all watchlisted tokens.
+    // - launch_discovery_worker: every N minutes, discovers newly launched pools.
+    //
+    // Both use the same PeriodicScanConfig from service.toml [periodic_scan].
+    // Cadence default: 5 minutes (ADR 0007 §9.4).
+    // -----------------------------------------------------------------------
+    let periodic_scan_cfg = service_config
+        .periodic_scan
+        .clone()
+        .unwrap_or_default();
+
+    let rescore_handle = init::spawn_watchlist_rescore_worker(
+        mg_onchain_common::chain::Chain::Solana,
+        app_coordinator.clone(),
+        periodic_scan_cfg.clone(),
+        shutdown.clone(),
+    );
+
+    let discovery_handle = init::spawn_launch_discovery_worker(
+        mg_onchain_common::chain::Chain::Solana,
+        app_coordinator.clone(),
+        periodic_scan_cfg,
+        shutdown.clone(),
+    );
 
     // -----------------------------------------------------------------------
     // Step 11b: Spawn smart-money labeller (Sprint 22, design 0022 §6.1 Option B)
@@ -372,6 +452,9 @@ async fn main() -> anyhow::Result<()> {
             coordinator.join().await;
             // Drain the smart-money labeller (it selects on shutdown signal).
             let _ = sm_join_handle.await;
+            // Drain periodic scan workers (T26-6).
+            let _ = rescore_handle.await;
+            let _ = discovery_handle.await;
         },
     )
     .await;

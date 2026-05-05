@@ -99,7 +99,7 @@
 //! the account is owned by `RAYDIUM_V4_PROGRAM_ID`. Callers MUST verify owner
 //! before calling `decode_amm_v4_pool_state`.
 
-use solana_sdk::pubkey::Pubkey;
+use mg_solana_types::Pubkey;
 use thiserror::Error;
 
 /// Raydium AMM v4 program ID (same constant as in raydium_v4.rs — duplicated

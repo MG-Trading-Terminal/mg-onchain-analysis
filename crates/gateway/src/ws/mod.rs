@@ -1,6 +1,11 @@
-//! WebSocket stream: `GET /v1/ws/stream`.
+//! WebSocket handlers.
 //!
-//! Connection lifecycle:
+//! - `mod.rs` (`ws_stream_handler`) — `GET /v1/ws/stream`: anomaly event push.
+//! - `watchlist` (`watchlist_ws_handler`) — `GET /v1/watchlist`: real-time verdict push
+//!   (T26-6, ADR 0007 / design 0028 §4.5).
+//!
+//! # `ws_stream_handler` connection lifecycle
+//!
 //! 1. JWT validation (from Authorization header or ?token= param).
 //! 2. WebSocket upgrade.
 //! 3. Client sends `{"action":"subscribe", ...}`.
@@ -9,6 +14,8 @@
 //! 6. Server sends `{"type":"ping"}` every 30s; client must respond with `{"type":"pong"}`.
 //! 7. On buffer overflow: server sends `{"type":"lag_notice", ...}`.
 //! 8. On disconnect/shutdown: server sends `{"type":"closing", ...}`.
+
+pub mod watchlist;
 
 use std::sync::Arc;
 use std::time::{Duration, Instant};

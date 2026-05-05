@@ -9,9 +9,6 @@ description = "Binary entry point: background task orchestration for onchain-ser
 
 [features]
 default = []
-# exex: activates chain-adapter/exex transitively + gates onchain-reth binary entry.
-# Sprint 24 ships the stub binary only. Sprint 25 implements Reth NodeBuilder + install_exex.
-exex = ["mg-onchain-chain-adapter/exex", "dep:reth-tracing"]
 # test-containers: enables Docker testcontainers Postgres for onchain-validate --docker mode.
 # Requires Docker daemon accessible. Gated so the binary is runnable in environments without Docker.
 # Also enables test-utils mock stores in mg-onchain-graph + mg-onchain-storage so that
@@ -32,11 +29,6 @@ path = "src/main.rs"
 # No required-features: WS-mode binary works with default features.
 
 [[bin]]
-name = "onchain-reth"
-path = "src/main_reth.rs"
-required-features = ["exex"]
-
-[[bin]]
 name = "onchain-cli"
 path = "src/bin/onchain_cli.rs"
 # No required-features: CLI only needs reqwest + clap.
@@ -51,12 +43,36 @@ name = "onchain-calibrate"
 path = "src/bin/onchain_calibrate.rs"
 # No required-features: calibration pass is pure in-process (no Postgres).
 
+[[bin]]
+name = "onchain-check-token"
+path = "src/bin/onchain_check_token.rs"
+# Sprint 26 (2026-04-28): minimum-viable CLI that runs OUR D03 detector math
+# (`mg_onchain_detectors::signals::{gini_descending, top_n_pct}`) against REAL
+# on-chain holder data fetched via standard JSON-RPC. First true end-to-end
+# validation that our detector code produces real verdicts on real data.
+# No Postgres / docker-compose / testcontainers — pure CLI demo.
+
+[[bin]]
+name = "onchain-score-server"
+path = "src/bin/onchain_score_server.rs"
+# Sprint 27 T27-35: thin axum HTTP wrapper around onchain-check-token.
+# GET /v1/score?chain=X&token=Y spawns the CLI as a subprocess, parses
+# composite verdict + driving signals, returns JSON. Single binary, no DB.
+# Per memory feedback_cli_first_product: "When a consumer asks for an API:
+# wrap the CLI in a REST endpoint."
+
 [dependencies]
 anyhow.workspace      = true
 thiserror.workspace   = true
 tokio.workspace       = true
 tracing.workspace     = true
 tracing-subscriber.workspace = true
+# Sprint 26 T26-7 (ADR 0007 §9.5): OTLP exporter wired in `init::tracing_init`.
+# Inactive when OTEL_EXPORTER_OTLP_ENDPOINT env / config field is unset — stdout-only fallback.
+opentelemetry.workspace         = true
+opentelemetry_sdk.workspace     = true
+opentelemetry-otlp.workspace    = true
+tracing-opentelemetry.workspace = true
 serde.workspace       = true
 reqwest.workspace     = true
 chrono.workspace      = true
@@ -70,6 +86,12 @@ tokio-util.workspace  = true
 url.workspace         = true
 rust_decimal.workspace = true
 prometheus            = "0.13"
+# axum: HTTP framework for the onchain-score-server REST wrapper (T27-35).
+# Already used transitively via mg-onchain-gateway; declared explicitly so
+# the score-server bin can depend on it directly without going through
+# the gateway feature surface.
+axum = { version = "0.8", features = ["macros"] }
+tower-http = { version = "0.6", features = ["trace"] }
 # sqlx needed for PgTokenRiskReportStore in risk_report_store.rs (V00012).
 sqlx = { version = "0.8", features = [
     "runtime-tokio-rustls",
@@ -88,12 +110,6 @@ mg-onchain-dex-adapter     = { path = "../dex-adapter" }
 mg-onchain-graph           = { path = "../graph" }
 mg-onchain-chain-adapter   = { path = "../chain-adapter" }
 
-# Reth ExEx deps — optional; compiled only with --features exex.
-# reth-tracing: Reth's log/tracing setup; needed when running as a Reth-embedded binary.
-# reth-node-builder and reth-cli are NOT added here in Sprint 24; the onchain-reth binary
-# entry is a stub (Sprint 25 will add NodeBuilder wiring).
-reth-tracing = { workspace = true, optional = true }
-
 # test-containers: Postgres testcontainer for onchain-validate --docker mode.
 # Optional — compile with `--features test-containers`.
 testcontainers         = { version = "0.23", optional = true }
@@ -105,7 +121,7 @@ bs58          = { workspace = true }
 sqlx          = { workspace = true, features = ["postgres", "runtime-tokio-rustls", "chrono", "uuid"] }
 async-trait   = { workspace = true }
 base64        = { workspace = true }
-solana-sdk    = { workspace = true }
+mg-solana-types = { path = "../solana-types" }
 rust_decimal  = { workspace = true }
 testcontainers            = "0.23"
 testcontainers-modules    = { version = "0.11", features = ["postgres"] }

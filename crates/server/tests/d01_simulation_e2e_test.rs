@@ -276,7 +276,7 @@ async fn d01_s6_fires_on_buy_success_sell_fail() {
     let _meta = honeypot_token_meta(pool_addr);
 
     // Build CPMM swap accounts (MockPoolAccountProvider returns these for the pool).
-    let k = solana_sdk::pubkey::Pubkey::new_from_array([0x01; 32]);
+    let k = mg_solana_types::Pubkey::new_from_array([0x01; 32]);
     let cpmm_accounts = RaydiumCpmmSwapAccounts {
         payer: k,
         authority: k,
@@ -586,10 +586,10 @@ async fn d01_s6_full_pipeline_docker() {
     // D01_TEST_POOL is the pool pubkey. MockPoolAccountProvider returns
     // CPMM swap accounts for any pubkey set via `with_cpmm_accounts`.
     // ----------------------------------------------------------------
-    let pool_pubkey: solana_sdk::pubkey::Pubkey = D01_TEST_POOL
+    let pool_pubkey: mg_solana_types::Pubkey = D01_TEST_POOL
         .parse()
         .expect("D01_TEST_POOL must be a valid Solana pubkey");
-    let k = solana_sdk::pubkey::Pubkey::new_from_array([0x01; 32]);
+    let k = mg_solana_types::Pubkey::new_from_array([0x01; 32]);
     let cpmm_accounts = RaydiumCpmmSwapAccounts {
         payer: k,
         authority: k,
@@ -779,7 +779,7 @@ async fn d01_s6_full_pipeline_docker() {
     }
     let clean_rpc = RecordedSolanaRpc::new(clean_responses) as Arc<dyn SolanaRpc>;
 
-    let clean_pool_pubkey: solana_sdk::pubkey::Pubkey = D01_CLEAN_POOL
+    let clean_pool_pubkey: mg_solana_types::Pubkey = D01_CLEAN_POOL
         .parse()
         .expect("D01_CLEAN_POOL must be a valid Solana pubkey");
     let clean_cpmm = RaydiumCpmmSwapAccounts {

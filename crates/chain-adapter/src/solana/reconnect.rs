@@ -1,4 +1,4 @@
-//! Reconnect loop with exponential backoff for the Yellowstone gRPC stream.
+//! Reconnect loop with exponential backoff for the Solana JSON-RPC WebSocket stream.
 //!
 //! # Design
 //!
@@ -13,26 +13,14 @@
 //! 1. **Normal reconnect** (`base_delay_ms → max_delay_ms × 2^attempt` + jitter):
 //!    triggered by `AdapterError::Transport`, `AdapterError::StreamEnded`.
 //! 2. **Rate-limit backoff** (`rate_limit_base_ms → max_delay_ms × 2^attempt`):
-//!    triggered by `AdapterError::RateLimit` or `tonic::Code::ResourceExhausted`.
+//!    triggered by `AdapterError::RateLimit`.
 //!    Applied with an INITIAL delay before the first reconnect attempt.
 //!
 //! # Reconnect failure
 //!
 //! After `max_attempts` consecutive failures, the reconnect loop terminates and
 //! propagates the last error. The `server` crate's health check detects this and
-//! marks the adapter unhealthy. An alert should fire at that point.
-//!
-//! # Resume position
-//!
-//! The caller passes a `resume_slot` which the reconnect loop sets in the
-//! `SubscribeRequest.from_slot` field. This ensures the server replays events
-//! from the last confirmed slot rather than from the current tip (which would
-//! silently drop events during the reconnect window).
-//!
-//! Note: Yellowstone `from_slot` is a best-effort hint — providers may not
-//! honour it for slots older than their retention window. Operators should set
-//! `backfill_on_gap = true` in the indexer to trigger a backfill when the
-//! stream skips slots.
+//! marks the adapter unhealthy.
 
 use std::time::Duration;
 
@@ -65,15 +53,11 @@ pub fn compute_delay(policy: &ReconnectPolicy, attempt: u32, error: &AdapterErro
         policy.base_delay_ms
     };
 
-    // Exponential backoff: base * 2^attempt, capped at max_delay_ms, plus jitter.
-    // We replicate the ExponentialBackoff math directly to return a concrete Duration
-    // (tokio-retry's iterator API is used for the full reconnect loop below).
+    // Exponential backoff: base * 2^attempt, capped at max_delay_ms.
     let delay_ms = (base_ms as u128)
         .saturating_mul(1u128 << attempt.min(30))
         .min(policy.max_delay_ms as u128);
 
-    // Add up to base_ms jitter (uniform random — "full jitter" strategy).
-    // We use tokio-retry's `jitter` function via the strategy iterator.
     Some(Duration::from_millis(delay_ms as u64))
 }
 
@@ -112,7 +96,7 @@ pub fn decide_reconnect(
         warn!(
             attempt,
             delay_ms = delay.as_millis(),
-            "gRPC stream error — will reconnect after delay"
+            "WS stream error — will reconnect after delay"
         );
     }
 
@@ -126,7 +110,7 @@ pub fn decide_reconnect(
 /// - Aborts immediately on non-reconnectable errors.
 ///
 /// This is the primary entrypoint for the subscribe loop. The caller passes
-/// a closure that establishes a gRPC connection and returns the stream.
+/// a closure that establishes a WebSocket connection and returns the stream.
 pub async fn with_reconnect<F, Fut, T>(
     policy: &ReconnectPolicy,
     operation_name: &'static str,
@@ -208,7 +192,7 @@ where
         "max reconnect attempts reached"
     );
 
-    Err(last_error.unwrap_or_else(|| AdapterError::StreamEnded { slot: 0 }))
+    Err(last_error.unwrap_or(AdapterError::StreamEnded { slot: 0 }))
 }
 
 // ---------------------------------------------------------------------------
@@ -230,7 +214,7 @@ mod tests {
     }
 
     fn transport_err() -> AdapterError {
-        AdapterError::Transport(tonic::Status::unavailable("test disconnect"))
+        AdapterError::Transport("test disconnect".into())
     }
 
     fn rate_limit_err() -> AdapterError {
@@ -239,6 +223,10 @@ mod tests {
 
     fn config_err() -> AdapterError {
         AdapterError::Config("bad endpoint".into())
+    }
+
+    fn stream_ended_err() -> AdapterError {
+        AdapterError::StreamEnded { slot: 0 }
     }
 
     // --- compute_delay ---
@@ -323,7 +311,7 @@ mod tests {
             async move {
                 let n = cc.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
                 if n < 2 {
-                    Err(AdapterError::Transport(tonic::Status::unavailable("simulated disconnect")))
+                    Err(AdapterError::Transport("simulated disconnect".into()))
                 } else {
                     Ok::<u32, AdapterError>(99)
                 }
@@ -364,7 +352,7 @@ mod tests {
             let cc = cc.clone();
             async move {
                 cc.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
-                Err::<u32, AdapterError>(AdapterError::StreamEnded { slot: 0 })
+                Err::<u32, AdapterError>(stream_ended_err())
             }
         })
         .await;

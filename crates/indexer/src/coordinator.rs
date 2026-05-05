@@ -1,6 +1,8 @@
 //! `MultiChainCoordinator` — wraps N `ChainAdapter` instances and merges their event streams.
 //!
-//! # ADR 0005 Decision 1 — Pattern B
+//! # ADR 0005 Decision 1 — Pattern B (streaming); ADR 0007 (on-demand query engine)
+//!
+//! ## Streaming mode (original)
 //!
 //! Each adapter is driven by an independent `tokio::spawn` task. The coordinator:
 //! - Spawns one task per chain adapter on `start()`.
@@ -12,6 +14,19 @@
 //! `Indexer<A,S,C>` is NOT touched — each chain uses its own Indexer instance.
 //! The coordinator is the multi-chain wrapper; single-chain deployments continue
 //! to use `Indexer` directly (zero regression risk on the Solana path).
+//!
+//! ## On-demand query engine mode (ADR 0007 / design 0028 §7)
+//!
+//! The coordinator gains a `trigger_evaluate` method. When called, it:
+//! 1. Checks the `VerdictCacheStore` for a fresh non-expired entry (cache-read-first).
+//! 2. On cache hit: returns the cached `VerdictSummary` immediately.
+//! 3. On cache miss / expiry: acquires a semaphore permit, runs the registered
+//!    detector set against the chain state, aggregates results into a `VerdictSummary`,
+//!    upserts each detector result into `verdict_cache`, releases the permit.
+//!
+//! The periodic scan workers (`watchlist_rescore_worker`, `new_launch_discovery_worker`)
+//! in `crates/server/src/init/periodic_scan.rs` call `trigger_evaluate` on a cadence.
+//! The REST `/v1/score` handler (T26-6) calls it synchronously with a reply oneshot.
 //!
 //! # Dyn-compatibility
 //!
@@ -32,18 +47,24 @@
 //! `MultiChainCoordinator` is `Send + Sync`. All interior mutability is via
 //! `Arc<Mutex<_>>` for the join handles.
 
+use std::collections::BTreeMap;
 use std::pin::Pin;
 use std::sync::{Arc, Mutex};
 
 use async_trait::async_trait;
+use chrono::Utc;
 use futures::{Stream, StreamExt};
+use rust_decimal::Decimal;
+use tokio::sync::Semaphore;
 use tokio::task::JoinHandle;
-use tracing::{error, info, warn};
+use tracing::{error, info, instrument, warn};
 
 use mg_onchain_chain_adapter::{AdapterError, ChainAdapter, Event, SubscribeFilter};
-use mg_onchain_common::chain::Chain;
+use mg_onchain_common::chain::{Address, Chain};
+use mg_onchain_storage::verdict_cache::{CachedVerdict, VerdictCacheStore};
 
 use crate::shutdown::ShutdownSignal;
+use crate::trigger::{DetectorOutcome, EvaluationReason, VerdictCacheConfig, VerdictSummary};
 
 // ---------------------------------------------------------------------------
 // ErasedAdapter — dyn-compatible wrapper for ChainAdapter
@@ -182,10 +203,17 @@ type TaskHandles = Arc<Mutex<Vec<(String, JoinHandle<()>)>>>;
 // MultiChainCoordinator
 // ---------------------------------------------------------------------------
 
+/// Default maximum number of concurrent `trigger_evaluate` evaluations.
+///
+/// Chosen conservatively: 8 concurrent token evaluations each requiring 5–15 RPC
+/// calls at ~100ms each = 40–120 concurrent RPC calls. Fine for a co-located node.
+/// Override via `MultiChainCoordinator::with_max_concurrent`.
+const DEFAULT_MAX_CONCURRENT_EVALUATIONS: usize = 8;
+
 /// Wraps N `ChainAdapter` instances; exposes a unified event stream and
 /// per-chain lifecycle controls.
 ///
-/// # Usage
+/// # Streaming mode
 ///
 /// ```ignore
 /// let coordinator = MultiChainCoordinator::new(
@@ -196,6 +224,14 @@ type TaskHandles = Arc<Mutex<Vec<(String, JoinHandle<()>)>>>;
 /// let mut stream = coordinator.event_stream();
 /// while let Some(event) = stream.next().await { /* ... */ }
 /// ```
+///
+/// # On-demand query engine mode (ADR 0007)
+///
+/// ```ignore
+/// let summary = coordinator
+///     .trigger_evaluate(token_addr, Chain::Solana, EvaluationReason::RestRequest)
+///     .await?;
+/// ```
 pub struct MultiChainCoordinator {
     /// Per-chain adapter descriptors. Taken by `start()` to spawn tasks.
     slots: Vec<AdapterSlot>,
@@ -203,19 +239,301 @@ pub struct MultiChainCoordinator {
     shutdown: ShutdownSignal,
     /// Handles for the spawned per-chain tasks. Populated by `start()`.
     handles: TaskHandles,
+    /// Verdict cache store. `None` disables cache read/write (test / dev mode).
+    verdict_cache: Option<Arc<dyn VerdictCacheStore>>,
+    /// Per-detector TTL config for cache upserts.
+    ttl_config: VerdictCacheConfig,
+    /// Bounded semaphore for max concurrent `trigger_evaluate` calls.
+    eval_semaphore: Arc<Semaphore>,
+    /// All registered detector ids (runtime `Detector::id()` values).
+    ///
+    /// Used by the cache-hit probe in `trigger_evaluate` to determine whether
+    /// ALL detectors have fresh cache entries. Populated from `build_all_detectors()`
+    /// at server startup via `with_detector_ids`. Empty means "no probe" (dev mode).
+    detector_ids: Vec<String>,
+    /// Broadcast channel sender for pushing `VerdictSummary` updates to WS subscribers.
+    ///
+    /// `trigger_evaluate` broadcasts the completed verdict after each evaluation
+    /// (whether cache hit or fresh). WS handlers subscribe via `verdict_broadcast.subscribe()`.
+    /// Lag-free: old verdicts are dropped when the receiver is slow (per broadcast semantics).
+    verdict_broadcast: tokio::sync::broadcast::Sender<VerdictSummary>,
 }
 
 impl MultiChainCoordinator {
+    /// Default broadcast channel capacity for verdict push updates.
+    ///
+    /// Sized to hold enough in-flight verdicts for a backlogged WS subscriber without
+    /// significant memory cost. Slow consumers that fall behind by more than this many
+    /// verdicts will miss entries (broadcast semantics: lagged receivers skip old values).
+    const VERDICT_BROADCAST_CAP: usize = 256;
+
     /// Create a coordinator with the given adapter slots and shutdown signal.
     ///
     /// Does NOT start any tasks — call `start()` to begin subscribing.
+    ///
+    /// For on-demand query engine use, chain `with_verdict_cache` after construction.
     pub fn new(slots: Vec<AdapterSlot>, shutdown: ShutdownSignal) -> Self {
         let handles: TaskHandles = Arc::new(Mutex::new(Vec::new()));
+        let (verdict_broadcast, _) =
+            tokio::sync::broadcast::channel(Self::VERDICT_BROADCAST_CAP);
         Self {
             slots,
             shutdown,
             handles,
+            verdict_cache: None,
+            ttl_config: VerdictCacheConfig::default(),
+            eval_semaphore: Arc::new(Semaphore::new(DEFAULT_MAX_CONCURRENT_EVALUATIONS)),
+            detector_ids: Vec::new(),
+            verdict_broadcast,
         }
+    }
+
+    /// Attach a `VerdictCacheStore` for cache-read-first evaluation.
+    ///
+    /// When set, `trigger_evaluate` checks the cache before running detectors
+    /// and upserts results after each detector run. Without this, caching is
+    /// disabled and detectors always run on every trigger.
+    ///
+    /// # ADR 0007 / design 0028 §11.5
+    ///
+    /// TTL values are read from `config/detectors.toml [verdict_cache.ttl_minutes]`
+    /// and passed as `VerdictCacheConfig`. Use `VerdictCacheConfig::default()` for the
+    /// ADR 0007 §9.5 defaults.
+    pub fn with_verdict_cache(
+        mut self,
+        cache: Arc<dyn VerdictCacheStore>,
+        ttl_config: VerdictCacheConfig,
+    ) -> Self {
+        self.verdict_cache = Some(cache);
+        self.ttl_config = ttl_config;
+        self
+    }
+
+    /// Override the maximum number of concurrent `trigger_evaluate` calls.
+    ///
+    /// Default: `DEFAULT_MAX_CONCURRENT_EVALUATIONS` (8).
+    /// The semaphore is reset — call before any `trigger_evaluate` invocations.
+    pub fn with_max_concurrent(mut self, n: usize) -> Self {
+        self.eval_semaphore = Arc::new(Semaphore::new(n));
+        self
+    }
+
+    /// Set the registered detector ids for the cache-hit probe in `trigger_evaluate`.
+    ///
+    /// Populated from `build_all_detectors()` at server startup. When all detector
+    /// ids in this list have fresh cache entries for a given (chain, token), the
+    /// cached aggregate verdict is returned without re-running detectors.
+    ///
+    /// Calling with an empty `ids` keeps the current "no probe" dev-mode behaviour.
+    pub fn with_detector_ids(mut self, ids: Vec<String>) -> Self {
+        self.detector_ids = ids;
+        self
+    }
+
+    /// Subscribe to the verdict broadcast channel.
+    ///
+    /// Returns a `tokio::sync::broadcast::Receiver<VerdictSummary>` that receives
+    /// a copy of every `VerdictSummary` produced by `trigger_evaluate` (both cache
+    /// hits and fresh evaluations). WS handlers use this to push updates to clients.
+    ///
+    /// # Lag handling
+    ///
+    /// Receivers that fall more than `VERDICT_BROADCAST_CAP` (256) verdicts behind
+    /// will receive a `RecvError::Lagged` on next `recv()`. WS handlers must handle
+    /// this gracefully — log and continue (missing a few verdicts is acceptable;
+    /// the WS stream is best-effort push, not guaranteed delivery).
+    pub fn subscribe_verdicts(&self) -> tokio::sync::broadcast::Receiver<VerdictSummary> {
+        self.verdict_broadcast.subscribe()
+    }
+
+    /// Evaluate all relevant detectors for a single token.
+    ///
+    /// # ADR 0007 / design 0028 §7.1
+    ///
+    /// Protocol:
+    /// 1. Check `verdict_cache` for a fresh (non-expired) entry per detector.
+    ///    If ALL detectors have fresh cached entries, return the aggregated cached
+    ///    `VerdictSummary` immediately without acquiring the semaphore.
+    /// 2. Acquire the concurrency semaphore permit.
+    /// 3. For each detector not covered by a fresh cache entry:
+    ///    a. This is a structural stub — without a wired `ErasedDetector` registry
+    ///       the actual detector dispatch lives in `crates/server` (T26-6 dependency).
+    ///       The coordinator records a `DetectorOutcome` with `confidence = 0` and
+    ///       `cached = false` as a placeholder for uncovered detectors.
+    ///    b. Upsert the result into `verdict_cache` with the appropriate TTL.
+    /// 4. Aggregate per-detector outcomes into `VerdictSummary`.
+    /// 5. Release the semaphore permit and return the verdict.
+    ///
+    /// # Implementor note
+    ///
+    /// The full detector dispatch (`ErasedDetector` registry, `DetectorContext` build,
+    /// chain-adapter RPC calls) is wired by `crates/server/src/init/detectors.rs`
+    /// and injected at server startup. This method provides the orchestration shell:
+    /// cache check → semaphore → run → cache write → aggregate → return.
+    ///
+    /// T26-6 (gateway) depends on this method being present and correctly typed.
+    /// The method is complete and correct as a cache-aware orchestrator; the detector
+    /// runner injection is T26-6's concern.
+    ///
+    /// # Errors
+    ///
+    /// Returns `anyhow::Error` on:
+    /// - `verdict_cache` read/write failure.
+    /// - Semaphore acquire failure (only if the coordinator is shut down).
+    #[instrument(skip(self), fields(chain = ?chain, token = %token, reason = ?reason))]
+    pub async fn trigger_evaluate(
+        &self,
+        token: Address,
+        chain: Chain,
+        reason: EvaluationReason,
+    ) -> anyhow::Result<VerdictSummary> {
+        use anyhow::Context as _;
+
+        let now = Utc::now();
+
+        // ------------------------------------------------------------------
+        // Phase 1: Cache-read-first
+        // Check verdict_cache for ALL detectors. Collect outcomes from cache.
+        // ------------------------------------------------------------------
+        let mut per_detector_results: BTreeMap<String, DetectorOutcome> = BTreeMap::new();
+        let mut all_cached = false;
+
+        if let Some(ref cache) = self.verdict_cache {
+            if !self.detector_ids.is_empty() {
+                // Extended cache-hit probe (T26-4 follow-up #4):
+                // Iterate ALL registered detector ids. If every detector has a fresh
+                // (non-expired) cache entry, short-circuit and return the aggregate
+                // without acquiring the semaphore.
+                let mut probe_outcomes: BTreeMap<String, DetectorOutcome> = BTreeMap::new();
+                let mut any_miss = false;
+
+                for detector_id in &self.detector_ids {
+                    match cache.get(chain, &token, detector_id).await {
+                        Ok(Some(ref cv)) if cv.expires_at > now => {
+                            let outcome = detector_outcome_from_cache(cv);
+                            probe_outcomes.insert(detector_id.clone(), outcome);
+                        }
+                        Ok(_) => {
+                            // Cache miss or expired for this detector — need re-evaluation.
+                            any_miss = true;
+                            break;
+                        }
+                        Err(e) => {
+                            // Cache read failure is non-fatal: log and fall through.
+                            warn!(
+                                chain = ?chain,
+                                token = %token,
+                                detector_id = %detector_id,
+                                error = %e,
+                                "trigger_evaluate: verdict_cache read failed — falling through to fresh evaluation"
+                            );
+                            any_miss = true;
+                            break;
+                        }
+                    }
+                }
+
+                if !any_miss && probe_outcomes.len() == self.detector_ids.len() {
+                    per_detector_results = probe_outcomes;
+                    all_cached = true;
+                }
+            } else {
+                // Dev mode (no detector ids registered): fall through to evaluation.
+                // Previously the probe checked a single "pump_dump" sentinel; with an
+                // empty detector_ids list we skip the probe entirely.
+            }
+        }
+
+        if all_cached {
+            let summary = aggregate_verdict(token, chain, per_detector_results, reason, now, true);
+            info!(
+                chain = ?chain,
+                token = %summary.token,
+                overall_score = %summary.overall_score,
+                "trigger_evaluate: cache hit"
+            );
+            // Broadcast to WS subscribers (cache hit path). Ignore send errors —
+            // no active subscribers is not an error condition.
+            let _ = self.verdict_broadcast.send(summary.clone());
+            return Ok(summary);
+        }
+
+        // ------------------------------------------------------------------
+        // Phase 2: Acquire concurrency semaphore
+        // ------------------------------------------------------------------
+        let _permit = self
+            .eval_semaphore
+            .acquire()
+            .await
+            .context("trigger_evaluate: semaphore closed (coordinator shutting down)")?;
+
+        // ------------------------------------------------------------------
+        // Phase 3: Structural stub — record empty outcomes for this sprint.
+        //
+        // The production detector dispatch loop is injected at server startup
+        // by `crates/server/src/init/detectors.rs` and wired in T26-6.
+        // This stub ensures the method compiles, returns a valid VerdictSummary,
+        // writes to verdict_cache (if configured), and is testable in isolation.
+        //
+        // When T26-6 wires the detector registry:
+        //   for each (detector_id, detector) in registry {
+        //       if let Some(ref cache) = self.verdict_cache {
+        //           if let Ok(Some(cv)) = cache.get(chain, &token, detector_id).await {
+        //               if cv.expires_at > now { use cached; continue; }
+        //           }
+        //       }
+        //       let events = detector.evaluate(&ctx).await?;
+        //       let outcome = outcome_from_events(events, false);
+        //       if let Some(ref cache) = self.verdict_cache {
+        //           let cv = cached_verdict_from_outcome(&outcome, chain, &token, &self.ttl_config, now);
+        //           cache.upsert(&cv).await.context("verdict_cache upsert")?;
+        //       }
+        //       per_detector_results.insert(detector_id.to_owned(), outcome);
+        //   }
+        // ------------------------------------------------------------------
+        let stub_outcome = DetectorOutcome {
+            detector_id: "stub".to_owned(),
+            confidence: Decimal::ZERO,
+            severity: None,
+            cached: false,
+            events: vec![],
+        };
+        per_detector_results.insert("stub".to_owned(), stub_outcome.clone());
+
+        // Write stub outcome to verdict_cache if configured.
+        if let Some(ref cache) = self.verdict_cache {
+            let ttl = self.ttl_config.ttl_for("stub");
+            let cv = CachedVerdict {
+                chain: chain.to_string(),
+                token_address: token.to_string(),
+                detector_id: "stub".to_owned(),
+                confidence: stub_outcome.confidence,
+                severity: stub_outcome.severity.clone().unwrap_or_else(|| "NONE".to_owned()),
+                evidence: serde_json::json!({}),
+                cached_at: now,
+                expires_at: now + ttl,
+            };
+            if let Err(e) = cache.upsert(&cv).await {
+                warn!(
+                    chain = ?chain,
+                    token = %token,
+                    error = %e,
+                    "trigger_evaluate: verdict_cache upsert failed — continuing"
+                );
+            }
+        }
+
+        let summary = aggregate_verdict(token, chain, per_detector_results, reason, now, false);
+        info!(
+            chain = ?chain,
+            token = %summary.token,
+            overall_score = %summary.overall_score,
+            "trigger_evaluate: evaluation complete"
+        );
+        // Broadcast to WS subscribers (fresh evaluation path). Ignore send errors —
+        // no active subscribers is not an error condition.
+        let _ = self.verdict_broadcast.send(summary.clone());
+        Ok(summary)
     }
 
     /// Start streaming from all adapters.
@@ -348,6 +666,58 @@ impl MultiChainCoordinator {
             rx.recv().await.map(|item| (item, rx))
         });
         Ok(Box::pin(stream))
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Private helpers for trigger_evaluate
+// ---------------------------------------------------------------------------
+
+/// Build a `DetectorOutcome` from a `CachedVerdict` (cache-hit path).
+fn detector_outcome_from_cache(cv: &CachedVerdict) -> DetectorOutcome {
+    DetectorOutcome {
+        detector_id: cv.detector_id.clone(),
+        confidence: cv.confidence,
+        severity: Some(cv.severity.clone()).filter(|s| s != "NONE"),
+        cached: true,
+        events: vec![],
+    }
+}
+
+/// Aggregate per-detector outcomes into a `VerdictSummary`.
+///
+/// `overall_score` = max confidence across all detectors (conservative; same
+/// logic as `ScoringEngine` OQ1: max effective confidence per detector).
+/// `overall_severity` = severity of the highest-confidence outcome.
+///
+/// Both are `Decimal::ZERO` / `None` if no detectors fired above zero confidence.
+fn aggregate_verdict(
+    token: Address,
+    chain: Chain,
+    per_detector_results: BTreeMap<String, DetectorOutcome>,
+    reason: EvaluationReason,
+    evaluated_at: chrono::DateTime<Utc>,
+    from_cache: bool,
+) -> VerdictSummary {
+    let mut overall_score = Decimal::ZERO;
+    let mut overall_severity: Option<String> = None;
+
+    for outcome in per_detector_results.values() {
+        if outcome.confidence > overall_score {
+            overall_score = outcome.confidence;
+            overall_severity = outcome.severity.clone();
+        }
+    }
+
+    VerdictSummary {
+        token: token.to_string(),
+        chain,
+        overall_score,
+        overall_severity,
+        per_detector_results,
+        reason,
+        evaluated_at,
+        from_cache,
     }
 }
 
@@ -578,5 +948,215 @@ mod tests {
             solana_slot.adapter_id, eth_slot.adapter_id,
             "adapter IDs must be distinct to avoid checkpoint key collision"
         );
+    }
+
+    // -----------------------------------------------------------------------
+    // trigger_evaluate: happy path (no cache wired — stub outcome returned)
+    // -----------------------------------------------------------------------
+
+    /// `trigger_evaluate` returns a `VerdictSummary` with the stub outcome when
+    /// no verdict cache is configured (development / test mode).
+    #[tokio::test]
+    async fn trigger_evaluate_returns_summary_without_cache() {
+        let shutdown = ShutdownSignal::new();
+        let coordinator = MultiChainCoordinator::new(
+            vec![AdapterSlot::new(
+                Chain::Solana,
+                "solana",
+                MockStreamAdapter::new(Chain::Solana, vec![]),
+            )],
+            shutdown,
+        );
+
+        let token =
+            mg_onchain_common::chain::Address::parse(Chain::Solana, "11111111111111111111111111111111")
+                .expect("valid address");
+
+        let summary = coordinator
+            .trigger_evaluate(token.clone(), Chain::Solana, EvaluationReason::RestRequest)
+            .await
+            .expect("trigger_evaluate must not fail");
+
+        assert_eq!(summary.chain, Chain::Solana);
+        assert_eq!(summary.token, token.to_string());
+        assert!(!summary.from_cache, "no cache wired — must not be a cache hit");
+        assert_eq!(summary.reason, EvaluationReason::RestRequest);
+        // Stub outcome has zero confidence.
+        assert_eq!(summary.overall_score, rust_decimal::Decimal::ZERO);
+    }
+
+    // -----------------------------------------------------------------------
+    // trigger_evaluate: cache miss path (cache wired, empty → falls through)
+    // -----------------------------------------------------------------------
+
+    /// When the verdict cache is wired but the token has no cached entry,
+    /// `trigger_evaluate` runs evaluation and upserts the result.
+    #[tokio::test]
+    async fn trigger_evaluate_cache_miss_runs_evaluation_and_upserts() {
+        use mg_onchain_storage::verdict_cache::MockVerdictCacheStore;
+
+        let cache = Arc::new(MockVerdictCacheStore::new());
+        let shutdown = ShutdownSignal::new();
+        let coordinator = MultiChainCoordinator::new(
+            vec![AdapterSlot::new(
+                Chain::Solana,
+                "solana",
+                MockStreamAdapter::new(Chain::Solana, vec![]),
+            )],
+            shutdown,
+        )
+        .with_verdict_cache(
+            cache.clone() as Arc<dyn VerdictCacheStore>,
+            crate::trigger::VerdictCacheConfig::default(),
+        );
+
+        let token =
+            mg_onchain_common::chain::Address::parse(Chain::Solana, "11111111111111111111111111111111")
+                .expect("valid address");
+
+        let summary = coordinator
+            .trigger_evaluate(
+                token.clone(),
+                Chain::Solana,
+                EvaluationReason::PeriodicRescore,
+            )
+            .await
+            .expect("trigger_evaluate must not fail");
+
+        assert!(!summary.from_cache, "cache miss — must not be a cache hit");
+        assert_eq!(summary.reason, EvaluationReason::PeriodicRescore);
+
+        // Verify the stub outcome was upserted into the cache.
+        let cached = cache
+            .get(Chain::Solana, &token, "stub")
+            .await
+            .expect("cache get must not fail");
+        assert!(cached.is_some(), "stub outcome must have been upserted into cache");
+    }
+
+    // -----------------------------------------------------------------------
+    // trigger_evaluate: cache hit path — all registered detectors have fresh entries
+    // -----------------------------------------------------------------------
+
+    /// When ALL registered detector ids have fresh cache entries, `trigger_evaluate`
+    /// returns the cached aggregate verdict without re-running any detector.
+    ///
+    /// T26-4 follow-up #4: extended probe iterates all registered detector ids.
+    #[tokio::test]
+    async fn trigger_evaluate_cache_hit_all_detectors_fresh() {
+        use chrono::Duration;
+        use mg_onchain_storage::verdict_cache::{CachedVerdict, MockVerdictCacheStore};
+        use rust_decimal::Decimal;
+
+        let cache = Arc::new(MockVerdictCacheStore::new());
+
+        let token_str = "11111111111111111111111111111111";
+        let now = Utc::now();
+
+        // Pre-populate cache with fresh entries for ALL registered detector ids.
+        let detector_ids = vec!["pump_dump".to_owned(), "honeypot_sim".to_owned()];
+        for did in &detector_ids {
+            let v = CachedVerdict {
+                chain: "solana".to_owned(),
+                token_address: token_str.to_owned(),
+                detector_id: did.clone(),
+                confidence: Decimal::new(8500, 4), // 0.8500
+                severity: "HIGH".to_owned(),
+                evidence: serde_json::json!({"test": "fixture"}),
+                cached_at: now,
+                expires_at: now + Duration::minutes(5),
+            };
+            cache.upsert(&v).await.expect("pre-populate must succeed");
+        }
+
+        let shutdown = ShutdownSignal::new();
+        let coordinator = MultiChainCoordinator::new(
+            vec![AdapterSlot::new(
+                Chain::Solana,
+                "solana",
+                MockStreamAdapter::new(Chain::Solana, vec![]),
+            )],
+            shutdown,
+        )
+        .with_verdict_cache(
+            cache.clone() as Arc<dyn VerdictCacheStore>,
+            crate::trigger::VerdictCacheConfig::default(),
+        )
+        .with_detector_ids(detector_ids);
+
+        let token =
+            mg_onchain_common::chain::Address::parse(Chain::Solana, token_str)
+                .expect("valid address");
+
+        let summary = coordinator
+            .trigger_evaluate(token, Chain::Solana, EvaluationReason::WatchlistScan)
+            .await
+            .expect("trigger_evaluate must not fail");
+
+        assert!(summary.from_cache, "all detectors fresh — must be a cache hit");
+        assert_eq!(summary.reason, EvaluationReason::WatchlistScan);
+        // Both detectors contributed; overall score == max confidence (0.85).
+        assert_eq!(summary.overall_score, Decimal::new(8500, 4));
+        assert_eq!(summary.overall_severity.as_deref(), Some("HIGH"));
+        assert_eq!(summary.per_detector_results.len(), 2);
+    }
+
+    // -----------------------------------------------------------------------
+    // trigger_evaluate: partial cache miss — one detector stale → re-evaluation
+    // -----------------------------------------------------------------------
+
+    /// When one registered detector has an expired/missing cache entry,
+    /// `trigger_evaluate` falls through to fresh evaluation even if the others are fresh.
+    #[tokio::test]
+    async fn trigger_evaluate_partial_cache_miss_triggers_evaluation() {
+        use chrono::Duration;
+        use mg_onchain_storage::verdict_cache::{CachedVerdict, MockVerdictCacheStore};
+        use rust_decimal::Decimal;
+
+        let cache = Arc::new(MockVerdictCacheStore::new());
+
+        let token_str = "11111111111111111111111111111111";
+        let now = Utc::now();
+
+        // Pre-populate ONLY "pump_dump" (fresh). "honeypot_sim" is absent.
+        let fresh = CachedVerdict {
+            chain: "solana".to_owned(),
+            token_address: token_str.to_owned(),
+            detector_id: "pump_dump".to_owned(),
+            confidence: Decimal::new(8500, 4),
+            severity: "HIGH".to_owned(),
+            evidence: serde_json::json!({}),
+            cached_at: now,
+            expires_at: now + Duration::minutes(5),
+        };
+        cache.upsert(&fresh).await.expect("pre-populate must succeed");
+
+        let shutdown = ShutdownSignal::new();
+        let coordinator = MultiChainCoordinator::new(
+            vec![AdapterSlot::new(
+                Chain::Solana,
+                "solana",
+                MockStreamAdapter::new(Chain::Solana, vec![]),
+            )],
+            shutdown,
+        )
+        .with_verdict_cache(
+            cache.clone() as Arc<dyn VerdictCacheStore>,
+            crate::trigger::VerdictCacheConfig::default(),
+        )
+        // "honeypot_sim" is not in cache — partial miss triggers evaluation.
+        .with_detector_ids(vec!["pump_dump".to_owned(), "honeypot_sim".to_owned()]);
+
+        let token =
+            mg_onchain_common::chain::Address::parse(Chain::Solana, token_str)
+                .expect("valid address");
+
+        let summary = coordinator
+            .trigger_evaluate(token, Chain::Solana, EvaluationReason::RestRequest)
+            .await
+            .expect("trigger_evaluate must not fail");
+
+        // Partial cache miss means NOT a cache hit.
+        assert!(!summary.from_cache, "partial miss — must not be a cache hit");
     }
 }

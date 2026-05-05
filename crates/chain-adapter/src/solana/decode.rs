@@ -45,7 +45,7 @@
 use std::collections::HashMap;
 
 use chrono::{DateTime, TimeZone, Utc};
-use solana_sdk::pubkey::Pubkey;
+use mg_solana_types::Pubkey;
 use tracing::warn;
 
 use mg_onchain_common::chain::{Address, BlockRef, Chain, TxHash};

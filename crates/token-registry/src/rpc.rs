@@ -194,7 +194,7 @@ pub struct RawAccount {
     /// Lamport balance.
     pub lamports: u64,
     /// Owner program address.
-    pub owner: solana_sdk::pubkey::Pubkey,
+    pub owner: mg_solana_types::Pubkey,
     /// Raw account data bytes (decoded from base64).
     pub data: Vec<u8>,
     /// Whether the account is executable.
@@ -625,7 +625,7 @@ impl SolanaRpc for HttpSolanaRpc {
             reason: e.to_string(),
         })?;
 
-        let owner = solana_sdk::pubkey::Pubkey::from_str(&account.owner)
+        let owner = mg_solana_types::Pubkey::from_str(&account.owner)
             .map_err(|e| RegistryError::InvalidMintAccount {
                 mint: address.to_owned(),
                 reason: format!("invalid owner pubkey '{}': {}", account.owner, e),

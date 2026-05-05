@@ -11,6 +11,7 @@ use tokio::sync::broadcast;
 
 use mg_onchain_common::chain::Chain;
 use mg_onchain_detectors::config::DetectorConfig;
+use mg_onchain_indexer::coordinator::MultiChainCoordinator;
 use mg_onchain_scoring::ScoringEngine;
 use mg_onchain_storage::pg::PgStore;
 use mg_onchain_token_registry::TokenRegistry;
@@ -96,10 +97,24 @@ pub struct AppState {
 
     /// Service start time for uptime computation.
     pub started_at: Instant,
+
+    /// Pull-based query engine coordinator (ADR 0007 / design 0028 §4.5).
+    ///
+    /// `Arc` so that `trigger_evaluate` can be called concurrently from both:
+    /// - REST handlers (`GET /v1/score`) via axum's multi-threaded executor.
+    /// - Periodic scan workers (`watchlist_rescore_worker`, `launch_discovery_worker`).
+    ///
+    /// The coordinator manages its own concurrency semaphore internally
+    /// (`MultiChainCoordinator::with_max_concurrent`).
+    pub coordinator: Arc<MultiChainCoordinator>,
 }
 
 impl AppState {
     /// Construct `AppState`. All components must already be initialized.
+    ///
+    /// The `coordinator` field is required (T26-6: ADR 0007 pull-based query engine).
+    /// Pass `Arc::new(MultiChainCoordinator::new(vec![], shutdown))` for a no-op
+    /// coordinator in test environments that do not exercise `/v1/score` or `/v1/watchlist`.
     #[allow(clippy::too_many_arguments)]
     pub fn new(
         config: GatewayConfig,
@@ -109,6 +124,7 @@ impl AppState {
         detector_config: DetectorConfig,
         jwt_keys: JwtKeys,
         metrics: GatewayMetrics,
+        coordinator: Arc<MultiChainCoordinator>,
     ) -> Arc<Self> {
         let risk_cache = RiskCache::new(&config.gateway.cache);
         let rate_limiter = RateLimitManager::new(config.gateway.ratelimit.clone());
@@ -127,6 +143,7 @@ impl AppState {
             invalidation_tx,
             in_flight_analyzes: Arc::new(Mutex::new(HashSet::new())),
             started_at: Instant::now(),
+            coordinator,
         })
     }
 

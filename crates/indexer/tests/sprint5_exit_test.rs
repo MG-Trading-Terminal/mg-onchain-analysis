@@ -1467,6 +1467,13 @@ poll_interval_ms = 100
     let gw_metrics = GatewayMetrics::new().expect("gateway metrics");
 
     // Build AppState.
+    // T26-6: AppState::new now requires an Arc<MultiChainCoordinator>.
+    // The sprint5 exit test does not exercise /v1/score or /v1/watchlist so a
+    // no-op coordinator (no adapters, no verdict cache) is sufficient here.
+    let test_shutdown = ShutdownSignal::new();
+    let noop_coordinator = std::sync::Arc::new(
+        mg_onchain_indexer::coordinator::MultiChainCoordinator::new(vec![], test_shutdown),
+    );
     let app_state = AppState::new(
         gateway_config.clone(),
         pg.clone(),
@@ -1475,6 +1482,7 @@ poll_interval_ms = 100
         gateway_detector_config,
         jwt_keys,
         gw_metrics,
+        noop_coordinator,
     );
 
     // Bind to :0 to get an OS-assigned port.

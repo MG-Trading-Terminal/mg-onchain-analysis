@@ -32,7 +32,7 @@
 
 use std::path::PathBuf;
 
-use alloy::primitives::U256;
+use mg_evm_types::{I256, U256};
 use mg_onchain_chain_adapter::ethereum::decoder::{
     try_decode_approval, try_decode_transfer, try_decode_v2_burn, try_decode_v2_mint,
     try_decode_v2_swap, try_decode_v3_burn, try_decode_v3_mint, try_decode_v3_swap,
@@ -246,7 +246,7 @@ fn v3_swap_decoded_correctly() {
     assert_ne!(decoded.sender.to_string(), "0x0000000000000000000000000000000000000000");
     assert!(decoded.block_number > 0);
     // amounts must be non-zero (this is an actual swap)
-    assert!(decoded.amount0 != alloy::primitives::I256::ZERO || decoded.amount1 != alloy::primitives::I256::ZERO,
+    assert!(decoded.amount0 != I256::ZERO || decoded.amount1 != I256::ZERO,
         "at least one of amount0/amount1 must be non-zero in a real swap");
     println!("V3Swap decoded: pool={}, tick={}, sender={}", decoded.pool, decoded.tick, decoded.sender);
 }
@@ -270,7 +270,7 @@ fn v3_mint_decoded_correctly() {
     assert_eq!(decoded.tick_lower, -887270, "V3Mint tickLower");
     assert_eq!(decoded.tick_upper, 887270, "V3Mint tickUpper");
     assert!(decoded.amount > 0, "V3Mint amount must be positive");
-    assert!(decoded.amount0 > U256::ZERO || decoded.amount1 > U256::ZERO,
+    assert!(decoded.amount0 > U256::zero() || decoded.amount1 > U256::zero(),
         "V3Mint must have non-zero amount0 or amount1");
     println!("V3Mint decoded: pool={}, owner={}, amount={}", decoded.pool, decoded.owner, decoded.amount);
 }
@@ -334,8 +334,8 @@ fn v2_swap_decoded_from_fixture() {
         .expect("V2Swap must decode");
 
     // Exactly one direction is non-zero in a real swap
-    let has_in = decoded.amount0_in > U256::ZERO || decoded.amount1_in > U256::ZERO;
-    let has_out = decoded.amount0_out > U256::ZERO || decoded.amount1_out > U256::ZERO;
+    let has_in = decoded.amount0_in > U256::zero() || decoded.amount1_in > U256::zero();
+    let has_out = decoded.amount0_out > U256::zero() || decoded.amount1_out > U256::zero();
     assert!(has_in && has_out, "V2Swap must have both in and out amounts non-zero");
     println!("V2Swap decoded: pair={}, sender={}, a0in={}, a1out={}",
         decoded.pair, decoded.sender, decoded.amount0_in, decoded.amount1_out);
@@ -370,14 +370,14 @@ fn v2_mint_and_burn_decoded_from_fixture() {
         .expect("V2Mint log must be in fixture");
     let mint = try_decode_v2_mint(&log_from_value(mint_log))
         .expect("no error").expect("V2Mint decoded");
-    assert!(mint.amount0 > U256::ZERO || mint.amount1 > U256::ZERO);
+    assert!(mint.amount0 > U256::zero() || mint.amount1 > U256::zero());
 
     let burn_log = logs.iter()
         .find(|l| l["topics"][0].as_str().unwrap_or("") == UNISWAP_V2_BURN_TOPIC0)
         .expect("V2Burn log must be in fixture");
     let burn = try_decode_v2_burn(&log_from_value(burn_log))
         .expect("no error").expect("V2Burn decoded");
-    assert!(burn.amount0 > U256::ZERO || burn.amount1 > U256::ZERO);
+    assert!(burn.amount0 > U256::zero() || burn.amount1 > U256::zero());
 
     println!("V2Mint: a0={}, a1={}", mint.amount0, mint.amount1);
     println!("V2Burn: a0={}, a1={}", burn.amount0, burn.amount1);

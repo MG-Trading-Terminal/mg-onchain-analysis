@@ -1,7 +1,7 @@
 # Design 0024 — Reth ExEx Feature Flag (Sprint 24, S24-1)
 
 **Date:** 2026-04-24
-**Status:** Draft — awaiting user sign-off on §11 decisions before implementation
+**Status:** SUPERSEDED by ADR 0006 (`docs/adr/0006-code-level-self-sovereignty.md`, accepted 2026-04-27). The Cargo feature-flag approach (in-process `reth-exex` linking gated by `--features exex`) violates the code-level self-sovereignty doctrine. ExEx integration is reorganised as an out-of-process gRPC bridge in Sprint 25 — see `bridge/exex-bridge/` plan in ADR 0006 §Migration. This document is retained for historical traceability of the deprecated approach; do not implement against it.
 **Author:** architect agent
 **Sprint:** 24 (S24-1: spec; S24-2: implementation; S24-3: closure)
 **Carry-from:** Sprint 17 (7 sprints, oldest deferred infrastructure item)

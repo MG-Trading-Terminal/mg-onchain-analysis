@@ -1,71 +1,80 @@
-//! Configuration types for the Solana Yellowstone gRPC adapter.
+//! Configuration types for the Solana JSON-RPC + WebSocket adapter.
 //!
-//! # Provider-agnostic design (ADR 0001 §D2)
+//! # Standard JSON-RPC + WebSocket (ADR 0007)
 //!
-//! The same `SolanaAdapterConfig` works against all three providers:
+//! Sprint 26 (T26-2) replaced the Yellowstone gRPC path with standard Solana
+//! JSON-RPC 2.0 over WebSocket.  The config now mirrors `EthereumAdapterConfig`:
+//! two URL fields (one HTTP for one-shot RPC calls, one WS for subscriptions) plus
+//! commitment and reconnect settings.
 //!
-//! | Provider | Auth mechanism | Example endpoint |
-//! |----------|----------------|-----------------|
-//! | Helius LaserStream | `x-api-key` header via `auth_token` | `https://mainnet.helius-rpc.com` |
-//! | Triton Dragon's Mouth | gRPC metadata token via `auth_token` | `https://ams1.rpc.triton.one:443` |
-//! | Self-hosted | No auth (or custom via `auth_token`) | `http://localhost:10000` |
+//! | Field | Purpose | Default |
+//! |-------|---------|---------|
+//! | `http_url` | HTTP JSON-RPC endpoint for `getBlock`, `getTransaction`, `getSlot`, etc. | `http://127.0.0.1:8899` |
+//! | `ws_url`   | WebSocket endpoint for `programSubscribe`, `logsSubscribe`, etc.          | `ws://127.0.0.1:8900`  |
+//! | `commitment` | Solana commitment level for subscriptions and queries | `confirmed` |
+//! | `reconnect` | Exponential-backoff reconnect policy | see `ReconnectPolicy::default` |
+//! | `filters`   | Which programs / account owners to subscribe to | Solana token + DEX set |
 //!
-//! Provider discrimination is NEVER in code — only in this config struct.
-//! See `config/adapters.toml.example` for complete examples.
+//! Standard Agave RPC-only node exposes JSON-RPC on port 8899 and WebSocket on
+//! port 8900 by default.  Self-hosted operators can override via TOML config.
 //!
-//! # Provider-specific quirks (inline documentation)
-//!
-//! ## Helius LaserStream
-//! - Auth: HTTP header `x-api-key: <token>`. The `yellowstone-grpc-client` builder
-//!   supports custom headers via `GeyserGrpcBuilder::x_token(token)`.
-//! - Rate limits: 429 / `RESOURCE_EXHAUSTED` gRPC status on overload.
-//!   `rate_limit_base_ms` in `ReconnectPolicy` controls the extended backoff.
-//! - Endpoint: append `/` (no path) — the builder connects to the root service.
-//!   Do NOT append `/v1/` or any REST path.
-//!
-//! ## Triton Dragon's Mouth
-//! - Auth: gRPC metadata key `x-token: <token>`. Same `GeyserGrpcBuilder::x_token`.
-//! - Endpoint format: `https://<region>.rpc.triton.one:443` — TLS required.
-//!   Set `tls = true` in the config (or omit; TLS is on by default when port=443).
-//! - No known rate-limit behavior distinct from generic `RESOURCE_EXHAUSTED`.
-//!
-//! ## Self-hosted validator
-//! - No auth token needed (omit `auth_token` or leave `None`).
-//! - Plaintext gRPC supported: `http://localhost:10000`. The builder auto-detects
-//!   plaintext vs TLS from the URL scheme.
+//! Private RPC endpoints may require an `Authorization: Bearer <token>` HTTP header.
+//! Set `auth_token` and the adapter will attach it on every HTTP request.
+//! The same token is used as a query-param on the WS URL if the node requires it
+//! (non-standard; most nodes do not).
 
 use serde::{Deserialize, Serialize};
 use url::Url;
 
-/// Configuration for the Solana Yellowstone gRPC adapter.
+/// Configuration for the Solana JSON-RPC + WebSocket adapter.
 ///
 /// Load via TOML (see `config/adapters.toml.example`), then construct
-/// `SolanaAdapter::new(config)`.
+/// `SolanaAdapter::new(config, checkpoint_store)`.
+///
+/// # Example (TOML)
+///
+/// ```toml
+/// [solana]
+/// http_url = "http://127.0.0.1:8899"
+/// ws_url   = "ws://127.0.0.1:8900"
+/// commitment = "confirmed"
+/// checkpoint_path = "./checkpoints/solana.json"
+/// ```
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SolanaAdapterConfig {
-    /// gRPC endpoint URL.
+    /// HTTP JSON-RPC endpoint.
     ///
-    /// - Helius: `https://mainnet.helius-rpc.com` (or `https://<custom>.helius-rpc.com`)
-    /// - Triton: `https://ams1.rpc.triton.one:443` (or other region)
-    /// - Self-hosted: `http://localhost:10000`
-    pub endpoint: Url,
+    /// Used for one-shot requests: `getBlock`, `getTransaction`, `getSlot`,
+    /// `getSignaturesForAddress`, `getAccountInfo`, `getHealth`, etc.
+    ///
+    /// Default: `http://127.0.0.1:8899` (standard Agave RPC HTTP port).
+    #[serde(default = "default_http_url")]
+    pub http_url: Url,
 
-    /// Authentication token passed via `x-token` gRPC metadata / `x-api-key` HTTP header.
+    /// WebSocket endpoint.
     ///
-    /// - Helius: your Helius API key.
-    /// - Triton: your Triton access token.
-    /// - Self-hosted: omit (`None`).
+    /// Used for push subscriptions: `programSubscribe`, `logsSubscribe`,
+    /// `accountSubscribe`, `signatureSubscribe`.
+    ///
+    /// Default: `ws://127.0.0.1:8900` (standard Agave RPC WebSocket port).
+    #[serde(default = "default_ws_url")]
+    pub ws_url: Url,
+
+    /// Optional Bearer token for private RPC endpoints.
+    ///
+    /// When set, the adapter attaches `Authorization: Bearer <token>` to every
+    /// HTTP request. Most self-hosted nodes do not require auth.
     ///
     /// NEVER commit real tokens. This field is `None` in the `.example` file.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub auth_token: Option<String>,
 
-    /// Solana commitment level for the live subscription stream.
+    /// Solana commitment level for live subscriptions and block queries.
     ///
     /// - `Confirmed` — hot path; fast, but events can be rolled back if the slot is
     ///   skipped. The adapter emits `ReorgMarker` when a confirmed slot goes dead.
     /// - `Finalized` — immutable; ~32 slots behind confirmed. Use for detector-critical
-    ///   inputs that cannot tolerate reorg noise (e.g., rug-pull LP drain confirmation).
+    ///   inputs that cannot tolerate reorg noise.
     ///
     /// Per CLAUDE.md §Multi-Chain Rules / Solana: use `Confirmed` for hot path,
     /// `Finalized` for immutable records.
@@ -76,22 +85,9 @@ pub struct SolanaAdapterConfig {
     #[serde(default)]
     pub reconnect: ReconnectPolicy,
 
-    /// Subscription filter — which programs / accounts to stream.
+    /// Subscription filter — which programs / account owners to subscribe to.
     #[serde(default)]
     pub filters: SubscribeFiltersConfig,
-
-    /// Solana JSON-RPC endpoint for backfill (`getBlock` calls).
-    ///
-    /// Separate from the gRPC endpoint because:
-    /// - Archive backfill needs a high-data-retention RPC (not all gRPC providers
-    ///   retain full block history).
-    /// - Some self-hosted setups run gRPC on a different port than JSON-RPC.
-    ///
-    /// If omitted, the adapter falls back to the gRPC provider's JSON-RPC endpoint
-    /// (derived by replacing the port with 8899 for self-hosted, or using the
-    /// provider's documented JSON-RPC URL for Helius/Triton).
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub rpc_endpoint: Option<Url>,
 
     /// Path to the file-backed checkpoint file.
     ///
@@ -99,6 +95,14 @@ pub struct SolanaAdapterConfig {
     /// Set to a volume-mounted path in Docker deployments.
     #[serde(default = "default_checkpoint_path")]
     pub checkpoint_path: String,
+}
+
+fn default_http_url() -> Url {
+    Url::parse("http://127.0.0.1:8899").expect("default http url is valid")
+}
+
+fn default_ws_url() -> Url {
+    Url::parse("ws://127.0.0.1:8900").expect("default ws url is valid")
 }
 
 fn default_commitment() -> CommitmentConfig {
@@ -111,7 +115,7 @@ fn default_checkpoint_path() -> String {
 
 /// Solana commitment levels exposed in adapter config.
 ///
-/// Maps to Yellowstone `CommitmentLevel` proto enum in `subscribe.rs`.
+/// Maps to the Solana JSON-RPC `commitment` parameter string in subscribe and query calls.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum CommitmentConfig {
@@ -121,18 +125,20 @@ pub enum CommitmentConfig {
 }
 
 impl CommitmentConfig {
-    /// Convert to the Yellowstone proto `CommitmentLevel`.
-    pub fn to_proto(self) -> yellowstone_grpc_proto::geyser::CommitmentLevel {
-        use yellowstone_grpc_proto::geyser::CommitmentLevel;
+    /// Convert to the Solana JSON-RPC string representation.
+    ///
+    /// Used as the `"commitment"` value in JSON-RPC request params:
+    /// `{"encoding": "base64", "commitment": "<level>"}`.
+    pub fn as_str(self) -> &'static str {
         match self {
-            CommitmentConfig::Processed => CommitmentLevel::Processed,
-            CommitmentConfig::Confirmed => CommitmentLevel::Confirmed,
-            CommitmentConfig::Finalized => CommitmentLevel::Finalized,
+            CommitmentConfig::Processed => "processed",
+            CommitmentConfig::Confirmed => "confirmed",
+            CommitmentConfig::Finalized => "finalized",
         }
     }
 }
 
-/// Reconnect and retry policy for the Yellowstone gRPC stream.
+/// Reconnect and retry policy for the JSON-RPC WebSocket stream.
 ///
 /// Uses exponential backoff with jitter. The formula is:
 /// `delay = min(base_delay_ms * 2^attempt, max_delay_ms) + jitter`
@@ -184,18 +190,26 @@ fn default_rate_limit_base_ms() -> u64 { 5_000 }
 /// Which programs / account owners to include in the subscription.
 ///
 /// Defaults to the full SPL Token + Token-2022 + major DEX program set.
-/// Narrow this list to reduce stream volume (and provider costs) in production.
+/// Narrow this list to reduce stream volume in production.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SubscribeFiltersConfig {
-    /// Solana program IDs (Base58) to include in the transaction filter.
+    /// Solana program IDs (Base58) to include in the `logsSubscribe` mentions filter.
+    ///
+    /// For `programSubscribe` calls the adapter iterates this list and opens one
+    /// subscription per program ID.
     #[serde(default = "default_program_ids")]
     pub program_ids: Vec<String>,
 
-    /// Account owner program IDs for the account update filter.
+    /// Account owner program IDs for the `programSubscribe` account filter.
     #[serde(default = "default_account_owners")]
     pub account_owners: Vec<String>,
 
-    /// Whether to subscribe to slot metadata updates for reorg detection.
+    /// Whether to track slot confirmations for reorg detection.
+    ///
+    /// When `true` the adapter polls `getSlot({commitment: "finalized"})` periodically
+    /// and emits `ReorgMarker` events when the confirmed tip diverges from the
+    /// finalized tip by more than the configured reorg window.
+    ///
     /// Default: `true`.
     #[serde(default = "default_true")]
     pub include_slot_updates: bool,
@@ -250,6 +264,21 @@ mod tests {
     }
 
     #[test]
+    fn commitment_as_str_confirmed() {
+        assert_eq!(CommitmentConfig::Confirmed.as_str(), "confirmed");
+    }
+
+    #[test]
+    fn commitment_as_str_finalized() {
+        assert_eq!(CommitmentConfig::Finalized.as_str(), "finalized");
+    }
+
+    #[test]
+    fn commitment_as_str_processed() {
+        assert_eq!(CommitmentConfig::Processed.as_str(), "processed");
+    }
+
+    #[test]
     fn reconnect_policy_defaults() {
         let p = ReconnectPolicy::default();
         assert_eq!(p.base_delay_ms, 500);
@@ -272,9 +301,31 @@ mod tests {
     }
 
     #[test]
-    fn commitment_to_proto_confirmed() {
-        use yellowstone_grpc_proto::geyser::CommitmentLevel;
-        let proto = CommitmentConfig::Confirmed.to_proto();
-        assert_eq!(proto, CommitmentLevel::Confirmed);
+    fn solana_adapter_config_default_urls() {
+        let config = SolanaAdapterConfig {
+            http_url: default_http_url(),
+            ws_url: default_ws_url(),
+            auth_token: None,
+            commitment: CommitmentConfig::Confirmed,
+            reconnect: ReconnectPolicy::default(),
+            filters: SubscribeFiltersConfig::default(),
+            checkpoint_path: "/tmp/test.json".into(),
+        };
+        assert_eq!(config.http_url.as_str(), "http://127.0.0.1:8899/");
+        assert_eq!(config.ws_url.as_str(), "ws://127.0.0.1:8900/");
+    }
+
+    #[test]
+    fn solana_adapter_config_serde_minimal() {
+        // Minimal JSON round-trip: only override urls, rest use serde defaults.
+        let json_str = r#"{
+            "http_url": "http://rpc.example.com:8899",
+            "ws_url":   "ws://rpc.example.com:8900"
+        }"#;
+        let config: SolanaAdapterConfig = serde_json::from_str(json_str).unwrap();
+        assert_eq!(config.http_url.as_str(), "http://rpc.example.com:8899/");
+        assert_eq!(config.ws_url.as_str(), "ws://rpc.example.com:8900/");
+        assert_eq!(config.commitment, CommitmentConfig::Confirmed);
+        assert!(config.auth_token.is_none());
     }
 }

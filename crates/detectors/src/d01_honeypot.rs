@@ -103,9 +103,7 @@ use std::sync::Arc;
 use base64::prelude::{BASE64_STANDARD, Engine as _};
 use rust_decimal::Decimal;
 use rust_decimal::prelude::FromPrimitive;
-use solana_sdk::hash::Hash;
-use solana_sdk::pubkey::Pubkey;
-use solana_sdk::signer::Signer as _;
+use mg_solana_types::{Hash, Pubkey};
 use tracing::{debug, instrument, warn};
 
 use mg_onchain_common::anomaly::{AnomalyEvent, Confidence, Evidence, Severity};
@@ -1491,13 +1489,11 @@ async fn simulate_sell(
 // ---------------------------------------------------------------------------
 
 /// Serialize a `Transaction` to base64 for `simulateTransaction` RPC.
-fn encode_tx(tx: &solana_sdk::transaction::Transaction) -> Result<String, DetectorError> {
-    bincode::serialize(tx)
-        .map(|bytes| BASE64_STANDARD.encode(bytes))
-        .map_err(|e| DetectorError::Simulation {
-            feature: "honeypot_simulation",
-            reason: format!("bincode serialize transaction: {e}"),
-        })
+///
+/// Uses Solana wire format (compact-u16 length prefixes) via
+/// `mg_solana_types::Transaction::serialize()`, not bincode.
+fn encode_tx(tx: &mg_solana_types::Transaction) -> Result<String, DetectorError> {
+    Ok(BASE64_STANDARD.encode(tx.serialize()))
 }
 
 /// Parse the SPL token account amount from a base64-encoded data field.
@@ -2906,7 +2902,7 @@ mod tests {
         let cfg = load_cfg();
         let meta = meta_with_pool(DexKind::RaydiumCpmm, Decimal::from(100_000u64));
 
-        let k = solana_sdk::pubkey::Pubkey::new_from_array([0x01; 32]);
+        let k = mg_solana_types::Pubkey::new_from_array([0x01; 32]);
         let cpmm_accounts = RaydiumCpmmSwapAccounts {
             payer: k,
             authority: k,
@@ -2958,7 +2954,7 @@ mod tests {
         let cfg = load_cfg();
         let meta = meta_with_pool(DexKind::RaydiumCpmm, Decimal::from(100_000u64));
 
-        let k = solana_sdk::pubkey::Pubkey::new_from_array([0x01; 32]);
+        let k = mg_solana_types::Pubkey::new_from_array([0x01; 32]);
         let cpmm_accounts = RaydiumCpmmSwapAccounts {
             payer: k,
             authority: k,
@@ -3009,7 +3005,7 @@ mod tests {
         let cfg = load_cfg();
         let meta = meta_with_pool(DexKind::RaydiumCpmm, Decimal::from(100_000u64));
 
-        let k = solana_sdk::pubkey::Pubkey::new_from_array([0x01; 32]);
+        let k = mg_solana_types::Pubkey::new_from_array([0x01; 32]);
         let cpmm_accounts = RaydiumCpmmSwapAccounts {
             payer: k,
             authority: k,
@@ -3084,7 +3080,7 @@ mod tests {
         let cfg = load_cfg();
         let meta = meta_with_pool(DexKind::RaydiumCpmm, Decimal::from(100_000u64));
 
-        let k = solana_sdk::pubkey::Pubkey::new_from_array([0x01; 32]);
+        let k = mg_solana_types::Pubkey::new_from_array([0x01; 32]);
         let cpmm_accounts = RaydiumCpmmSwapAccounts {
             payer: k,
             authority: k,
@@ -3173,7 +3169,7 @@ mod tests {
             .with_market(cpmm_market)
             .build();
 
-        let k = solana_sdk::pubkey::Pubkey::new_from_array([0x02; 32]);
+        let k = mg_solana_types::Pubkey::new_from_array([0x02; 32]);
         let cpmm_accounts = RaydiumCpmmSwapAccounts {
             payer: k,
             authority: k,
@@ -3250,7 +3246,7 @@ mod tests {
             .with_market(v4_market)
             .build();
 
-        let k = solana_sdk::pubkey::Pubkey::new_from_array([0x03; 32]);
+        let k = mg_solana_types::Pubkey::new_from_array([0x03; 32]);
         let v4_accounts = RaydiumV4SwapAccounts {
             amm_pool: k,
             amm_authority: k,

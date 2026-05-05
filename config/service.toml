@@ -166,6 +166,30 @@ reorg_depth = 64
 checkpoint_path = "./checkpoints/polygon.json"
 
 # ---------------------------------------------------------------------------
+# Periodic scan workers — Sprint 26 T26-4 (ADR 0007 §9.4)
+# ---------------------------------------------------------------------------
+#
+# Two background tasks poll the watchlist / factory programs on a cadence
+# and call MultiChainCoordinator::trigger_evaluate for discovered tokens.
+# Design reference: docs/designs/0028-lightweight-query-engine-deployment.md §7.2
+
+[periodic_scan]
+
+# Scan cadence in minutes.
+# ADR 0007 §9.4 recommendation: 5 minutes for both workers.
+# Operators with a narrow watchlist can reduce to 1 minute; large watchlists
+# on lightweight hardware may increase to 15 minutes.
+interval_minutes = 5
+
+# Watchlist rescore worker: re-evaluate all tokens in the watchlist on each tick.
+# The coordinator's cache-read-first protocol skips tokens with fresh cached verdicts.
+rescore_enabled = true
+
+# New-launch discovery worker: query factory programs (Raydium v4 / Uniswap v2/v3 /
+# PancakeSwap) for newly created pools and enqueue EvaluateToken for each new token.
+discovery_enabled = true
+
+# ---------------------------------------------------------------------------
 # Gateway
 # ---------------------------------------------------------------------------
 

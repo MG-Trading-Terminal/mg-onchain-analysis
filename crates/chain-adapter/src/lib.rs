@@ -40,6 +40,7 @@
 
 pub mod error;
 pub mod ethereum;
+pub(crate) mod jsonrpc;
 pub mod solana;
 
 use futures::Stream;
@@ -174,8 +175,8 @@ pub trait ChainAdapter: Send + Sync {
     /// Start streaming live events from the chain tip.
     ///
     /// `filter` specifies which account owners / program IDs to subscribe to.
-    /// The adapter translates this into a Yellowstone `SubscribeRequest` or
-    /// EVM `eth_subscribe` filter.
+    /// The adapter translates this into a Solana JSON-RPC `logsSubscribe` /
+    /// `programSubscribe` call, or an EVM `eth_subscribe` filter.
     ///
     /// The stream MUST reconnect automatically on disconnect. Callers must not
     /// implement retry logic themselves — they rely on the adapter's reconnect
@@ -260,8 +261,8 @@ pub trait ChainAdapter: Send + Sync {
 /// Filter specification passed to `ChainAdapter::subscribe`.
 ///
 /// The adapter converts this into a provider-specific filter:
-/// - Solana: Yellowstone `SubscribeRequestFilterTransactions` (account_include)
-///   and `SubscribeRequestFilterAccounts` (owner).
+/// - Solana: one `logsSubscribe({mentions:[id]})` per `program_ids` entry
+///   and one `programSubscribe(owner)` per `account_owners` entry (JSON-RPC WS).
 /// - EVM (Phase 4): `eth_getLogs` filter with `address` and `topics`.
 ///
 /// An empty `program_ids` list subscribes to ALL transactions (very high volume

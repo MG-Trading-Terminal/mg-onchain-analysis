@@ -1,0 +1,51 @@
+# Dockerfile.service — builds the mg-onchain-analysis service binary.
+#
+# ADR 0003: all production artefacts built from source — no SaaS binaries.
+# ADR 0006: main workspace contains only public-spec implementations.
+# Build context: mg-onchain-analysis repo root (../ relative to infra/).
+
+FROM rust:1.95-slim-bookworm AS builder
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libssl-dev \
+    pkg-config \
+    protobuf-compiler \
+    ca-certificates \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build
+
+COPY Cargo.toml Cargo.lock ./
+COPY crates/ ./crates/
+COPY migrations/ ./migrations/
+
+RUN cargo build --release --locked --bin onchain-service
+
+FROM debian:bookworm-slim AS runtime
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    libssl3 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN groupadd --system onchain && useradd --system --gid onchain --no-create-home onchain
+
+WORKDIR /app
+
+COPY --from=builder /build/target/release/onchain-service /app/onchain-service
+COPY --from=builder /build/migrations /app/migrations
+COPY config/ /app/config/
+
+RUN mkdir -p /app/checkpoints && chown onchain:onchain /app/checkpoints
+
+USER onchain
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+    CMD curl -sf http://localhost:8080/health | grep -q '"status":"ok"'
+
+ENTRYPOINT ["/app/onchain-service"]
+CMD ["--config", "/app/config/service.toml"]

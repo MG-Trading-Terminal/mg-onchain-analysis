@@ -1,0 +1,88 @@
+== onchain-check-token ==
+chain: solana
+token: orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE
+rpc:   https://api.mainnet-beta.solana.com
+
+[chain-adapter] calling get_token_holders(...) — SPL getProgramAccounts under the hood
+== fetch via mg_onchain_chain_adapter::solana ==
+  token accounts returned: 292754
+  non-zero holders:        89826
+  zero-balance accounts:   202928
+  summed supply (active):  74999558708883 raw
+
+== D03 holder_concentration via mg_onchain_detectors::signals ==
+  gini_descending(all 89826 holders) = 0.9981272641198112476657205841
+  top_n_pct(all 89826 holders, 10)   = 0.6333661410300779352349684919 (63.336614103007793523496849190%)
+
+== verdict ==
+  severity:       MEDIUM
+  signal_3_fires: false
+  rationale:      top-10 share 0.6333661410300779352349684919 between 0.50-0.85 → concentrated but below auto-fire
+
+top-10 holder owners (from getProgramAccounts):
+   1. GwH3Hiv5mACLX3ufTw1pFsrhSPon5tdw252DBs4Rx4PV | 14200768337139 raw | 18.9345%
+   2. CSqKhyW1cpdyjheAx5HXx4ibcnYrzpL5JywEMAkZixBK | 9242120556277 raw | 12.3229%
+   3. DbfGbmN89NGpXoEyuNj49tn29XTAr9Tw7y29bBnsJ74v | 5884520808619 raw | 7.8461%
+   4. 5Je5sHZL5HrF8YDiwZDbpnsRSzzbeNYAjQSx4e2U5Uxd | 4048206787747 raw | 5.3976%
+   5. 5tzFkiKscXHK5ZXCGbXZxdw7gTjjD1mBwuoFbhUvuAi9 | 3310994314839 raw | 4.4147%
+   6. 7NQr63ojGTySSaPqD8w3bQ7pTFk4TdmvYGVjZzNtfwML | 3000000010001 raw | 4.0000%
+   7. Fue5m7uwemAhv1uyPSC44hd6UpBgAkubxiFCvBGmc8Ah | 2863213647943 raw | 3.8176%
+   8. 35naBFBZG6bRw9kwjmsUdmTxXJTYUvw5V3SBtDeFDbfn | 1650785538613 raw | 2.2011%
+   9. AuVBa5BkKaxWNTn66GwE2MR7LtnYoFioWQcr1VTcej44 | 1650785538613 raw | 2.2011%
+  10. 5Z8wujmSTqvj7dYk8zQ4C5pwJwxoCpw4u6irZwUS6ZeJ | 1650785538613 raw | 2.2011%
+
+[chain-adapter] calling get_mint_state(...) — getAccountInfo + SPL Mint layout decode
+== D02/D06 mint state via mg_onchain_chain_adapter::solana::get_mint_state ==
+  supply (raw):     74999558708883 (74999558.708883 ui at 6 decimals)
+  is_initialized:   true
+  mint_authority:   Some(GwH3Hiv5mACLX3ufTw1pFsrhSPon5tdw252DBs4Rx4PV)  ← can mint more — RUG-PREP RISK if unverified
+  freeze_authority: None  ← cannot freeze any holder
+
+  D02/D06 verdict (mint-state heuristic): severity=Medium confidence=0.40
+    rationale: mint authority active (RUG-PREP risk; legit if DAO PDA)
+
+== D01 honeypot static via mg_onchain_detectors (formula from d01_honeypot::compute_static) ==
+  S1 freeze_authority_active: false (weight +0.00)
+  S2 transfer_fee_bps:        0 (regular SPL — Token-2022 ext not parsed)
+  S3 permanent_delegate:      none (regular SPL)
+  S4 transfer_hook:           none (regular SPL)
+  raw signal sum:             0.000
+  static_conf (sigmoid):      0.269
+  D01 verdict: severity=Low confidence=0.269
+    rationale: no honeypot static signals; regular SPL with renounced freeze authority
+
+[chain-adapter] calling get_oldest_signature_block_time(...) — paginated getSignaturesForAddress
+== D10 launch_audit via mg_onchain_chain_adapter::solana ==
+  pages fetched:    2 (cap 50, ≤ 50,000 signatures)
+  scan complete:    false
+  stop reason:      RPC error: {"code":429,"message":"Too many requests for a specific RPC call"}
+  oldest signature observed: 2026-04-28T16:34:47+00:00 (UNIX=1777394087)
+  observed-window age: 0 days (incomplete scan; observed window may be much shorter than true token age)
+  D10 verdict: UNKNOWN (incomplete scan, observed window <7d) (severity=Info, confidence=0.00)
+    rationale: incomplete scan and observed window <7d — cannot distinguish fresh launch from recent activity on a mature token. Use --rpc <self-hosted> to complete the scan.
+
+[chain-adapter] calling get_recent_signatures(...) — page-1 sig list for activity histogram
+== D04 pump-dump (proxy via signature-rate, NOT real swap-event detection) ==
+  signatures fetched: 0 (1 page; complete=false)
+  stop reason:        RPC error: {"code":429,"message":"Too many requests for a specific RPC call"}
+  D04 verdict: UNKNOWN — no block_times returned (RPC blocked before page 1 yielded data)
+
+== D11 synchronized-activity (proxy via 10s-bucket burst rate) ==
+  D11-proxy verdict: UNKNOWN — shares signature data path with D04; both blocked by public-RPC throttling
+    rationale: use --rpc <self-hosted> Solana node to bypass mainnet-beta rate limits
+
+== summary ==
+  D01 honeypot static:       evaluated (regular-SPL state path; Token-2022 TLV deferred)
+  D02/D06 mint-state:        evaluated end-to-end (mint + freeze authority)
+  D03 holder_concentration:  evaluated end-to-end (full holder distribution)
+  D04 pump-dump proxy:       evaluated (signature-rate; real swap-event D04 deferred)
+  D10 launch_audit:          evaluated end-to-end (oldest signature, RPC-paged)
+  D11 sync-activity proxy:   evaluated (10s-bucket burst rate; per-tx sender decode deferred)
+
+  not yet evaluated by this CLI (need event-stream / multi-event decode):
+    D05 wash_trading         (needs full transfer graph + cycle detection)
+    D07 withdraw_withheld    (Token-2022 only; ORCA is regular SPL)
+    D08 sybil                (needs cluster store + funding-graph traversal)
+    D09 deployer_changepoint (needs deployer launch-history)
+    D12 permit2_drainer      (Ethereum-only)
+    D13 sandwich_mev         (Ethereum-only)

@@ -26,7 +26,7 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use solana_sdk::pubkey::Pubkey;
+use mg_solana_types::Pubkey;
 use thiserror::Error;
 
 use mg_onchain_token_registry::SolanaRpc;
@@ -569,7 +569,7 @@ impl PoolAccountProvider for MockPoolAccountProvider {
 mod tests {
     use super::*;
     use std::sync::Arc;
-    use solana_sdk::pubkey::Pubkey;
+    use mg_solana_types::Pubkey;
 
     fn dummy_pool() -> Pubkey {
         Pubkey::new_from_array([0xAA; 32])

@@ -1,10 +1,3 @@
-[features]
-default = []
-# exex: gates ExExRpcClient + EthereumRpcExEx trait.
-# Activating this feature adds reth-exex + reth-primitives to the dep tree.
-# Sprint 24: API surface + unit tests. Sprint 25: onchain-reth binary wiring.
-exex = ["dep:reth-exex", "dep:reth-primitives"]
-
 [package]
 name        = "mg-onchain-chain-adapter"
 version.workspace     = true
@@ -30,25 +23,26 @@ futures.workspace       = true
 url.workspace           = true
 tokio-retry.workspace   = true
 bs58.workspace          = true
+base64.workspace        = true
 rust_decimal.workspace  = true
 
-# Yellowstone gRPC — one client, three providers (Helius / Triton / self-hosted).
-# Pin: yellowstone-grpc-client 13.1 requires yellowstone-grpc-proto 12.2 and tonic 0.14.
-# Bump all three in lock-step — see workspace Cargo.toml comments.
-yellowstone-grpc-client.workspace = true
-yellowstone-grpc-proto.workspace  = true
-tonic.workspace                   = true
-prost.workspace                   = true
+# Our Solana primitive types (replaces solana-sdk Pubkey/Signature/Slot/Hash/Epoch).
+mg-solana-types = { path = "../solana-types" }
 
 # tokio-stream for ReceiverStream (mpsc → Stream bridging).
 tokio-stream = "0.1"
 
+# tokio-tungstenite: WebSocket RFC 6455 client for the in-tree JSON-RPC 2.0 over WS
+# implementation (JsonRpcClient in crates/chain-adapter/src/jsonrpc/).
+# Replaces alloy::transports::ws::WsConnect + alloy_rpc_client::RpcClient (ADR 0006 Task #5b).
+tokio-tungstenite.workspace = true
+
+# futures-util: SinkExt + StreamExt for the WS write/read pump halves.
+# Provided transitively via futures; made explicit here for direct SinkExt/StreamExt use.
+futures-util = "0.3"
+
 # reqwest for backfill JSON-RPC calls (minimal HTTP client; avoids full solana-client dep).
 reqwest = { version = "0.12", features = ["json"] }
-
-# solana-sdk: Pubkey + Signature canonical types at the ingestion boundary.
-# Import is ONLY inside crates/chain-adapter/src/solana/. Do not re-export to consumers.
-solana-sdk.workspace = true
 
 # async-trait: required for #[async_trait] on EthereumRpc (object-safe async methods).
 async-trait.workspace = true
@@ -56,24 +50,13 @@ async-trait.workspace = true
 # hex: decode data field hex strings in eth_getLogs responses.
 hex.workspace = true
 
-# alloy: EVM toolkit for WsRpcClient + ABI decoding.
-# Sprint 16 (2026-04-24) — version 1.0.x pinned in workspace.
-alloy.workspace = true
-
-# Reth ExEx deps — optional; compiled only with --features exex.
-# Reth crates are not published to crates.io as versioned packages; consumed via git dep
-# in workspace Cargo.toml (see SPEC-NOTE in docs/designs/0024). Sprint 24 uses ExExRpcClient
-# skeleton; full notification mapping + onchain-reth binary entry are Sprint 25.
-reth-exex       = { workspace = true, optional = true }
-reth-primitives = { workspace = true, optional = true }
-
 # Internal
-mg-onchain-common   = { path = "../common" }
+mg-onchain-common      = { path = "../common" }
 mg-onchain-dex-adapter = { path = "../dex-adapter" }
+mg-evm-types           = { path = "../evm-types" }
+mg-evm-types-macros    = { path = "../evm-types-macros" }
 
 # ---------------------------------------------------------------------------
 # Dev-dependencies (tests only — no network calls in unit tests)
 # ---------------------------------------------------------------------------
 [dev-dependencies]
-# tokio-stream is already a runtime dep, but tonic is needed in test code.
-tonic = { version = "0.14", features = ["tls-native-roots"] }

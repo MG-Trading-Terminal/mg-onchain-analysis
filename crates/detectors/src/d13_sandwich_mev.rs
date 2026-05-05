@@ -727,7 +727,7 @@ pub fn decode_swap_for_chain(
     log: &mg_onchain_chain_adapter::ethereum::types::RawLog,
     chain: Chain,
 ) -> Option<NormalizedSwap> {
-    use alloy::primitives::U256;
+    use mg_evm_types::U256;
     use mg_onchain_chain_adapter::ethereum::decoder::{
         try_decode_v2_swap,
         try_decode_v3_swap,
@@ -741,8 +741,8 @@ pub fn decode_swap_for_chain(
     };
 
     // Helper: convert I256 absolute value to Decimal.
-    let i256_abs_to_decimal = |v: alloy::primitives::I256| -> Decimal {
-        Decimal::from_str(&v.abs().to_string()).unwrap_or(Decimal::ZERO)
+    let i256_abs_to_decimal = |v: mg_evm_types::I256| -> Decimal {
+        Decimal::from_str(&v.abs_as_u256().to_string()).unwrap_or(Decimal::ZERO)
     };
 
     // Try UniV2 first on all EVM chains (widest coverage).

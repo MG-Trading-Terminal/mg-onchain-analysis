@@ -38,6 +38,8 @@ mg-onchain-graph         = { path = "../graph" }
 [dev-dependencies]
 # Graph mock stores for graph_writer unit tests (gated by test-utils feature).
 mg-onchain-graph = { path = "../graph", features = ["test-utils"] }
+# Storage mock stores: MockVerdictCacheStore for trigger_evaluate tests (T26-4).
+mg-onchain-storage = { path = "../storage", features = ["test-utils"] }
 
 # Integration test: real Postgres via Docker containers
 testcontainers         = "0.23"

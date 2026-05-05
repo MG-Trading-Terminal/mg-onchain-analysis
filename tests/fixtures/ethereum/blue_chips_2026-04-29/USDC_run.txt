@@ -1,0 +1,83 @@
+[resolver] "USDC" is not an address; querying token lists…
+[resolver] "USDC" found on multiple chains:
+[resolver]   - Ethereum: 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (USDCoin, 6 decimals)
+[resolver]   - Solana:   EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v (USD Coin, 6 decimals)
+[resolver] using Ethereum by default cascade priority; pass `--chain solana USDC` to investigate the Solana version instead.
+[resolver] "USDC" → 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (Ethereum, 6 decimals, name="USDCoin")
+== onchain-check-token ==
+token: 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48
+chain: ethereum
+
+[chain-adapter] calling evm_token_metadata(...) — 6× eth_call + 1× eth_getCode
+== EVM token metadata via mg_onchain_chain_adapter::ethereum ==
+  address:        0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48
+  name:           USD Coin
+  symbol:         USDC
+  decimals:       6
+  totalSupply:    54387958384622159 raw (54387958384.622159 ui)
+  bytecode size:  2186 bytes (contract present)
+
+[chain-adapter] calling fetch_recent_holder_flows(...) — eth_getLogs Transfer over last 2000 blocks
+== D02 rug_pull_lp_drain / mint-authority via Ownable owner() ==
+  D02 verdict: MEDIUM (severity=Medium, confidence=0.40)
+    rationale: owner() = 0xfcb19e6a322b27c06842a71e8c725399f049ae3a → active EOA/contract can call privileged functions; verify against deployer + DAO label store before clearing
+
+== D06 mint_burn_anomaly via bytecode selector grep ==
+  has mint(uint256) | mint(address,uint256) | issue(uint256): true
+  D06 verdict: HIGH (severity=High, confidence=0.70)
+    rationale: mint() exists in bytecode AND owner (0xfcb19e6a322b27c06842a71e8c725399f049ae3a) is active → privileged caller can mint more supply (rug-prep capability)
+
+== D01 honeypot (static bytecode patterns + simulate-sell probe) ==
+  paused() returns:               false (Pausable but not currently paused)
+  pause() in bytecode:            true
+  blacklist(address,bool):        true
+  setSwapEnabled(bool):           false
+[chain-adapter] calling simulate_sell_evm(...) — eth_call from owner + top-5 recent receivers
+  simulate-sell:                  ✓ transferable (sender→0xdEaD probe succeeded)
+  raw signal sum:                 0.300
+  static_conf (sigmoid):          0.388
+  D01 verdict: severity=Low confidence=0.388
+    rationale: bytecode contains: pause() selector, blacklist(address,bool) selector
+    NOTE: combines static bytecode-pattern grep with a live simulate-sell probe; rugs that revert on transfer with a non-balance reason are caught.
+
+[chain-adapter] calling find_contract_age(...) — binary-search eth_getCode (~24 RPC calls)
+== D10 launch_audit via binary-search eth_getCode ==
+  creation block:   6082465
+  creation time:    2018-08-03T19:28:24+00:00 (UNIX=1533324504)
+  age:              2825 days
+  D10 verdict: MATURE (>30d) (severity=Info, confidence=0.00)
+    rationale: contract age 2825 days — established, no fresh-launch signal
+
+[chain-adapter] calling probe_swap_volume(...) — getPair/getPool + eth_getLogs over 7200 blocks
+== D04 pump_dump via DEX swap-event scan ==
+  pool resolved:    0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc (UniswapV2)
+  scan window:      blocks 24978040..24985240 (7200 blocks)
+  total swaps:      1125
+  recent (last 300 blocks ≈ 1h):  144
+  D04 verdict: MEDIUM (elevated) (severity=Medium, confidence=0.50)
+    rationale: spike ratio 3.38× — elevated above trailing baseline
+
+== D03 holder_concentration via Transfer-log net-flow analysis ==
+  D03 verdict: UNKNOWN — RPC error: transport error: eth_getLogs HTTP error: error sending request for url (https://ethereum-rpc.publicnode.com/)
+
+====================================================================
+  TOKEN VERDICT — 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 on Ethereum
+====================================================================
+  composite verdict: CRITICAL  (confidence 0.90)
+  detectors fired:   5 of 12 (7 skipped — see gap below)
+
+  driving signals (highest first):
+        HIGH d06_mint_burn  conf 0.70  — mint() exists in bytecode AND owner (0xfcb19e6a322b27c06842a71e8c725399f049ae3a) is active → privileged caller can mint more supply (rug-prep capability)
+      MEDIUM d04_pump_dump  conf 0.50  — spike ratio 3.38× — elevated above trailing baseline
+      MEDIUM d02_ownable_owner  conf 0.40  — owner() = 0xfcb19e6a322b27c06842a71e8c725399f049ae3a → active EOA/contract can call privileged functions; verify against deployer + DAO label store before clearing
+
+  coverage gap (7 detector(s) skipped):
+    - d03_holder_concentration — RPC error during Transfer-log scan: transport error: eth_getLogs HTTP error: error sending request for url (https://ethereum-rpc.publicnode.com/)
+    - d05_wash_trading — needs Transfer log graph
+    - d08_sybil — needs cluster store
+    - d09_deployer_changepoint — needs deployer history
+    - d11_synchronized — needs Transfer log time bucketing
+    - d12_permit2_drainer — decoder shipped; needs log scan
+    - d13_sandwich_mev — decoder shipped; needs mempool
+
+  RECOMMENDATION: do not interact without manual review. Multiple high-confidence risk signals.

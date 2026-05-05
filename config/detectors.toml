@@ -1938,3 +1938,35 @@ value     = "config/known_bridges.toml"
 rationale = """Path to the bridge registry TOML file. Loaded once at startup via
               init::known_bridges::load_known_bridges. Falls back to empty registry if absent."""
 refs      = ["D14/bridge_drain_v1"]
+
+# ---------------------------------------------------------------------------
+# verdict_cache TTL — Sprint 26 (ADR 0007 §9.5)
+# ---------------------------------------------------------------------------
+# Per-detector cache TTL in minutes. Indexer computes `expires_at = now() + TTL`
+# at upsert. Hourly background task purges expired rows.
+#
+# Three TTL classes per ADR 0007 §9.5:
+#   - Fast-moving signals (5 min): D04 pump_dump, D05 wash_trading,
+#                                  D11 synchronized_activity, D13 sandwich_mev
+#   - Honeypot (15 min):           D01
+#   - Slow-moving signals (60 min): everything else
+#
+# Keys are config-side detector ids; the indexer maps them to runtime
+# `Detector::id()` constants at lookup time (see crates/detectors/src/{d01..d14}.rs
+# `DETECTOR_ID` constants).
+
+[verdict_cache.ttl_minutes]
+d01_honeypot_v1          = 15
+d02_rug_pull_v1          = 60
+d03_concentration_v1     = 60
+d04_pump_dump_v1         = 5
+d05_wash_trading_v1      = 5
+d06_mint_burn_v1         = 60
+d07_withdraw_withheld_v1 = 60
+d08_sybil_v1             = 60
+d09_bocpd_deployer_v1    = 60
+d10_launch_audit_v1      = 60
+d11_synchronized_v1      = 5
+d12_permit2_drainer_v1   = 60
+d13_sandwich_mev_v1      = 5
+d14_bridge_drain_v1      = 60

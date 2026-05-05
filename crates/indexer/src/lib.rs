@@ -54,8 +54,14 @@ pub mod reorg;
 pub mod router;
 pub mod shutdown;
 pub mod sink;
+/// On-demand trigger types for the pull-based query engine (ADR 0007).
+///
+/// Consumers that dispatch trigger_evaluate (REST handler T26-6, periodic scan workers)
+/// import from this module.
+pub mod trigger;
 
 pub use coordinator::{AdapterSlot, ChainHealth, CoordinatorError, MultiChainCoordinator};
+pub use trigger::{DetectorOutcome, EvaluationReason, IndexerTrigger, VerdictCacheConfig, VerdictSummary};
 
 use futures::StreamExt;
 use tracing::{debug, error, info, instrument, warn};

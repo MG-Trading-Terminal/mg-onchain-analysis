@@ -1,186 +1,136 @@
-# Session Kickoff — Sprint 23 CLOSED (Smart-money consumer integration) / Sprint 24 OPEN
+# Session Kickoff — Sprints 24+25 CLOSED (full ADR 0006 realization) / Sprint 26 OPEN (carry-forward backlog, no doctrinal blockers)
 
-**Read this first after session restart.** Sprint 23 closed 2026-04-25 single-session. **Smart-money consumer integration shipped** — S22 labels now flow into D04 P&D (UP +0.12/+0.07) + D08 Sybil (UP +0.10/+0.05) + D05 wash trading (NEUTRAL metadata-only). New `SmartMoneyLookup` trait + builder pattern Option backwards compat. Cross-detector enrichment loop closed. **1293 tests passing** (+34). **13 detectors** (D04+D05+D08 enhanced; count unchanged). **16 migrations**. **5 ADRs**. **23 design docs**. **Gotcha #3 (RA stale) now confirmed 21×**.
+**Read this first after session restart.** Sprints 24+25 closed 2026-04-27 same day. **ADR 0006 fully realized end-to-end.** Vendor SDK Cargo crates removed across both EVM (Sprint 24: alloy + reth-*) and Solana (Sprint 25: solana-sdk + yellowstone-grpc-client + yellowstone-grpc-proto). New in-tree stack: `crates/evm-types/`, `crates/evm-types-macros/`, `crates/chain-adapter/src/jsonrpc/`, `crates/yellowstone-proto/`, `crates/solana-types/`. `bridge/` directory was proposed in flight (design 0025) and rescinded same session by user "kludge test" principle — ADR 0006 amended same session as original sign-off. **Architecture uniformly "wire protocols only" across both chains.** 61 test groups workspace-clean. **6 ADRs** (0006 amended). **26 design docs** (0024 + 0025 SUPERSEDED, 0026 added).
 
 ## TL;DR
 
-Sprint 23 converted Sprint 22 labelling investment into measurable detector quality improvements. 3 detectors amplify based on smart-money labels: D04 catches mastermind buyers pre-pump (Perseus-anchored), D08 catches informed-coordinator Sybil clusters, D05 emits metadata for downstream consumer policy (genuine ambiguity, no confidence change). Builder pattern preserves backwards compat — existing `::new(thresholds)` callsites unchanged.
+Sprints 24+25 were a doctrinal+structural double-shipment with zero detector changes. User pushed back on the feature-flag-driven Reth ExEx plan ("если это наша разработка..."), conversation rapidly converged on extending ADR 0003 (no SaaS at runtime) into ADR 0006 (no vendor SDKs at compile time). All EVM-specific vendor crates ripped from main workspace and replaced by in-tree types + own JSON-RPC over WS client (Sprint 24). User then pushed further ("когда начинаются костыли..."), articulating the "kludge test" principle and rescinding the bridge concept itself (memory `feedback_kludge_test.md`); ADR 0006 amended same session, design 0025 (exex-bridge) SUPERSEDED before any code was written. Sprint 25 repurposed as Solana stack divestment — symmetric counterpart to Sprint 24's EVM divestment, applied to `solana-sdk` + `yellowstone-grpc-client` + `yellowstone-grpc-proto`. Architecture is now uniformly "wire protocols only" across both chains.
 
 ## First action on session start
 
-**Sprint 23 CLOSED. Sprint 24 OPEN.** User directive not yet locked.
+**Sprints 24+25 CLOSED. Sprint 26 OPEN with no doctrinal blockers.**
 
-**Option A (3rd EVM detector):**
-- Bridge-drain / EVM wash trading port (D05 → Ethereum) / Ethereum-honeypot variants
-- Pattern S12/S14/S18/S20: analyst → user sign-off → developer
-- ~1 sprint
-
-**Option B (Reth ExEx feature flag — OLDEST deferral, 7 sprints carry S17→S23):**
-- `cfg(feature = "exex")` + `ExExRpcClient` alternate impl
-- ~1 sprint, infrastructure-only
-
-**Option C (Token-2022 extensions):**
-- 4 sub-detectors × ~400 LOC: ConfidentialTransfer / NonTransferable / ScaledUiAmount / Pausable → D14-D17
-
-**Option D (Pump.fun graduation enrichment):**
-- ~300 LOC ship-small
-
-**Option E (Decimals exact-fetch — closes 3 S21 SPEC-NOTEs):**
-- D11/D12/D13 fetch exact decimals from `tokens` table
-
-**Option F (Observability hardening):**
-- OTLP exporter + live integration test (S19 + S20 deferred)
-
-**Option G (D13 pool coverage extension):**
-- Curve / Balancer / SushiSwap decoders
-
-**Option H (D13 mempool integration):**
-- Real-time pre-emption
-
-**Option I (Stage 2 FDR — Barras 2010):**
-- Only viable when ≥30-day live corpus available; data-blocked
-
-Recommended: **Option B (Reth ExEx)** is the OLDEST infrastructure deferral (7 sprints carry); each sprint without it adds drift. **Option A (3rd EVM detector)** keeps EVM detector momentum. **Option C (Token-2022)** ships 4 detectors at once for high feature density. Strategic balance shifts toward **infrastructure debt closure (B)** unless user wants more feature density.
+User picks a theme from the carry-forward backlog. There is NO architect spec drafted for Sprint 26 — the doctrine work is done.
 
 ```
 1. Read CLAUDE.md, ROADMAP.md.
-2. Read this file + memory/research_state.md + designs 0022 + 0023 (smart-money pipeline + consumer).
-3. Read CHANGELOG.md ## [Unreleased] Sprint 12-23 entries.
-4. Read SPRINTS.md Sprint 23 section.
-5. Pick A/B/C/D/E/F/G/H/I or propose different.
+2. Read this file + memory/research_state.md.
+3. Read docs/adr/0006-code-level-self-sovereignty.md AMENDMENT block at top (binding doctrine).
+4. User picks one of the carry-forward themes (see "Sprint 26 candidate themes" below).
+5. Dispatch onchain-analyst or architect (depending on theme) to draft a §11-style design doc.
+6. Sign off, then dispatch dev-agent.
 ```
 
-## What Sprint 23 shipped (single session)
+## What Sprints 24+25 shipped (single working day)
 
-### S23-1 Spec (onchain-analyst)
-- `docs/designs/0023-smart-money-consumer-integration.md`
-- 8 user-approved decisions: SmartMoneyLookup trait location / D04 deltas / D04 60-min window / D08 UPWARD / D05 NEUTRAL / per-eval batch load / 5-key evidence schema / builder pattern Option backwards compat
+### Doctrine
+- **ADR 0006 accepted then AMENDED same session 2026-04-27**: extends ADR 0003 runtime self-sovereignty into compile-time / Cargo dependencies. Vendor-curated SDK crates banned everywhere in the repository (not just service crates — bridge escape hatch closed). Allowed = language-level Rust libs + generic implementations of public specifications. Reference reading of vendor source allowed (license-permitting).
+- **Memory `feedback_kludge_test.md`** added: standard wire-protocol integration is OK; custom bridges/feature-flags/in-process linkage is a kludge that indicates a foundational architecture problem to be resolved by changing the architecture.
+- **Memory `feedback_track_latest_rust.md`** added: workspace `rust-version = "1.95"` (current stable); track-latest policy, no MSRV-conservatism for internal monorepo.
+- **Design 0025 (exex-bridge) SUPERSEDED** before any code was written. **Design 0026 (Solana divestment) accepted + implemented end-to-end.**
 
-### S23-2 SmartMoneyLookup trait (NEW `crates/graph/src/smart_money_lookup.rs`)
-- async trait + `GraphSmartMoneyLookup` impl + `MockSmartMoneyLookup` (test-utils gated)
-- Reads from `GraphLabelStore::addresses_with_label(LabelType::SmartMoney)` + parses tier from evidence JSON + filters expired
-- 7 unit tests
+### Implementation
+- **`crates/evm-types/` + `crates/evm-types-macros/`** (Sprint 24): in-tree EVM type stack (Address EIP-55, B256, U256/I256, ABI decoder, `event_signature!` proc-macro with compile-time keccak256). Replaces alloy.
+- **`crates/chain-adapter/src/jsonrpc/`** (Sprint 24 #5b): in-tree JSON-RPC 2.0 over WebSocket via `tokio-tungstenite`. Replaces `alloy::rpc::client::RpcClient`.
+- **`crates/yellowstone-proto/`** (Sprint 25 T25-1): vendored .proto from `rpcpool/yellowstone-grpc@v12.2.0+solana.3.1.13` + `tonic-prost-build = "0.14"` codegen. Replaces `yellowstone-grpc-client` + `yellowstone-grpc-proto`.
+- **`crates/solana-types/`** (Sprint 25 T25-2 + T25-5 ext): in-tree Solana type stack (Pubkey/Signature/Hash/Slot/Epoch + Keypair/Instruction/AccountMeta/Transaction with hand-rolled compact-u16 short-vec wire format). Replaces solana-sdk.
+- **All 5 service crates migrated**: chain-adapter / detectors / dex-adapter / token-registry / server. Tests preserved + augmented. Behaviour: identical.
 
-### S23-2 Shared amplifier helper (NEW `crates/detectors/src/smart_money_amplifier.rs`)
-- `TierCounts` + `intersect_tier_counts` — avoids duplication across D04/D08/D05
-- 6 unit tests
+### Inline fixups (caught by main session across both sprints)
+1. T25-2 test bug (45-char base58 → 45 zero bytes per leading-zero convention, not 33).
+2. T25-5 first-attempt agent rabbit-holed on `fewer-permission-prompts` skill; re-dispatched with anti-detour brief framing.
+3. T25-6 cross-crate type coupling (RawAccount.owner consumed in pool_accounts struct literals; design 0026 §4 audit had labelled tasks as independent but they were coupled through public struct field types).
+4. `mg_pubkey_to_sdk` test bridge cleanup (helper became unnecessary once both sides became `mg_solana_types::Pubkey`).
+5. Sub-agent #5a clippy-scope narrowing (Sprint 24); brief framing tightened.
 
-### S23-2 D04 amplification
-- Builder `with_smart_money()` + `fetch_pre_pump_buyers` helper
-- Step 5: Tier1 → +0.12 (capped per-event), Tier2 ≥2 wallets → +0.07, Tier3 → 0.00. 0.95 cap respected
-- 5-key evidence prefix `pump_dump_v1/`
-- 9 unit tests
+### Operational incident
+- **Disk-pressure during T25-5 verification**: target/ filled system disk to 100% causing tool-output capture failures. User ran `cargo clean` twice across the sprint. Mid-flight switch from `cargo build --workspace --all-targets` to `cargo check --workspace --all-targets` (no linker = ~10× lighter on disk).
 
-### S23-2 D08 amplification
-- Builder + Step 7 cluster intersection (Tier1=+0.10 / Tier2 ≥2=+0.05)
-- Coexists with existing GraphLabelStore (S11)
-- 6 unit tests
-
-### S23-2 D05 NEUTRAL
-- Builder + metadata-only emission (`delta=0.00` explicitly)
-- Confidence UNCHANGED regardless of smart-money presence
-- 3 unit tests assert invariance
-
-### S23-2 Production wiring
-- `init::detectors.rs` constructs `GraphSmartMoneyLookup` via `min_label_confidence` config
-- Injects via `with_smart_money(...)` builder for D04/D08/D05
-
-### Inline developer fixes (3, no main-session intervention)
-1. D04 `ctx.window.block_start` (BlockRef) → `ctx.window.start` (DateTime<Utc>)
-2. D08 `ctx.cluster_store` → `self.cluster_store` field
-3. Missing `min_label_confidence` in 4 places — added all
-
-### Cross-detector enrichment trail closed
-S22 smart-money labels → S23 SmartMoneyLookup trait → D04+D08 UP amplification + D05 NEUTRAL metadata. Labels actively improve signal-to-noise ratio.
-
-### Metrics
-- **1293 tests passing, 0 failed, 29 ignored** (+34 from 1259: 7 trait + 6 amplifier + 9 D04 + 6 D08 + 3 D05 + 3 fixture)
-- 13 detectors unchanged in count; D04+D05+D08 enhanced
-- 16 migrations unchanged
-- **22 → 23 design docs** (0023 added)
-- 5 ADRs unchanged
-- Workspace deps unchanged
+### Metrics (Sprints 24+25 combined)
+- ≈61 test result groups, 0 failed across the workspace
+- 13 detectors unchanged in count (D13 + D01 migrated off vendor SDKs; amplification from S23 preserved)
+- 16 migrations unchanged (next V00017)
+- **5 → 6 ADRs** (0006 added + amended)
+- **23 → 26 design docs** (0024 + 0025 SUPERSEDED, 0023 + 0026 added)
+- Workspace deps removed: 5 EVM (alloy + 4 reth-*) + 3 Solana (yellowstone-grpc-client + yellowstone-grpc-proto + solana-sdk) = **8 vendor SDK Cargo crates eliminated**
+- Workspace deps added: 8 generic-spec implementations (tiny-keccak / primitive-types / proc-macro2 / syn / quote / tokio-tungstenite / ed25519-dalek / sha2)
+- Net workspace dep delta: ~0 (vendor → generic-protocol/language-level swap)
+- Rust MSRV: **1.88 → 1.95** (track-latest policy)
 - Clippy `--workspace --all-targets -- -D warnings` clean
-- 1 RA-stale round, 6 phantom errors → gotcha #3 counter **21×**
-- Agent dispatches: 2 (1 spec + 1 impl; **NO timeout**)
+- ≈30 RA-stale rounds across both sprints (gotcha #3 ≈25× → ≈30×)
+- Sub-agent over-reports: 2 (S24 #5a + S25 T25-5 first-attempt)
+- Disk-full incidents: 1 (S25 T25-5 retry verification); resolved by user `cargo clean`
+- Agent dispatches: 12 dev + 2 architect = 14 across both sprints
 
-## Sprint 24 candidate tracks
+## Sprint 26 candidate themes (carry-forward backlog, no doctrinal blockers)
 
-### A — 3rd EVM detector
-1-3. Onchain-analyst spec → user sign-off → developer impl
+User picks one (or proposes a new one). All have outstanding spec or research tasks.
 
-### B — Reth ExEx feature flag (oldest deferral, 7 sprints)
-4. `cfg(feature = "exex")` + `ExExRpcClient`
+- **A. 3rd EVM detector** (bridge-drain / EVM wash trading port / Ethereum honeypot) — keeps EVM detector momentum
+- **B. Token-2022 extensions** (D14-D17 sub-detectors: ConfidentialTransfer / NonTransferable / ScaledUiAmount / Pausable, ~400 LOC each) — high feature density
+- **C. Pump.fun graduation enrichment** (~300 LOC ship-small)
+- **D. Decimals exact-fetch** (closes 3 SPEC-NOTEs from S21: D11/D12/D13 fetch exact decimals from `tokens` table)
+- **E. Observability hardening** (OTLP exporter wire-up + live integration test with testcontainers Postgres; both deferred from S19)
+- **F. D13 mempool integration** (real-time pre-emption, S20 Decision 8)
+- **G. D13 pool coverage extension** (Curve / Balancer / SushiSwap decoders, S20 Decision 2)
+- **H. eth_unsubscribe on Receiver drop + mid-stream WS reconnect** (Sprint 17 TODOs in chain-adapter/ethereum/jsonrpc)
+- **I. Cross-check test rename** (`*_topic0_matches_sol*` → drop "_sol", purely cosmetic; quick-win)
+- **J. SPL layout decoders** in `mg-solana-types` (deferred per design 0026 §11.6 minimal-first; needed if more Solana detectors arrive)
+- **K. Stage 2 FDR** (Barras 2010, corpus-blocked ≥30-day live data — only viable if corpus has matured since S22)
 
-### C — Token-2022 extensions
-5-8. ConfidentialTransfer / NonTransferable / ScaledUiAmount / Pausable
-
-### D — Pump.fun graduation enrichment
-9. T1-2 ship-small
-
-### E — Decimals exact-fetch (3 SPEC-NOTEs from S21)
-10. D11/D12/D13 fetch exact decimals from `tokens` table
-
-### F — Observability hardening
-11. OTLP exporter (env-gated)
-12. Live integration test (testcontainers + mock adapter)
-
-### G — D13 pool coverage extension
-13. Curve / Balancer / SushiSwap decoders
-
-### H — D13 mempool integration
-14. Real-time pre-emption
-
-### I — Stage 2 FDR (data-blocked)
-15. Barras 2010 FDR — only viable when ≥30-day live corpus
-
-## Sprint 24 exit criterion
-
-`cargo clippy --workspace --all-targets -- -D warnings` clean. At least ONE of A/B/C/D/E/F/G/H landed.
+Recommended cadence when re-engaging: ask user which consumer (bot-trader, custody, MM, exchange) has the highest current ROI signal, then pick the theme that maps to that consumer's needs.
 
 ## Sub-agent briefing
 
 ```
-Project: mg-onchain-analysis (Rust 2024, Sprint 24 OPEN after Sprint 23 smart-money consumer integration shipped).
+Project: mg-onchain-analysis (Rust 2024 edition; rust-version = "1.95"; track-latest stable; Sprint 26 OPEN with no doctrinal blockers).
+
 At session start, read:
   CLAUDE.md, ROADMAP.md, SESSION-KICKOFF.md,
-  docs/adr/0001-0005,
-  docs/designs/0001-0023 as relevant,
+  docs/adr/0001-0006 (esp. 0006 — code-level self-sovereignty doctrine, READ THE AMENDMENT BLOCK AT TOP),
+  docs/designs/0001-0026 as relevant (0024 + 0025 SUPERSEDED — historical context only),
   research/sprint13-b-citations.md (if smart-money / FDR),
-  CHANGELOG.md ## [Unreleased] (S9-S23).
+  CHANGELOG.md ## [Unreleased] (S9-S25).
+
 Storage Postgres 16 only. 16 migrations shipped (V00001-V00016); next is V00017.
-Self-sovereign infra (ADR 0003+0004) — no Helius/Alchemy/Infura/Chainalysis API/Scam-Sniffer API/Flashbots-Relay API/Nansen API in prod.
+Self-sovereign infra (ADR 0003) — no Helius/Alchemy/Infura/Chainalysis/Scam-Sniffer/Flashbots/Nansen API in prod.
+Self-sovereign code (ADR 0006, AMENDED) — no vendor SDK Cargo crates ANYWHERE in repository (bridge exception closed). Standard wire-protocol integration only.
 STANDALONE SERVICE ONLY: NO writes to consumer repos.
-13 detectors (D01-D13) + 1 background-task pipeline (smart-money). 11 Solana + 2 EVM. D04+D08+D05 amplified by smart-money labels (S23).
-Production binary `onchain-service` materialized S19. Boots clean: clap CLI + auto-migrate + signal handling + 30s drain.
-Workspace deps: alloy = "1.0", clap, toml, tokio-util, url, rust_decimal, statrs, async_trait + sqlx uuid feature.
+13 detectors (D01-D13) + 1 background-task pipeline (smart-money). 11 Solana + 2 EVM. D04+D08+D05 amplified by smart-money labels (S23). D13 migrated off alloy in S24. D01 migrated off solana-sdk in S25.
+Production binary `onchain-service` materialized S19. Boots clean: clap CLI + auto-migrate + signal handling + 30s drain. **No `onchain-reth` binary** (S24 wiped the feature-flag plan; S25 also rescinded the bridge plan).
+Workspace deps: tokio, clap, toml, tokio-util, url, rust_decimal, statrs, async_trait, sqlx (with uuid feature), reqwest, tokio-tungstenite, primitive-types, tiny-keccak, syn 2, quote, proc-macro2, ed25519-dalek, sha2, prost-types, tonic, prost. **Zero vendor SDK Cargo crates.**
+EVM stack in-tree: crates/evm-types/, crates/evm-types-macros/ (event_signature! proc-macro with compile-time keccak), crates/chain-adapter/src/jsonrpc/ (hand-rolled JSON-RPC 2.0 over tokio-tungstenite).
+Solana stack in-tree: crates/yellowstone-proto/ (vendored .proto + tonic-build), crates/solana-types/ (Pubkey/Signature/Hash/Slot/Epoch + Keypair/Instruction/AccountMeta/Transaction with hand-rolled Solana wire format).
 Detectors override `supported_chains()`. D12+D13 = `&[Chain::Ethereum]`; rest default `&[Chain::Solana]`.
 TokenPriceProvider in `crates/storage/src/price_provider.rs` (S21). WalletPnlCorpusStore in `crates/storage/src/wallet_pnl_corpus.rs` (S22). SmartMoneyLabeller in `crates/graph/src/smart_money.rs` (S22). SmartMoneyLookup in `crates/graph/src/smart_money_lookup.rs` (S23). SwapFetcher trait abstracts swaps reads.
-Reth ExEx is Sprint 24+ feature flag (7 sprints deferred — oldest carry).
-First non-Detector pipeline pattern shipped S22; first cross-detector enrichment trail S23.
-`cargo clippy --workspace --all-targets -- -D warnings` is the bar.
-RA stale 21× confirmed — `touch + cargo check` to verify after trait/module/feature changes.
-S18+S19+S20+S21+S22+S23 lesson: tighter agent briefs with explicit time-box + clear deferral list = no timeout. Builder pattern Option<...> backwards compat is reusable for cross-detector wirings.
+`cargo clippy --workspace --all-targets -- -D warnings` is the bar. **EMPHASIS for sub-agent briefs: workspace scope, NOT `-p` scope. Past gotcha #14 / S24-#5a + S25 T25-5 first-attempt recurrences.**
+RA stale ~30× confirmed — `touch + cargo check` to verify after trait/module/feature changes.
+Sub-agent rabbit-hole risk: do NOT invoke `fewer-permission-prompts` or any skill if a tool denies. Just retry with different command form. Brief framing must include explicit anti-detour wording at top.
+Disk-pressure risk for full `cargo build --workspace --all-targets` (heavy dev-deps testcontainers + bollard ~10 GB). Prefer `cargo check` for iterative verification; reserve `cargo build/test` for sprint-close gates.
+Inline fixup over second-agent dispatch when sub-agent gaps are small (≤7 file edits).
 ```
 
 ## Gotchas (high-signal subset)
 
 1. **`crates/common` FROZEN.**
-2. **Sub-agent clippy scope narrow.**
-3. **Rust-analyzer lag — 21× CONFIRMED.** S23 saw 6 phantom (BlockRef/TimeDelta sub mismatch on d04 — agent had ALREADY fixed via field accessor change). Pattern: type-mismatch fixes + new field additions = textbook trigger.
+2. **Sub-agent clippy scope narrow** — S24 #5a + S25 T25-5 recurrence. Brief MUST emphasise `--workspace` scope in CAPS.
+3. **Rust-analyzer lag — ~30× CONFIRMED.** S24+S25 saw many phantom rounds. Anytime Cargo.toml / dep-tree edits touch a build-graph node → expect ~30s RA lag. `touch + cargo check` clears.
 9. **Detector evidence keys prefixed by detector_id.** Smart-money labels prefixed `smart_money/`.
 13. **Docker-gated tests `#[ignore]`.**
-14. **Sub-agent over-reports clean state.**
+14. **Sub-agent over-reports clean state** — see #2.
 17. **Suppression policy** unchanged.
 21. **STANDALONE SERVICE ONLY.**
 22. **`Utc::now()` ban** — except documented batch-task exception (S22 #93).
-27. **Detector + ChainAdapter + TokenPriceProvider + WalletPnlCorpusStore + SwapFetcher + GraphLabelStore + SmartMoneyLookup — all dyn-compatible via `#[async_trait]` or ErasedX wrapper.**
+27. **Detector + ChainAdapter + TokenPriceProvider + WalletPnlCorpusStore + SwapFetcher + GraphLabelStore + SmartMoneyLookup — all dyn-compatible.**
 28. **`observed_at` from block_time** — except batch tasks.
 31. **Migrations:** V00001-V00016. Next is **V00017**.
 42. **Suppression by detector**: D08 NOT; D10 DOES; D11 NOT; D12 NOT; D13 hard-suppress on settlement allowlist.
-49. **(RESOLVED S19) Server-binary materialized.**
-58. **`alloy = "1.0"` is the EVM workspace dep.**
-59. **(S15→S23 deferred 7 sprints) Reth ExEx is Sprint 24+ feature flag.** Oldest accumulated deferral.
+58. **(S24 RESOLVED) `alloy` removed.** EVM types now from `mg-evm-types`.
+59. **(S24 WIPED + S25 RESCINDED) Reth ExEx**: feature-flag plan WIPED in S24; bridge plan RESCINDED in S25 (kludge-test). Reth runs as standard sibling node consumed via JSON-RPC + WS exclusively.
+60. **(NEW S25) `solana-sdk` removed.** Solana types now from `mg-solana-types`. Pubkey 32-byte base58, Signature 64-byte base58.
+61. **(NEW S25) `yellowstone-grpc-client/proto` removed.** Yellowstone client now generated by us via `tonic-prost-build` from vendored `crates/yellowstone-proto/proto/geyser.proto` (pinned to upstream tag `v12.2.0+solana.3.1.13`; re-vendor on protocol bumps).
+62. **(NEW S25) tonic 0.14 split**: codegen in separate `tonic-prost-build` crate; `ProstCodec` runtime in `tonic-prost`. Both pinned to 0.14.
+63. **(NEW S25) Solana wire format** is `mg_solana_types::wire::{encode_compact_u16,decode_compact_u16}` + `Transaction::serialize()`. Compact-u16 short-vec is the protocol-level length-prefix encoding (1-3 bytes, MSB-continuation).
 65. **`MultiChainCoordinator`** — multi-chain wrapper.
 67. **`Detector::supported_chains()` override** — D12+D13 = Ethereum; rest = Solana.
 77. **`crates/server/src/init/`** is production wiring entry.
@@ -188,31 +138,45 @@ S18+S19+S20+S21+S22+S23 lesson: tighter agent briefs with explicit time-box + cl
 81. **Graceful shutdown 30s drain** — smart-money JoinHandle joined to drain set.
 82. **D13 SettlementAllowlist HARD suppression.**
 86. **(S21 RESOLVED) Phase 5 USD enrichment for D11+D12+D13 closed via TokenPriceProvider.**
-87. **(S21 OPEN) Decimals defaults**: D11=9 / D12=18 / D13=propagation. Sprint 24+ exact-fetch.
+87. **(S21 OPEN) Decimals defaults**: D11=9 / D12=18 / D13=propagation. Sprint 26 carry-forward.
 89. **(S22) Smart-money labelling MVP** = first non-Detector pipeline.
-90. **(S22) `LabelType::SmartMoney`** already exists — reused without schema change.
+90. **(S22) `LabelType::SmartMoney`** already exists.
 91. **(S22) V00016 `wallet_pnl_corpus`** materialized + NOT partitioned.
-92. **(S22) Background-task spawn pattern** — periodic interval ticker + cancellation token + JoinHandle.
+92. **(S22) Background-task spawn pattern.**
 93. **(S22) Documented `Utc::now()` exception** for batch-task wall-clock window_end.
-94. **(S22) Heuristic annotation** `smart_money/heuristic_not_fdr_controlled = true` until Stage 2 unblocks.
-95. **(S22 OPEN) Stage 2 FDR** — config flag exists, implementation when corpus matures.
-96. **(NEW S23) `SmartMoneyLookup` trait** in `crates/graph/src/smart_money_lookup.rs`. `GraphSmartMoneyLookup` reads from `GraphLabelStore::addresses_with_label(LabelType::SmartMoney)`. Per-evaluation batch load (no TTL cache — label table small + changes only every 6h).
-97. **(NEW S23) D04 P&D smart-money amplification**: Tier1 → +0.12 (capped per-event, not per-wallet); Tier2 ≥2 wallets → +0.07; Tier3 → 0.00. Cap 0.95. Pre-pump window 60-min (Fantazzini 2023, configurable via `d04_pre_pump_window_minutes`).
-98. **(NEW S23) D08 Sybil smart-money amplification**: Tier1 → +0.10; Tier2 ≥2 → +0.05. Coexists with existing GraphLabelStore funding-source-label injection (S11).
-99. **(NEW S23) D05 wash trading NEUTRAL metadata**: `delta=0.00` always. Confidence unchanged. Documents deliberate no-change for downstream consumer policy. Genuine ambiguity (legit MM vs skilled wash) unresolvable without secondary signal.
-100. **(NEW S23) Builder pattern + `Option<Arc<dyn SmartMoneyLookup>>`** preserves backwards compat — existing `::new(thresholds)` callsites compile unchanged. `with_smart_money()` is opt-in injection. **Reusable template for future cross-detector wirings.**
-101. **(NEW S23) Standardized 5-key evidence schema** for amplifying detectors: `{detector_id}/smart_money_present`, `tier1_count`, `tier2_count`, `tier3_count`, `amplification_delta`. Mirror this when adding more amplifiers.
+94. **(S22) Heuristic annotation** `smart_money/heuristic_not_fdr_controlled = true`.
+95. **(S22 OPEN) Stage 2 FDR.**
+96. **(S23) `SmartMoneyLookup` trait** in `crates/graph/src/smart_money_lookup.rs`.
+97. **(S23) D04 P&D smart-money amplification**: Tier1 → +0.12; Tier2 ≥2 wallets → +0.07; Tier3 → 0.00. Cap 0.95. Pre-pump window 60-min (Fantazzini 2023).
+98. **(S23) D08 Sybil smart-money amplification**: Tier1 → +0.10; Tier2 ≥2 → +0.05.
+99. **(S23) D05 wash trading NEUTRAL metadata**: `delta=0.00` always.
+100. **(S23) Builder pattern + `Option<Arc<dyn SmartMoneyLookup>>`** preserves backwards compat.
+101. **(S23) Standardized 5-key evidence schema** for amplifying detectors.
+102. **(S24) ADR 0006 binding** — vendor SDK crates banned in service crates; AMENDMENT 2026-04-27 closes the bridge escape hatch (no bridges anywhere without a new ADR).
+103. **(S24) `crates/evm-types/`** is the EVM type/decoder home.
+104. **(S24) `crates/evm-types-macros/`** owns the `event_signature!` proc-macro with compile-time keccak256.
+105. **(S24) `crates/chain-adapter/src/jsonrpc/`** owns the in-tree JSON-RPC 2.0 over WebSocket client.
+106. **(S24) Rust MSRV = 1.95** (current stable). Track-latest policy per memory `feedback_track_latest_rust.md`.
+107. **(S24) Reference reading of vendor source allowed** — license-permitting, MIT/Apache OK to derive with `// reference: <crate>::<symbol> (<license>)` attribution. AGPL conceptual-only.
+108. **(NEW S25) `crates/yellowstone-proto/`** owns the vendored Geyser proto + tonic-build-generated client. Pinned to tag `v12.2.0+solana.3.1.13`. Re-vendor on Yellowstone protocol bumps.
+109. **(NEW S25) `crates/solana-types/`** owns Pubkey/Signature/Hash/Slot/Epoch + Keypair/Instruction/AccountMeta/Transaction. SPL layout decoders deferred to Sprint 26 per design 0026 §11.6.
+110. **(NEW S25) Memory `feedback_kludge_test.md`** is binding doctrine: standard wire-protocol integration is OK; bridges/feature-flags/in-process linkage is a kludge to be resolved by changing architecture, not by sanctioning the kludge.
+111. **(NEW S25) Sub-agent rabbit-hole pattern**: when dev-agent hits any tool-denial, they sometimes pivot to invoking `fewer-permission-prompts` skill or trying to edit `.claude/settings.json` instead of doing the work. Brief framing must include explicit anti-detour wording at the top: "tools work, do NOT invoke skills, do NOT edit settings.json, just do the migration." Reference Sprint 25 T25-5 first-attempt for the recurring failure mode.
+112. **(NEW S25) Disk-pressure risk** for `cargo build --workspace --all-targets`: testcontainers + bollard add ~10 GB to `target/`, can fill the system disk. Prefer `cargo check` during iterative verification; reserve full build/test for sprint-close gates.
 
-## Production posture as of Sprint 23
+## Production posture as of Sprints 24+25 close
 
 - Single binary `onchain-service` boots cleanly
 - 13 detectors registered (12 streaming + D10 hook-only) + 1 background-task pipeline (smart-money 6h batch)
 - 11 Solana + 2 EVM detectors
-- D04+D08 UP-amplified by smart-money labels; D05 emits NEUTRAL metadata
+- D04 P&D + D08 Sybil + D05 wash trading consume smart-money labels (D04+D08 UP amplification, D05 NEUTRAL metadata)
+- Ethereum path: in-tree `JsonRpcClient` over `tokio-tungstenite` + in-tree `event_signature!`-generated event decoders + `mg-evm-types` primitives
+- Solana path: in-tree `tonic`-generated Yellowstone gRPC client over our `crates/yellowstone-proto/` + in-tree `mg-solana-types` primitives + hand-rolled Solana wire format
 - 16 migrations auto-apply unless `--no-migrate`
-- Default config: Solana on, Ethereum off, smart-money enabled (heuristic-tier labels emitted + consumed by D04/D08/D05)
+- Default config: Solana on, Ethereum off, smart-money enabled
 - SIGTERM/SIGINT triggers 30s drain → exit 0
+- **Zero vendor SDK Cargo crates anywhere in the workspace** (verified `grep -rn "use alloy\|alloy::\|use solana_sdk\|solana_sdk::\|use yellowstone_grpc\|yellowstone_grpc_\|reth_" crates/ --include="*.rs"` returns only `///`/`//!` doc-comments and `// reference:` attribution)
 
-## When Sprint 24 closes
+## When Sprint 26 closes
 
-Rewrite this file as Sprint 25 kickoff.
+Rewrite this file as Sprint 27 kickoff. Sprint 27 candidate themes will reflect what Sprint 26 decided to ship vs defer; the carry-forward backlog above is the starting menu.

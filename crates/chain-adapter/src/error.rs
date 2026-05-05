@@ -20,22 +20,21 @@ use thiserror::Error;
 #[derive(Debug, Error)]
 pub enum AdapterError {
     // --- Connectivity ---
-    /// A gRPC status error from tonic (server returned a non-OK status).
-    #[error("gRPC status error: {0}")]
-    Transport(#[from] tonic::Status),
+    /// A WebSocket or HTTP transport error (connection dropped, timeout, etc.).
+    /// Triggers the reconnect loop in `reconnect.rs`.
+    #[error("transport error: {0}")]
+    Transport(String),
 
-    /// A gRPC transport/connection error from the Yellowstone client.
-    ///
-    /// `GeyserGrpcClientError` has two variants: `TonicStatus` and `TransportError`.
-    /// Both are wrapped here to keep the reconnect logic simple.
-    #[error("Yellowstone gRPC client error: {0}")]
+    /// A JSON-RPC or WebSocket client error (request-level, not stream-level).
+    /// Treated as reconnectable: callers should apply backoff and retry.
+    #[error("JSON-RPC client error: {0}")]
     GrpcClient(String),
 
     /// The underlying stream ended unexpectedly (server-side close without error).
-    #[error("gRPC stream ended unexpectedly (slot={slot})")]
+    #[error("stream ended unexpectedly (slot={slot})")]
     StreamEnded { slot: u64 },
 
-    /// Provider returned a rate-limit response (HTTP 429 or gRPC `RESOURCE_EXHAUSTED`).
+    /// Provider returned a rate-limit response (HTTP 429 or equivalent).
     ///
     /// The reconnect loop applies `reconnect_policy.rate_limit_base_ms` × 2^attempts backoff
     /// instead of the normal `base_delay_ms` × 2^attempts to avoid hammering the endpoint.
@@ -43,11 +42,10 @@ pub enum AdapterError {
     RateLimit { slot: u64 },
 
     // --- Decoding ---
-    /// A required proto field was absent from the update message.
+    /// A required field was absent from the response payload.
     ///
-    /// Yellowstone protos use `optional` liberally; callers must handle absent fields.
     /// This error causes the single event to be skipped; the stream continues.
-    #[error("missing required proto field '{field}' in {context}")]
+    #[error("missing required field '{field}' in {context}")]
     MissingField {
         field: &'static str,
         context: &'static str,
@@ -122,13 +120,6 @@ impl AdapterError {
 
     /// Returns `true` if this is a rate-limit error (needs extended backoff).
     pub fn is_rate_limit(&self) -> bool {
-        if let AdapterError::RateLimit { .. } = self {
-            return true;
-        }
-        // Also detect via tonic Status code
-        if let AdapterError::Transport(status) = self {
-            return status.code() == tonic::Code::ResourceExhausted;
-        }
-        false
+        matches!(self, AdapterError::RateLimit { .. })
     }
 }

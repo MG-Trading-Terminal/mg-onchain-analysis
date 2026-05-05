@@ -17,13 +17,8 @@
 //! discarded after simulation. `simulateTransaction` with
 //! `sig_verify: false, replace_recent_blockhash: true` accepts them regardless.
 
+use mg_solana_types::{AccountMeta, Instruction, Keypair, Pubkey};
 use sha2::{Digest, Sha256};
-use solana_sdk::instruction::{AccountMeta, Instruction};
-use solana_sdk::pubkey::Pubkey;
-use solana_sdk::signature::Keypair;
-// `SeedDerivable` provides `Keypair::from_seed`. In solana-sdk 4 it lives in
-// `solana_seed_derivable` and is re-exported via `solana_sdk::signer`.
-use solana_sdk::signer::SeedDerivable;
 
 // ---------------------------------------------------------------------------
 // ComputeBudget helper (hand-rolled — no solana-compute-budget-interface dep)
@@ -292,12 +287,9 @@ pub fn derive_simulation_keypair(token: &Pubkey, pool: &Pubkey, path_index: u8) 
     hasher.update([path_index]);
     let hash: [u8; 32] = hasher.finalize().into();
 
-    // Expand the 32-byte seed to a 64-byte ed25519 key material via
-    // `SeedDerivable::from_seed`. Re-exported in solana-sdk 4 from
-    // `solana_seed_derivable` — the canonical path that avoids pulling in
-    // ed25519-dalek directly.
-    Keypair::from_seed(&hash)
-        .expect("SHA-256 output is always a valid 32-byte seed for ed25519")
+    // Construct the keypair from the 32-byte seed.
+    // mg_solana_types::Keypair::from_seed_bytes wraps ed25519_dalek::SigningKey::from_bytes.
+    Keypair::from_seed_bytes(&hash)
 }
 
 // ---------------------------------------------------------------------------
@@ -307,7 +299,6 @@ pub fn derive_simulation_keypair(token: &Pubkey, pool: &Pubkey, path_index: u8) 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use solana_sdk::signer::Signer;
 
     fn token() -> Pubkey {
         Pubkey::new_from_array([0xAA; 32])
