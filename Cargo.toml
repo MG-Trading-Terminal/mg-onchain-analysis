@@ -28,8 +28,8 @@ edition       = "2024"
 # every 6 weeks → bump this in lockstep. Any `rustup update` run by the user is the
 # trigger to bump. As of Sprint 24 (2026-04-27) latest stable is 1.95.
 rust-version  = "1.95"
-license       = "UNLICENSED"
-repository    = "https://github.com/meatgrinder/mg-onchain-analysis"
+license       = "MIT"
+repository    = "https://github.com/MG-Trading-Terminal/mg-onchain-analysis"
 
 [workspace.dependencies]
 tokio             = { version = "1", features = ["full"] }

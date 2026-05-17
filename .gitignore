@@ -1,5 +1,4 @@
 /target
-Cargo.lock
 *.swp
 .DS_Store
 .env
@@ -11,3 +10,9 @@ Cargo.lock
 /.claude/worktrees/
 /logs/
 *.log
+
+# Runtime checkpoint files (config: ./checkpoints/<chain>.json)
+/checkpoints/
+
+# Stray test output
+.test_out.txt

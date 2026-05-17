@@ -1,0 +1,25 @@
+# Code Owners — default reviewers for the repository.
+# Replace @iZonex with a team handle (e.g. @MG-Trading-Terminal/onchain)
+# once the org team exists.
+
+# Default owner for everything.
+*                       @iZonex
+
+# Detector logic — a wrong verdict has direct financial impact on consumers.
+crates/detectors/       @iZonex
+crates/scoring/         @iZonex
+
+# Threshold configuration — every number must be justified in REFERENCES.md.
+config/                 @iZonex
+REFERENCES.md           @iZonex
+
+# Database schema — migrations are append-only and need review.
+migrations/             @iZonex
+
+# Public API surface consumed by four sibling systems.
+crates/gateway/         @iZonex
+crates/client-sdk/      @iZonex
+
+# CI / build / deployment.
+.github/                @iZonex
+infra/                  @iZonex
