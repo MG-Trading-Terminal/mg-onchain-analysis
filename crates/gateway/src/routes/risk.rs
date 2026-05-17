@@ -175,6 +175,7 @@ fn reconstruct_events(
                 BlockRef::new(chain, row.window_end_height as u64),
             ),
             ingested_at: row.ingested_at,
+            oak_technique_id: row.oak_technique_id.clone(),
         });
     }
     Ok(events)

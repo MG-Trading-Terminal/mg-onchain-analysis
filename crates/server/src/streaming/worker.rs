@@ -316,7 +316,14 @@ impl SchedulerWorker {
             )
             .await;
 
-            if let Some(events) = events_opt {
+            if let Some(mut events) = events_opt {
+                // Auto-populate OAK technique ID from the detector if the
+                // detector didn't set one during evaluation.
+                if let Some(tid) = det.oak_technique_id() {
+                    for e in &mut events {
+                        e.oak_technique_id.get_or_insert_with(|| tid.to_owned());
+                    }
+                }
                 let confidence: f32 = events
                     .iter()
                     .map(|e| e.confidence.value() as f32)

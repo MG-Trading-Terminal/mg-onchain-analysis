@@ -560,6 +560,10 @@ impl crate::detector::Detector for D12PermitDrainerDetector {
         DETECTOR_ID
     }
 
+    fn oak_technique_id(&self) -> Option<&str> {
+        Some("OAK-T4.001") // Permit2 Signature-Based Authority Misuse
+    }
+
     fn severity_floor(&self) -> Severity {
         Severity::Medium
     }
@@ -880,6 +884,7 @@ impl D12PermitDrainerDetector {
                 severity,
                 evidence,
                 observed_at: ctx.observed_at,
+                oak_technique_id: None,
                 ingested_at: ctx.observed_at,
                 window: (ctx.window.block_start, ctx.window.block_end),
             };

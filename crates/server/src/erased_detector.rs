@@ -68,6 +68,9 @@ pub trait ErasedDetector: Send + Sync {
     /// ADR 0005 Decision 2.
     fn supported_chains(&self) -> &[Chain];
 
+    /// OAK Technique ID — mirrors `Detector::oak_technique_id()`.
+    fn oak_technique_id(&self) -> Option<&str>;
+
     /// Evaluate and return a boxed, `Send` future.
     ///
     /// The `+ Send` bound on the returned future is required so that
@@ -90,6 +93,10 @@ where
 
     fn supported_chains(&self) -> &[Chain] {
         Detector::supported_chains(self)
+    }
+
+    fn oak_technique_id(&self) -> Option<&str> {
+        Detector::oak_technique_id(self)
     }
 
     fn evaluate_erased<'ctx>(&'ctx self, ctx: &'ctx DetectorContext<'ctx>) -> DetectorFuture<'ctx> {

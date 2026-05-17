@@ -898,6 +898,10 @@ impl crate::detector::Detector for D13SandwichMevDetector {
         DETECTOR_ID
     }
 
+    fn oak_technique_id(&self) -> Option<&str> {
+        Some("OAK-T5.004") // Sandwich / MEV Extraction
+    }
+
     fn severity_floor(&self) -> Severity {
         Severity::Medium
     }
@@ -1187,6 +1191,7 @@ LIMIT 5000
                 severity,
                 evidence,
                 observed_at: ctx.observed_at, // block_time, NEVER Utc::now() (gotcha #22)
+                oak_technique_id: None,
                 ingested_at: ctx.observed_at,  // set to observed_at per C1 fix (context.rs)
                 window: (ctx.window.block_start, ctx.window.block_end),
             };

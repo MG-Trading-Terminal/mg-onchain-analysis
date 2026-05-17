@@ -318,12 +318,13 @@ pub struct AnomalyEventRow {
     pub confidence: f64,
     pub severity: String,
     pub evidence: serde_json::Value,
+    pub oak_technique_id: Option<String>,
 }
 
 impl AnomalyEventRow {
     /// Serialize to a JSON value for the REST API response.
     pub fn to_json_value(&self) -> serde_json::Value {
-        serde_json::json!({
+        let mut v = serde_json::json!({
             "detectorId": self.detector_id,
             "token": self.token,
             "chain": self.chain,
@@ -337,7 +338,11 @@ impl AnomalyEventRow {
                 { "chain": self.chain, "height": self.window_end_height }
             ],
             "_id": self.id,
-        })
+        });
+        if let Some(ref tid) = self.oak_technique_id {
+            v["oakTechniqueId"] = serde_json::Value::String(tid.clone());
+        }
+        v
     }
 }
 
@@ -1708,9 +1713,9 @@ impl PgStore {
                     observed_at, ingested_at,
                     window_start_height, window_end_height,
                     confidence, severity,
-                    evidence, emitted_by
+                    evidence, emitted_by, oak_technique_id
                    )
-                   VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)"#,
+                   VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)"#,
             )
             .bind(a.chain.as_str())
             .bind(a.token.as_str())
@@ -1723,6 +1728,7 @@ impl PgStore {
             .bind(format!("{:?}", a.severity).to_lowercase())
             .bind(sqlx::types::Json(evidence_json))
             .bind(emitted_by)
+            .bind(&a.oak_technique_id)
             .execute(&self.pool)
             .await?;
         }
@@ -3124,7 +3130,7 @@ WHERE chain = $1
             SELECT id, chain, token, detector_id,
                    observed_at, ingested_at,
                    window_start_height, window_end_height,
-                   confidence, severity, evidence
+                   confidence, severity, evidence, oak_technique_id
             FROM anomaly_events
             WHERE ($1::TEXT IS NULL OR chain = $1)
               AND ($2::TEXT IS NULL OR token = $2)
@@ -3174,6 +3180,7 @@ WHERE chain = $1
             let evidence: serde_json::Value = row.try_get::<sqlx::types::Json<serde_json::Value>, _>("evidence")
                 .map(|j| j.0)
                 .map_err(StorageError::Postgres)?;
+            let oak_technique_id: Option<String> = row.try_get("oak_technique_id").ok();
 
             result.push(AnomalyEventRow {
                 id,
@@ -3187,6 +3194,7 @@ WHERE chain = $1
                 confidence,
                 severity: severity_str,
                 evidence,
+                oak_technique_id,
             });
         }
 

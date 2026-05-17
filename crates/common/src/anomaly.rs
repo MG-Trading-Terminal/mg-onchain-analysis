@@ -263,6 +263,13 @@ pub struct AnomalyEvent {
     /// and does not affect detector reproducibility — two runs of the same block
     /// range will differ in `ingested_at` but not in any other field.
     pub ingested_at: DateTime<Utc>,
+
+    /// OAK Technique ID that this detector covers (e.g. `"OAK-T1.006"`).
+    ///
+    /// Set by the detector via [`Detector::oak_technique_id`]. When `None`, the
+    /// event has not yet been mapped to the OAK taxonomy.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub oak_technique_id: Option<String>,
 }
 
 // ---------------------------------------------------------------------------

@@ -115,4 +115,18 @@ pub trait Detector: Send + Sync {
     fn supported_chains(&self) -> &[Chain] {
         &[Chain::Solana]
     }
+
+    /// Return the OAK Technique ID that this detector covers.
+    ///
+    /// Used to auto-populate the `oak_technique_id` field on every
+    /// [`AnomalyEvent`] emitted by this detector. When a detector covers
+    /// multiple techniques, return the primary one; the evidence bundle
+    /// can carry additional technique tags.
+    ///
+    /// # Default
+    ///
+    /// Returns `None` — the detector has not been mapped to the OAK taxonomy.
+    fn oak_technique_id(&self) -> Option<&str> {
+        None
+    }
 }

@@ -161,6 +161,10 @@ impl Detector for MintBurnAnomalyDetector {
         DETECTOR_ID
     }
 
+    fn oak_technique_id(&self) -> Option<&str> {
+        Some("OAK-T5.003") // Hidden-Mint Dilution
+    }
+
     fn severity_floor(&self) -> Severity {
         Severity::Info
     }
@@ -458,6 +462,7 @@ pub fn compute_signal_a<'ctx>(
         evidence,
         observed_at: ctx.window.end,
         window: (ctx.window.block_start, ctx.window.block_end),
+        oak_technique_id: None,
         ingested_at: ctx.observed_at,
     })
 }
@@ -624,6 +629,7 @@ pub fn compute_signal_b_events<'ctx>(
                 evidence: ev,
                 observed_at: ctx.window.end,
                 window: (ctx.window.block_start, ctx.window.block_end),
+                oak_technique_id: None,
                 ingested_at: ctx.observed_at,
             })
         })
@@ -728,6 +734,7 @@ pub fn compute_signal_c<'ctx>(
         evidence: ev,
         observed_at: ctx.window.end,
         window: (ctx.window.block_start, ctx.window.block_end),
+        oak_technique_id: None,
         ingested_at: ctx.observed_at,
     })
 }

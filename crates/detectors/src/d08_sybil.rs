@@ -161,6 +161,10 @@ impl crate::detector::Detector for D08SybilDetector {
         DETECTOR_ID
     }
 
+    fn oak_technique_id(&self) -> Option<&str> {
+        Some("OAK-T3.001") // Sybil-Bundled Launch
+    }
+
     fn severity_floor(&self) -> Severity {
         Severity::Low
     }
@@ -424,6 +428,7 @@ impl crate::detector::Detector for D08SybilDetector {
                 severity: final_severity,
                 evidence,
                 observed_at: ctx.observed_at,
+                oak_technique_id: None,
                 ingested_at: ctx.observed_at,
                 window: (ctx.window.block_start, ctx.window.block_end),
             };

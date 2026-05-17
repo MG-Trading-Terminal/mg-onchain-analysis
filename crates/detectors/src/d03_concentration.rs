@@ -159,6 +159,10 @@ impl Detector for ConcentrationDetector {
         DETECTOR_ID
     }
 
+    fn oak_technique_id(&self) -> Option<&str> {
+        Some("OAK-T3.006") // Insider Multi-Vector Supply Extraction
+    }
+
     fn severity_floor(&self) -> Severity {
         Severity::Info
     }
@@ -671,6 +675,7 @@ fn make_event(
         evidence,
         observed_at: ctx.window.end,
         window: (ctx.window.block_start, ctx.window.block_end),
+        oak_technique_id: None,
         ingested_at: ctx.observed_at,
     }
 }

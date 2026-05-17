@@ -427,6 +427,10 @@ impl crate::detector::Detector for D14BridgeDrainDetector {
         DETECTOR_ID
     }
 
+    fn oak_technique_id(&self) -> Option<&str> {
+        Some("OAK-T10.004") // Optimistic-Bridge Fraud-Proof Gap
+    }
+
     fn severity_floor(&self) -> Severity {
         // Tier1 no-amplifier base = 0.85 → Critical. Floor is High (Tier2).
         Severity::High
@@ -614,6 +618,7 @@ impl crate::detector::Detector for D14BridgeDrainDetector {
                     severity,
                     evidence,
                     observed_at: ctx.observed_at,
+                    oak_technique_id: None,
                     ingested_at: ctx.observed_at,
                     window: (ctx.window.block_start, ctx.window.block_end),
                 };

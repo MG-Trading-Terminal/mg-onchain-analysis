@@ -100,6 +100,7 @@ use mg_onchain_graph::labels::{GraphLabelStore, LabelType};
 use mg_onchain_graph::typed_edges::{EdgeType, TypedEdgeStore};
 
 use crate::context::DetectorContext;
+use crate::detector::Detector;
 use crate::error::DetectorError;
 use crate::signals::{severity_from_confidence, sigmoid};
 
@@ -1305,6 +1306,7 @@ impl D09BocpdDetector {
             observed_at,
             ingested_at: observed_at,
             window: (block_start, block_end),
+            oak_technique_id: self.oak_technique_id().map(String::from),
         };
 
         Ok(event)
@@ -1318,6 +1320,10 @@ impl D09BocpdDetector {
 impl crate::detector::Detector for D09BocpdDetector {
     fn id(&self) -> &'static str {
         DETECTOR_ID
+    }
+
+    fn oak_technique_id(&self) -> Option<&str> {
+        Some("OAK-T8.001") // Common-Funder Cluster Reuse
     }
 
     fn severity_floor(&self) -> Severity {

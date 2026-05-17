@@ -257,6 +257,10 @@ impl Detector for HoneypotDetector {
         DETECTOR_ID
     }
 
+    fn oak_technique_id(&self) -> Option<&str> {
+        Some("OAK-T1.006") // Honeypot-by-Design
+    }
+
     /// The minimum severity this detector emits (DG5 resolution).
     ///
     /// Returns `Severity::Info` — the real severity is computed dynamically from
@@ -431,6 +435,7 @@ impl Detector for HoneypotDetector {
             // C1 fix: ctx.observed_at is set once per batch by the caller (scheduler /
             // on-demand handler). Using Utc::now() here broke determinism — two evaluations
             // of the same input differed in ingested_at. See context.rs doc comment.
+            oak_technique_id: None,
             ingested_at: ctx.observed_at,
         };
 
@@ -657,6 +662,7 @@ impl HoneypotDetector {
             evidence,
             observed_at: ctx.window.end,
             window: (ctx.window.block_start, ctx.window.block_end),
+            oak_technique_id: None,
             ingested_at: ctx.observed_at,
         };
 

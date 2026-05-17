@@ -112,6 +112,10 @@ impl crate::detector::Detector for D11SynchronizedActivityDetector {
         DETECTOR_ID
     }
 
+    fn oak_technique_id(&self) -> Option<&str> {
+        Some("OAK-T3.003") // Coordinated Pump-and-Dump
+    }
+
     fn severity_floor(&self) -> Severity {
         Severity::Low
     }
@@ -539,6 +543,7 @@ impl crate::detector::Detector for D11SynchronizedActivityDetector {
                     severity,
                     evidence,
                     observed_at: ctx.observed_at,
+                    oak_technique_id: None,
                     ingested_at: ctx.observed_at,
                     window: (ctx.window.block_start, ctx.window.block_end),
                 };

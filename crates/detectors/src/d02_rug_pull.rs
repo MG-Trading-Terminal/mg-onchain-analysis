@@ -267,6 +267,10 @@ impl Detector for RugPullDetector {
         DETECTOR_ID
     }
 
+    fn oak_technique_id(&self) -> Option<&str> {
+        Some("OAK-T5.001") // Hard LP Drain
+    }
+
     /// The minimum severity this detector emits.
     ///
     /// Returns `Severity::Info` — real severity is computed from confidence.
@@ -1422,6 +1426,7 @@ fn make_event(
         evidence,
         observed_at: ctx.window.end,
         window: (ctx.window.block_start, ctx.window.block_end),
+        oak_technique_id: None,
         ingested_at: ctx.observed_at,
     }
 }

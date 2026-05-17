@@ -364,6 +364,7 @@ pub fn build_launch_audit_event(
         observed_at,
         ingested_at: observed_at,
         window: (window_ref, window_ref),
+        oak_technique_id: Some("OAK-T2.001".to_owned()), // Single-Sided Liquidity Plant
     })
 }
 
@@ -599,6 +600,10 @@ impl D10LaunchAuditDetector {
 impl crate::detector::Detector for D10LaunchAuditDetector {
     fn id(&self) -> &'static str {
         DETECTOR_ID
+    }
+
+    fn oak_technique_id(&self) -> Option<&str> {
+        Some("OAK-T2.001") // Single-Sided Liquidity Plant
     }
 
     fn severity_floor(&self) -> Severity {

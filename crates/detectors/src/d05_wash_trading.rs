@@ -226,6 +226,10 @@ impl Detector for WashTradingDetector {
         DETECTOR_ID
     }
 
+    fn oak_technique_id(&self) -> Option<&str> {
+        Some("OAK-T3.002") // Wash-Trade Volume Inflation
+    }
+
     fn severity_floor(&self) -> Severity {
         Severity::Info
     }
@@ -1014,6 +1018,7 @@ fn make_event(
         evidence,
         observed_at: ctx.window.end,
         window: (ctx.window.block_start, ctx.window.block_end),
+        oak_technique_id: None,
         ingested_at: ctx.observed_at, // C1 fix: use ctx.observed_at, NOT Utc::now()
     }
 }
